@@ -2,9 +2,6 @@ package com.virtualdisk.coordinator;
 
 
 import com.virtualdisk.network.*;
-import com.virtualdisk.util.*;
-
-import java.lang.*;
 import java.util.*;
 
 public class Coordinator

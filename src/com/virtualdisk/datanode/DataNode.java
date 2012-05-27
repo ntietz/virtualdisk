@@ -61,7 +61,7 @@ public class DataNode
         for (int index = 0; index < driveHandles.length; ++index)
         {
             Range startingFreeSpace = new Range(0, driveSizes[index]-1);
-            List current = new ArrayList<Range>();
+            List<Range> current = new ArrayList<Range>();
             current.add(startingFreeSpace);
             freeSpaceTable.add(index, current);
         }
