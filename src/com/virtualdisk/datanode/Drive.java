@@ -30,7 +30,7 @@ public class Drive
         return handle;
     }
 
-    public Boolean write(long physicalOffset, byte[] block)
+    public boolean write(long physicalOffset, byte[] block)
     {
         try
         {

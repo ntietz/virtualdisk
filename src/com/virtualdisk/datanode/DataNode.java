@@ -250,6 +250,11 @@ public class DataNode
     {
         volumeTable.setPhysicalLocation(volumeId, logicalOffset, location);
     }
+    
+    public long totalFreeSpace()
+    {
+        return freeSpaceTable.totalFreeSpace();
+    }
 }
 
 

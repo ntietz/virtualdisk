@@ -116,7 +116,7 @@ public class DataNodeTest
 
             assertArrayEquals("Did not return correct data.", data, datanode.read(1, index));
         }
-        Integer calculatedSpaceLeft = 10 + 20 + 30 - 40 - 5;
+        long calculatedSpaceLeft = 10 + 20 + 30 - 40 - 5;
         assertEquals("Free space should match.", calculatedSpaceLeft, datanode.totalFreeSpace());
 
         // write enough blocks to fill all the HDDs, read them, verify them
