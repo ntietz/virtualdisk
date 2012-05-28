@@ -1,30 +1,26 @@
 package com.virtualdisk.datanode;
-import com.virtualdisk.util.Range;
-
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.util.List;
-import java.util.ArrayList;
 
 public class Drive
 {
-    protected Integer blockSize;
-    protected Integer driveSize;
+    protected int blockSize;
+    protected int driveSize;
     protected String handle;
 
-    public Drive(Integer bs, Integer ds, String h)
+    public Drive(int bs, int ds, String h)
     {
         blockSize = bs;
         driveSize = ds;
         handle = h;
     }
 
-    public Integer getBlockSize()
+    public int getBlockSize()
     {
         return blockSize;
     }
 
-    public Integer getDriveSize()
+    public int getDriveSize()
     {
         return driveSize;
     }
@@ -34,7 +30,7 @@ public class Drive
         return handle;
     }
 
-    public Boolean write(Integer physicalOffset, byte[] block)
+    public Boolean write(int physicalOffset, byte[] block)
     {
         try
         {
@@ -56,7 +52,7 @@ public class Drive
         return true;
     }
 
-    public byte[] read(Integer physicalOffset)
+    public byte[] read(int physicalOffset)
     {
         byte[] block = new byte[blockSize];
 

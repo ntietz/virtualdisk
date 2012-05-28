@@ -2,24 +2,23 @@ package com.virtualdisk.util;
 
 public class DriveOffsetPair
 {
-    protected Integer driveNumber;
-    protected Integer offset;
+    protected int driveNumber;
+    protected long offset;
 
-    public DriveOffsetPair(Integer d, Integer o)
+    public DriveOffsetPair(int d, long o)
     {
         driveNumber = d;
         offset = o;
     }
 
-    public Integer getDriveNumber()
+    public int getDriveNumber()
     {
         return driveNumber;
     }
 
-    public Integer getOffset()
+    public long getOffset()
     {
         return offset;
     }
 
 }
-
