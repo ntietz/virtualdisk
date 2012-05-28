@@ -5,10 +5,10 @@ import java.io.RandomAccessFile;
 public class Drive
 {
     protected int blockSize;
-    protected int driveSize;
+    protected long driveSize;
     protected String handle;
 
-    public Drive(int bs, int ds, String h)
+    public Drive(int bs, long ds, String h)
     {
         blockSize = bs;
         driveSize = ds;
@@ -20,7 +20,7 @@ public class Drive
         return blockSize;
     }
 
-    public int getDriveSize()
+    public long getDriveSize()
     {
         return driveSize;
     }
@@ -30,7 +30,7 @@ public class Drive
         return handle;
     }
 
-    public Boolean write(int physicalOffset, byte[] block)
+    public Boolean write(long physicalOffset, byte[] block)
     {
         try
         {
@@ -38,9 +38,7 @@ public class Drive
             RandomAccessFile out = new RandomAccessFile(f, "rw");
 
             out.seek(physicalOffset * blockSize);
-
             out.write(block);
-
             out.close();
         }
         catch (Exception e)
@@ -52,7 +50,7 @@ public class Drive
         return true;
     }
 
-    public byte[] read(int physicalOffset)
+    public byte[] read(long physicalOffset)
     {
         byte[] block = new byte[blockSize];
 
@@ -62,9 +60,7 @@ public class Drive
             RandomAccessFile in = new RandomAccessFile(f, "r");
 
             in.seek(physicalOffset * blockSize);
-
             in.read(block);
-
             in.close();
         }
         catch (Exception e)

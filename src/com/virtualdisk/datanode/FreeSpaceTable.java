@@ -55,7 +55,7 @@ public class FreeSpaceTable
      * @param location  the disk location we are checking to see if is free
      * @return          true if the location is free, false if it is in use
      */
-    public boolean free(DriveOffsetPair location)
+    public boolean isFree(DriveOffsetPair location)
     {
         List<Range> driveTable = table.get(location.getDriveNumber());
         
@@ -140,5 +140,22 @@ public class FreeSpaceTable
         
         return true;
     }
-    
+
+    /**
+     * @return  the total number of free blocks the FreeSpaceTable describes
+     */
+    public long totalFreeSpace()
+    {
+        long freeSpace = 0;
+        
+        for (List<Range> drive : table)
+        {
+            for (Range range : drive)
+            {
+                freeSpace += (range.getEnd() - range.getBegin()) + 1;
+            }
+        }
+        
+        return freeSpace;
+    }
 }
