@@ -6,16 +6,16 @@ import java.util.*;
 
 public class Coordinator
 {
-    protected Integer blockSize;
-    protected Integer segmentSize;
-    protected Integer segmentGroupSize;
-    protected Integer quorumSize;
+    protected int blockSize;
+    protected int segmentSize;
+    protected int segmentGroupSize;
+    protected int quorumSize;
 
     protected List<DataNodeIdentifier> datanodes;
 
     protected PriorityQueue<DataNodeStatusPair> datanodeStatuses;
     protected List<SegmentGroup> segmentGroupList;
-    protected Map<Integer,Map<Integer,SegmentGroup>> volumeTable;
+    protected Map<Integer,Map<Long,SegmentGroup>> volumeTable;
     protected Date lastTimestamp;
 
     protected Queue<WriteHandler> writeHandlers;
