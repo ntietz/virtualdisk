@@ -12,7 +12,7 @@ public class TestFile
     public static void createFile(Drive drive)
     throws FileNotFoundException, IOException
     {
-        byte[] emptyBlock = new byte[drive.getBlockSize()];
+        byte[] emptyBlock = TestFile.emptyBlock(drive.getBlockSize());
         
         // initialize the empty block
         for (int index = 0; index < drive.getBlockSize(); ++index)
@@ -31,6 +31,19 @@ public class TestFile
         {
             out.write(emptyBlock);
         }
+    }
+    
+    public static byte[] emptyBlock(int blockSize)
+    {
+        byte[] emptyBlock = new byte[blockSize];
+        
+        // initialize the empty block
+        for (int index = 0; index < blockSize; ++index)
+        {
+            emptyBlock[index] = 0;
+        }
+        
+        return emptyBlock;
     }
     
     public static void deleteFile(Drive drive)

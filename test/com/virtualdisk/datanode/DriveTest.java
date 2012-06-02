@@ -6,11 +6,13 @@ import com.virtualdisk.util.*;
 
 import org.junit.*;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
 public class DriveTest
 {
+    public static final int seed = 2012;
+    
     @Test
     public void testGetters()
     {
@@ -37,7 +39,40 @@ public class DriveTest
         
         TestFile.createFile(drive);
         
-        fail("Not yet implemented");
+        Random random = new Random(seed);
+        Random confirmRandom = new Random(seed);
+        
+        for (int index = 0; index < driveSize; ++index)
+        {
+            byte[] block = new byte[blockSize];
+            random.nextBytes(block);
+            
+            drive.write(index, block);
+        }
+        
+        for (int index = 0; index < driveSize; ++index)
+        {
+            byte[] expectedBlock = new byte[blockSize];
+            confirmRandom.nextBytes(expectedBlock);
+            
+            byte[] readBlock = drive.read(index);
+            
+            assertArrayEquals("Block values should match.", expectedBlock, readBlock);
+        }
+        
+        TestFile.deleteFile(drive);
+        
+        for (int index = 0; index < driveSize; ++index)
+        {
+            assertNull("Read should fail", drive.read(index));
+        }
+        
+        File dir = new File(drive.getHandle());
+        dir.mkdir();
+        
+        assertFalse("Write should fail", drive.write(0, new byte[drive.getBlockSize()]));
+        
+        dir.delete();
     }
 
     @AfterClass

@@ -43,7 +43,7 @@ public class Drive
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
 
@@ -65,7 +65,7 @@ public class Drive
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         }
 
