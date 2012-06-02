@@ -3,14 +3,14 @@ package com.virtualdisk.network;
 public class DataNodeStatus
 {
 
-    protected Integer blockSizeInBytes;
-    protected Integer segmentSizeInBlocks;
-    protected Integer driveCapacityInSegments;
+    protected int blockSizeInBytes;
+    protected int segmentSizeInBlocks;
+    protected int driveCapacityInSegments;
 
-    protected Integer segmentsStored;
-    protected Float percentFull;
+    protected long segmentsStored;
+    protected float percentFull;
 
-    public DataNodeStatus(Integer bs, Integer ss)
+    public DataNodeStatus(int bs, int ss)
     {
         blockSizeInBytes = bs;
         segmentSizeInBlocks = ss;
@@ -18,12 +18,12 @@ public class DataNodeStatus
         segmentsStored = 0;
     }
 
-    public Integer getSegmentsStored()
+    public long getSegmentsStored()
     {
         return segmentsStored;
     }
 
-    public void addStoredSegments(Integer numberNewSegments)
+    public void addStoredSegments(int numberNewSegments)
     {
         segmentsStored += numberNewSegments;
     }

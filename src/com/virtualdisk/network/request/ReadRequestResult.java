@@ -1,23 +1,21 @@
-package com.virtualdisk.network;
+package com.virtualdisk.network.request;
+import com.virtualdisk.network.Sendable;
+
 import java.util.Date;
 
 public class ReadRequestResult
-implements RequestResult, Sendable
+extends RequestResult
+implements Sendable
 {
-    protected boolean completed = false;
     protected byte[] result = null;
     protected Date timestamp = null;
 
-    public ReadRequestResult(boolean c, byte[] r, Date ts)
+    public ReadRequestResult(boolean c, boolean s, byte[] r, Date ts)
     {
         completed = c;
+        successful = s;
         result = r;
         timestamp = ts;
-    }
-
-    public boolean completed()
-    {
-        return completed;
     }
 
     public byte messageType()

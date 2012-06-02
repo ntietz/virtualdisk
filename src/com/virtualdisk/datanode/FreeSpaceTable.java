@@ -21,7 +21,7 @@ public class FreeSpaceTable
         
         for (int drive = 0; drive < numberOfDrives; ++drive)
         {
-            Range wholeDrive = new Range(0, driveSize.get(drive));
+            Range wholeDrive = new Range(0, driveSize.get(drive)-1);
             List<Range> driveSpace = new ArrayList<Range>();
             driveSpace.add(wholeDrive);
             table.add(driveSpace);

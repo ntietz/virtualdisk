@@ -1,29 +1,20 @@
 package com.virtualdisk.coordinator;
 
-import com.virtualdisk.network.*;
+import com.virtualdisk.network.request.ReadRequestResult;
 
 import java.util.*;
 
 /*
  * This class handles read requests.
  */
-public class ReadHandler extends Thread
+public class ReadHandler extends Handler
 {
-    private boolean finished = false;
     private byte[] result = null;
-    private boolean paused = true;
-
-    private int requestId;
-
-    private Integer volumeId;
-    private Integer logicalOffset;
-
-    private Coordinator coordinator;
 
     /*
      * Constructor takes in volume ID and logical offset to configure the read request.
      */
-    public ReadHandler(Integer vid, Integer lo, Coordinator c)
+    public ReadHandler(int vid, long lo, Coordinator c)
     {
         volumeId = vid;
         logicalOffset = lo;
@@ -39,64 +30,11 @@ public class ReadHandler extends Thread
     }
 
     /*
-     * This method returns the finished status of the handler.
-     */
-    public boolean getFinished()
-    {
-        return finished;
-    }
-
-    /*
      * This method returns the result of the read request.
      */
     public byte[] getResult()
     {
         return result;
-    }
-
-    /*
-     * This method is used to set the request ID for the read request.
-     */
-    public void setRequestId(int id)
-    {
-        requestId = id;
-    }
-
-    /*
-     * This method is used to get the request ID for the read request.
-     */
-    public int getRequestId()
-    {
-        return requestId;
-    }
-
-    /*
-     * This method is used to check whether the handler's execution is paused or not.
-     */
-    public boolean isPaused()
-    {
-        return paused;
-    }
-
-    /*
-     * This method sets the appropriate flags and then pauses the execution of the thread.
-     * The thread will resume execution when the notify method is used.
-     */
-    private void pause()
-    {
-        paused = true;
-        try
-        {
-            synchronized(this)
-            {
-                wait();
-            }
-        }
-        catch (Throwable t)
-        {
-            //...
-        }
-        paused = false;
     }
 
     /*
@@ -111,7 +49,7 @@ public class ReadHandler extends Thread
 
         pause();
 
-        Integer orderId = coordinator.server.issueReadRequest(targets, volumeId, logicalOffset);
+        int orderId = coordinator.server.issueReadRequest(targets, volumeId, logicalOffset);
 
         boolean waiting = true;
         boolean success = false;
@@ -121,7 +59,7 @@ public class ReadHandler extends Thread
         while (waiting)
         {
             List<ReadRequestResult> results = coordinator.server.getReadRequestResults(orderId);
-            Integer completed = 0;
+            int completed = 0;
             Date timestamp = null;
 
             for (ReadRequestResult each : results)
@@ -159,11 +97,15 @@ public class ReadHandler extends Thread
                 }
                 else
                 {
-                    Integer id = coordinator.write(volumeId, logicalOffset, value);
+                    int id = coordinator.write(volumeId, logicalOffset, value);
                     while (!coordinator.writeCompleted(id))
                     {
                         pause();
                     }
+                    
+                    boolean writeSuccess = coordinator.writeResult(id);
+                    timestampsMatch = writeSuccess;
+                    success = writeSuccess;
                 }
             }
             else

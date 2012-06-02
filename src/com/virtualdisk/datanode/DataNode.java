@@ -2,16 +2,9 @@ package com.virtualdisk.datanode;
 
 import com.virtualdisk.datanode.Drive;
 import com.virtualdisk.util.DriveOffsetPair;
-import com.virtualdisk.util.Range;
-
-import java.util.Map;
 import java.util.List;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Collection;
-import java.io.RandomAccessFile;
-import java.io.File;
 import java.util.ArrayList;
 
 public class DataNode
@@ -79,7 +72,7 @@ public class DataNode
     {
         volumeTable.addVolume(volumeId);
         orderTimestampTable.addVolume(volumeId);
-        valueTimestampTable.removeVolume(volumeId);
+        valueTimestampTable.addVolume(volumeId);
     }
 
     /*
@@ -146,9 +139,19 @@ public class DataNode
 
         //TODO: add exception-checking for the correct length of data (block size)
 
-        Date orderTimestamp = getOrderTimestamp(volumeId, logicalOffset);
-        Date valueTimestamp = getValueTimestamp(volumeId, logicalOffset);
-
+        Date orderTimestamp = null;
+        Date valueTimestamp = null;
+        
+        try
+        {
+            orderTimestamp = getOrderTimestamp(volumeId, logicalOffset);
+            valueTimestamp = getValueTimestamp(volumeId, logicalOffset);
+        }
+        catch (NullPointerException npe)
+        {
+            return false;
+        }
+        
         if (orderTimestamp == null)
         {
             return false; // you cannot write if an ordering has not been performed
@@ -176,6 +179,7 @@ public class DataNode
             }
 
             setValueTimestamp(volumeId, logicalOffset, timestamp);
+            freeSpaceTable.claim(location);
 
             return drives.get(location.getDriveNumber()).write(location.getOffset(), block);
         }
@@ -191,7 +195,16 @@ public class DataNode
      */
     public byte[] read(int volumeId, long logicalOffset)
     {
-        DriveOffsetPair physicalOffset = getDriveOffsetPair(volumeId, logicalOffset);
+        DriveOffsetPair physicalOffset = null;
+        
+        try
+        {
+            physicalOffset = getDriveOffsetPair(volumeId, logicalOffset);
+        }
+        catch (NullPointerException npe)
+        {
+            return null;
+        }
 
         if (physicalOffset == null)
         {

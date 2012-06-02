@@ -42,14 +42,14 @@ public class HandlerManager extends Thread
                     // block until it pauses
                 }
 
-                if (!currentWriter.getFinished())
+                if (!currentWriter.isFinished())
                 {
                     coordinator.writeHandlers.offer(currentWriter);
                 }
                 else
                 {
-                    coordinator.requestCompletionMap.put(currentWriter.getRequestId(), true);
                     coordinator.writeResultMap.put(currentWriter.getRequestId(), currentWriter.getResult());
+                    coordinator.requestCompletionMap.put(currentWriter.getRequestId(), true);
                 }
             }
 
@@ -67,14 +67,14 @@ public class HandlerManager extends Thread
                     // block until it pauses
                 }
 
-                if (!currentReader.getFinished())
+                if (!currentReader.isFinished())
                 {
                     coordinator.readHandlers.offer(currentReader);
                 }
                 else
                 {
-                    coordinator.requestCompletionMap.put(currentReader.getRequestId(), true);
                     coordinator.readResultMap.put(currentReader.getRequestId(), currentReader.getResult());
+                    coordinator.requestCompletionMap.put(currentReader.getRequestId(), true);
                 }
             }
         }

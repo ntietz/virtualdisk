@@ -1,8 +1,8 @@
 package com.virtualdisk.coordinator;
 
-
 import com.virtualdisk.network.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 public class Coordinator
 {
@@ -13,7 +13,7 @@ public class Coordinator
 
     protected List<DataNodeIdentifier> datanodes;
 
-    protected PriorityQueue<DataNodeStatusPair> datanodeStatuses;
+    protected PriorityBlockingQueue<DataNodeStatusPair> datanodeStatuses;
     protected List<SegmentGroup> segmentGroupList;
     protected Map<Integer,Map<Long,SegmentGroup>> volumeTable;
     protected Date lastTimestamp;
@@ -34,10 +34,10 @@ public class Coordinator
     /*
      * This constructor initializes all the necessary information for the coordinator.
      */
-    public Coordinator( Integer bs
-                      , Integer ss
-                      , Integer sgs
-                      , Integer qs
+    public Coordinator( int bs
+                      , int ss
+                      , int sgs
+                      , int qs
                       , List<DataNodeIdentifier> initialNodes
                       , NetworkServer s
                       )
@@ -49,29 +49,27 @@ public class Coordinator
 
         server = s;
 
-        datanodes = new ArrayList<DataNodeIdentifier>(initialNodes);
-        datanodeStatuses = new PriorityQueue<DataNodeStatusPair>();
+        datanodes = Collections.synchronizedList(new ArrayList<DataNodeIdentifier>(initialNodes));
+        datanodeStatuses = new PriorityBlockingQueue<DataNodeStatusPair>();
         for (DataNodeIdentifier each : datanodes)
         {
             DataNodeStatus status = new DataNodeStatus(blockSize, segmentSize);
-
             DataNodeStatusPair pair = new DataNodeStatusPair(each, status);
-
             datanodeStatuses.add(pair);
         }
 
-        segmentGroupList = new ArrayList<SegmentGroup>();
+        segmentGroupList = Collections.synchronizedList(new ArrayList<SegmentGroup>());
 
-        volumeTable = new HashMap<Integer,Map<Integer,SegmentGroup>>();
+        volumeTable = new ConcurrentHashMap<Integer,Map<Long,SegmentGroup>>();
 
         lastTimestamp = new Date(0);
 
-        writeHandlers = new LinkedList<WriteHandler>();
-        readHandlers = new LinkedList<ReadHandler>();
+        writeHandlers = new ConcurrentLinkedQueue<WriteHandler>();
+        readHandlers = new ConcurrentLinkedQueue<ReadHandler>();
 
-        requestCompletionMap = new HashMap<Integer, Boolean>();
-        writeResultMap = new HashMap<Integer, Boolean>();
-        readResultMap = new HashMap<Integer, byte[]>();
+        requestCompletionMap = new ConcurrentHashMap<Integer, Boolean>();
+        writeResultMap = new ConcurrentHashMap<Integer, Boolean>();
+        readResultMap = new ConcurrentHashMap<Integer, byte[]>();
 
         handlerManager = new HandlerManager(this);
         handlerManager.start();
@@ -80,7 +78,7 @@ public class Coordinator
     /*
      * This method creates a new logical volume within the coordinator.
      */
-    public Boolean createVolume(Integer volumeId)
+    public boolean createVolume(int volumeId)
     {
         if (volumeTable.get(volumeId) != null)
         {
@@ -88,10 +86,10 @@ public class Coordinator
         }
         else
         {
-            Map<Integer,SegmentGroup> volumeMap = new HashMap<Integer,SegmentGroup>();
+            Map<Long,SegmentGroup> volumeMap = new ConcurrentHashMap<Long,SegmentGroup>();
             volumeTable.put(volumeId, volumeMap);
 
-            // TODO: put network handling in here, make this create volume create it on all the nodes
+            server.issueVolumeCreationRequest(volumeId);
 
             return true;
         }
@@ -100,13 +98,13 @@ public class Coordinator
     /*
      * This method deletes a logical volume within the coordinator.
      */
-    public Boolean deleteVolume(Integer volumeId)
+    public boolean deleteVolume(int volumeId)
     {
         if (volumeTable.get(volumeId) != null)
         {
             volumeTable.remove(volumeId);
 
-            // TODO: put network handling in here, make this deleve volume delete it on all the nodes
+            server.issueVolumeDeletionRequest(volumeId);
 
             return true;
         }
@@ -128,7 +126,7 @@ public class Coordinator
     /*
      * Initiates the write request and returns the request's ID.
      */
-    public Integer write(Integer volumeId, Integer logicalOffset, byte[] block)
+    public int write(int volumeId, long logicalOffset, byte[] block)
     {
         int id = generateNewRequestId();
 
@@ -159,9 +157,8 @@ public class Coordinator
 
     /*
      * This method fetches the result of the write request (success or failure).
-     * Returns null if it has not finished.
      */
-    public Boolean writeResult(Integer requestId)
+    public boolean writeResult(int requestId)
     {
         return writeResultMap.get(requestId);
     }
@@ -169,7 +166,7 @@ public class Coordinator
     /*
      * This method initiates a read request for the given volume ID and logical offset and returns its request ID.
      */
-    public Integer read(Integer volumeId, Integer logicalOffset)
+    public int read(int volumeId, long logicalOffset)
     {
         int id = generateNewRequestId();
 
@@ -185,7 +182,7 @@ public class Coordinator
     /*
      * This method returns whether or not the specified read request has completed.
      */
-    public Boolean readCompleted(Integer requestId)
+    public boolean readCompleted(Integer requestId)
     {
         Boolean finished = requestCompletionMap.get(requestId);
         if (finished)
@@ -207,22 +204,22 @@ public class Coordinator
     }
 
     // TODO: IMPLEMENT LATER
-    public Boolean addDataNode(DataNodeIdentifier node)
+    public boolean addDataNode(DataNodeIdentifier node)
     {
-        return null;
+        return false;
     }
 
     // TODO: IMPLEMENT LATER
-    public Boolean removeDataNode(DataNodeIdentifier node)
+    public boolean removeDataNode(DataNodeIdentifier node)
     {
-        return null;
+        return false;
     }
 
     /*
      * This method returns the segment group for a volumeId and logical offset.
      * If the volumeId and logical offset pair do not have a segment group, it will be assigned.
      */
-    protected SegmentGroup getSegmentGroup(Integer volumeId, Integer logicalOffset)
+    protected SegmentGroup getSegmentGroup(int volumeId, long logicalOffset)
     {
         SegmentGroup segmentgroup = volumeTable.get(volumeId).get(logicalOffset);
 
@@ -238,7 +235,7 @@ public class Coordinator
      * This method takes a volumeId and logical offset and assigns that pair a segment group.
      * It generates the segment group based off which nodes have the lightest load.
      */
-    protected SegmentGroup assignSegmentGroup(Integer volumeId, Integer logicalOffset)
+    protected SegmentGroup assignSegmentGroup(int volumeId, long logicalOffset)
     {
         SegmentGroup segmentgroup = volumeTable.get(volumeId).get(logicalOffset);
 
@@ -248,8 +245,8 @@ public class Coordinator
         }
         else
         {
-            List<DataNodeStatusPair> segmentGroupMemberPairs = new ArrayList<DataNodeStatusPair>(segmentGroupSize);
-            List<DataNodeIdentifier> segmentGroupMembers = new ArrayList<DataNodeIdentifier>(segmentGroupSize);
+            List<DataNodeStatusPair> segmentGroupMemberPairs = Collections.synchronizedList(new ArrayList<DataNodeStatusPair>(segmentGroupSize));
+            List<DataNodeIdentifier> segmentGroupMembers = Collections.synchronizedList(new ArrayList<DataNodeIdentifier>(segmentGroupSize));
 
             for (int index = 0; index < segmentGroupSize; ++index)
             {

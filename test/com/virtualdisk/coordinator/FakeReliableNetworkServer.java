@@ -5,6 +5,9 @@ import com.virtualdisk.coordinator.NetworkServer;
 import com.virtualdisk.coordinator.SegmentGroup;
 import com.virtualdisk.datanode.*;
 import com.virtualdisk.network.*;
+import com.virtualdisk.network.request.OrderRequestResult;
+import com.virtualdisk.network.request.ReadRequestResult;
+import com.virtualdisk.network.request.WriteRequestResult;
 
 import java.util.*;
 import java.io.*;
@@ -97,7 +100,7 @@ public class FakeReliableNetworkServer implements NetworkServer
             byte[] value = node.read(volumeId, logicalOffset);
             Date ts = node.getValueTimestamp(volumeId, logicalOffset);
 
-            ReadRequestResult result = new ReadRequestResult(true, value, ts);
+            ReadRequestResult result = new ReadRequestResult(true, true, value, ts);
             results.add(result);
         }
 
@@ -162,7 +165,7 @@ public class FakeReliableNetworkServer implements NetworkServer
      * Each virtual disk is named "fakedrive.nodeNumber.driveNumber". The disks are intialized to all 0s.
      * After the nodes and disks are created, the nodes and node identifiers are assigned for the network server to use.
      */
-    public List<DataNodeIdentifier> generateDataNodes(Integer numberOfNodes, Integer blockSize, Integer driveSizeInBlocks, Integer disksPerNode)
+    public List<DataNodeIdentifier> generateDataNodes(int numberOfNodes, int blockSize, long driveSizeInBlocks, int disksPerNode)
     throws IOException
     {
         List<DataNodeIdentifier> ids = new ArrayList<DataNodeIdentifier>(numberOfNodes);
@@ -175,11 +178,11 @@ public class FakeReliableNetworkServer implements NetworkServer
         for (int index = 0; index < numberOfNodes; ++index)
         {
             String[] handles = new String[disksPerNode];
-            Integer[] sizes = new Integer[disksPerNode];
+            Long[] sizes = new Long[disksPerNode];
             for (int loc = 0; loc < disksPerNode; ++loc)
             {
                 handles[loc] = "data/fakedrive." + (Integer.toString(index)) + "." + (Integer.toString(loc));
-                sizes[loc] = disksPerNode;
+                sizes[loc] = driveSizeInBlocks;
 
                 File f = new File(handles[loc]);
                 RandomAccessFile out = new RandomAccessFile(f, "rw");
@@ -191,7 +194,7 @@ public class FakeReliableNetworkServer implements NetworkServer
             }
 
             DataNodeIdentifier currentId = new DataNodeIdentifier(index, Integer.toString(index));
-            DataNode current = new DataNode(blockSize, handles, sizes);
+            DataNode current = new DataNode(blockSize, Arrays.asList(handles), Arrays.asList(sizes));
 
             ids.add(index, currentId);
             nodes.add(index, current);

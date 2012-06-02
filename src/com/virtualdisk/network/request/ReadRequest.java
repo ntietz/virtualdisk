@@ -1,24 +1,23 @@
-package com.virtualdisk.network;
+package com.virtualdisk.network.request;
 
-import java.util.*;
+import com.virtualdisk.network.Sendable;
 
-public class OrderRequest
-implements Request, Sendable
+public class ReadRequest
+extends Request
+implements Sendable
 {
     private int volumeId;
     private int logicalOffset;
-    private Date timestamp;
 
-    public OrderRequest(int v, int l, Date t)
+    public ReadRequest(int v, int l)
     {
         volumeId = v;
         logicalOffset = l;
-        timestamp = t;
     }
 
     public byte messageType()
     {
-        return Sendable.orderRequest;
+        return Sendable.readRequest;
     }
 
     public int getVolumeId()
@@ -29,11 +28,6 @@ implements Request, Sendable
     public int getLogicalOffset()
     {
         return logicalOffset;
-    }
-
-    public Date getTimestamp()
-    {
-        return timestamp;
     }
 }
 

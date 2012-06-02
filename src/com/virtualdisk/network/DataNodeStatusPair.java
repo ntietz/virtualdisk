@@ -20,7 +20,7 @@ public class DataNodeStatusPair implements Comparable<DataNodeStatusPair>
      */
     public int compareTo(DataNodeStatusPair other)
     {
-        int difference = status.getSegmentsStored() - other.getStatus().getSegmentsStored();
+        long difference = status.getSegmentsStored() - other.getStatus().getSegmentsStored();
 
         if (difference < 0)
         {

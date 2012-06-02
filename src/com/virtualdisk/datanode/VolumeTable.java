@@ -15,7 +15,10 @@ public class VolumeTable
     /**
      * Default empty constructor.
      */
-    public VolumeTable() { }
+    public VolumeTable()
+    {
+        table = new HashMap<Integer, Map<Long, DriveOffsetPair>>();
+    }
     
     /**
      * @param volumeId  the volume id we wish to add a diskmap for

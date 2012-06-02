@@ -1,5 +1,9 @@
 package com.virtualdisk.network;
 
+import com.virtualdisk.network.request.OrderRequestResult;
+import com.virtualdisk.network.request.ReadRequestResult;
+import com.virtualdisk.network.request.WriteRequestResult;
+
 import org.jboss.netty.channel.*;
 
 public class CoordinatorHandler

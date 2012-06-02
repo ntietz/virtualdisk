@@ -2,16 +2,16 @@ package com.virtualdisk.network;
 
 public class DataNodeIdentifier
 {
-    protected Integer nodeId;
+    protected int nodeId;
     protected String nodeAddress;
 
-    public DataNodeIdentifier(Integer id, String address)
+    public DataNodeIdentifier(int id, String address)
     {
         nodeId = id;
         nodeAddress = address;
     }
 
-    public Integer getNodeId()
+    public int getNodeId()
     {
         return nodeId;
     }
@@ -32,13 +32,13 @@ public class DataNodeIdentifier
             return false;
         }
         DataNodeIdentifier that = (DataNodeIdentifier)pThat;
-        return (  (nodeId.equals(that.getNodeId()))
+        return (  (nodeId == that.getNodeId())
                && (nodeAddress.equals(that.getNodeAddress())));
     }
 
     public int hashCode()
     {
-        return (nodeId.hashCode()/2 + nodeAddress.hashCode()/2);
+        return nodeId + nodeAddress.hashCode();
     }
 }
 

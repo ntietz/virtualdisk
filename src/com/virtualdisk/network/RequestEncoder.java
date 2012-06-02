@@ -1,5 +1,12 @@
 package com.virtualdisk.network;
 
+import com.virtualdisk.network.request.OrderRequest;
+import com.virtualdisk.network.request.OrderRequestResult;
+import com.virtualdisk.network.request.ReadRequest;
+import com.virtualdisk.network.request.ReadRequestResult;
+import com.virtualdisk.network.request.WriteRequest;
+import com.virtualdisk.network.request.WriteRequestResult;
+
 import org.jboss.netty.channel.*;
 import org.jboss.netty.buffer.*;
 import org.jboss.netty.handler.codec.oneone.*;
