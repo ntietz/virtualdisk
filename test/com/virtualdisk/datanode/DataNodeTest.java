@@ -1,18 +1,17 @@
 package com.virtualdisk.datanode;
-import com.virtualdisk.datanode.DataNode;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Random;
-import java.io.File;
-import java.io.RandomAccessFile;
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class DataNodeTest
 {
-
+    
+    @Test
+    public void test()
+    {
+        fail("Not yet implemented");
+    }
+/*
     private static final int blockSize = 8;
     private static final Long[] driveSizes = {10L, 20L, 30L};
     private static final String[] handles = {"data/fakedrive1", "data/fakedrive2", "data/fakedrive3"};
@@ -144,5 +143,6 @@ public class DataNodeTest
         assertEquals("Incorrect free space.", calculatedSpaceLeft, datanode.totalFreeSpace());
 
     }
+*/
 }
 
