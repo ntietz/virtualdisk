@@ -1,24 +1,37 @@
 package com.virtualdisk.datanode;
 
-import org.junit.*;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 public class DataNodeTest
 {
-    
-    @Test
-    public void test()
-    {
-        fail("Not yet implemented");
-    }
-/*
     private static final int blockSize = 8;
-    private static final Long[] driveSizes = {10L, 20L, 30L};
-    private static final String[] handles = {"data/fakedrive1", "data/fakedrive2", "data/fakedrive3"};
-
+    private static final List<Long> driveSizes = new ArrayList<Long>();
+    static {
+        driveSizes.add(10L);
+        driveSizes.add(20L);
+        driveSizes.add(30L);
+    }
+    private static final List<String> handles = new ArrayList<String>();
+    static {
+        handles.add("data/fakedrive1");
+        handles.add("data/fakedrive2");
+        handles.add("data/fakedrive3");
+    }
     private static final byte[] emptyBlock = new byte[blockSize];
-
-    private static final long seed = 2011; // seed used for consistent random numbers
+    private static final long seed = 2012; // seed used for consistent random numbers
 
     @BeforeClass
     public static void setup() throws Throwable
@@ -30,37 +43,45 @@ public class DataNodeTest
         }
 
         // initialize the empty hard drives
-        for (int index = 0; index < handles.length; ++index)
+        for (int index = 0; index < handles.size(); ++index)
         {
-            File f = new File(handles[index]);
+            File f = new File(handles.get(index));
             RandomAccessFile out = new RandomAccessFile(f, "rw");
 
             out.seek(0);
 
-            for (int loc = 0; loc < driveSizes[index]; ++loc)
+            for (int loc = 0; loc < driveSizes.get(index); ++loc)
             {
                 out.write(emptyBlock);
             }
         }
     }
-
+    
     @Test
-    public void testAll()
+    public void testOperations()
     {
         Random random = new Random(seed);
-        Random testRandom = new Random(seed);
+        Random confirmRandom = new Random(seed);
+        
+        DataNode dataNode = new DataNode(blockSize, handles, driveSizes);
+        
+        assertEquals("Free space should match.", 60L, dataNode.totalFreeSpace());
+        
+        dataNode.createVolume(0);
 
-        DataNode datanode = new DataNode(blockSize, new ArrayList<String>(Arrays.asList(handles)), new ArrayList<Long>(Arrays.asList(driveSizes)));
+        assertNull("Unordered location should be null", dataNode.getOrderTimestamp(0, 0L));
+        assertTrue("Order should succeed", dataNode.order(0, 0L, new Date(0)));
+        assertFalse("Order should fail", dataNode.order(0, 0L, new Date(0)));
+        assertTrue("Order should succeed", dataNode.order(0, 0L, new Date(1)));
+    }
 
-        // test initial conditions
-        assertEquals("Write should fail.", false, datanode.write(0, 0, emptyBlock,new Date(1)));
-        assertEquals("Read should be null.", null, datanode.read(0, 0));
+    @Test
+    public void failTest()
+    {
+        fail("Not yet implemented");
+    }
 
-        // create a new volume
-        datanode.createVolume(0);
-        //assertTrue("Creation of a volume should work.", datanode.createVolume(0));
-        //assertFalse("Should not create volume twice.", datanode.createVolume(0));
-
+/*
         // write a few blocks, read them, verify them
         // check free space
         for (int index = 0; index < 5; ++index)

@@ -79,7 +79,7 @@ public class DataNode
      * Attempts to delete the volume.
      * Returns the status of the deletion.
      */
-    public Boolean deleteVolume(int volumeId)
+    public boolean deleteVolume(int volumeId)
     {
         Collection<DriveOffsetPair> allocatedLocations = volumeTable.getAllPhysicalLocations(volumeId);
 
@@ -98,7 +98,7 @@ public class DataNode
     /*
      * This function performs an order request.
      */
-    public Boolean order(int volumeId, long logicalOffset, Date timestamp)
+    public boolean order(int volumeId, long logicalOffset, Date timestamp)
     {
         Date currentOrderTimestamp = getOrderTimestamp(volumeId, logicalOffset);
         Date currentValueTimestamp = getValueTimestamp(volumeId, logicalOffset);
@@ -106,14 +106,14 @@ public class DataNode
         // TODO: fix this logic so that negative timestamps to not break the system. fine for now...
         if (currentOrderTimestamp == null)
         {
-            currentOrderTimestamp = new Date(0);
+            currentOrderTimestamp = new Date(-1);
         }
         if (currentValueTimestamp == null)
         {
-            currentValueTimestamp = new Date(0);
+            currentValueTimestamp = new Date(-1);
         }
  
-        if (currentOrderTimestamp.after(timestamp) || currentValueTimestamp.after(timestamp))
+        if (!currentOrderTimestamp.before(timestamp) || !currentValueTimestamp.before(timestamp))
         {
             return false;
         }
