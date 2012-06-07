@@ -10,7 +10,6 @@ import java.util.*;
  */
 public class WriteHandler extends Handler
 {
-    private boolean result = false;
     private byte[] block;
 
     /*
@@ -33,14 +32,6 @@ public class WriteHandler extends Handler
     }
 
     /*
-     * Returns the result (success or failure) of the write request.
-     */
-    public boolean getResult()
-    {
-        return result;
-    }
-
-    /*
      * This method performs a write request, as configured in the constructor.
      * At any point where the request may block on IO, blocking will cause the handler
      * to pause and execution will go to the next request handler in the queue.
@@ -51,8 +42,6 @@ public class WriteHandler extends Handler
         Date currentTime = coordinator.getNewTimestamp();
 
         SegmentGroup targets = coordinator.getSegmentGroup(volumeId, logicalOffset);
-
-        pause();
 
         int orderId = coordinator.server.issueOrderRequest(targets, volumeId, logicalOffset, currentTime);
 
@@ -92,16 +81,11 @@ public class WriteHandler extends Handler
                 waiting = false;
                 success = false;
             }
-            else
-            {
-                pause();
-            }
         }
 
         if (!success)
         {
             finished = true;
-            result = false;
             return;
         }
 
@@ -143,24 +127,12 @@ public class WriteHandler extends Handler
                 waiting = false;
                 success = false;
             }
-            else
-            {
-                pause();
-            }
         }
 
         finished = true;
 
-        if (!success)
-        {
-            result = false;
-        }
-        else
-        {
-            result = true;
-        }
-
-        pause();
+        coordinator.writeResultMap.put(requestId, success);
+        coordinator.requestCompletionMap.put(requestId, true);
     }
 }
 

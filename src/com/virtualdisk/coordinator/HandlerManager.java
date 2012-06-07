@@ -6,11 +6,11 @@ package com.virtualdisk.coordinator;
 public class HandlerManager extends Thread
 {
     private boolean keepAlive = true;
-    private Coordinator coordinator;
+    //private Coordinator coordinator;
 
     public HandlerManager(Coordinator c)
     {
-        coordinator = c;
+        //coordinator = c;
     }
 
     /*
@@ -26,57 +26,10 @@ public class HandlerManager extends Thread
      */
     public void run()
     {
+        
         while (keepAlive)
         {
-            //fetch from read queue, resume, wait for it to pause, put it on end of queue
-            WriteHandler currentWriter = coordinator.writeHandlers.poll();
-            if (currentWriter != null)
-            {
-                synchronized (currentWriter)
-                {
-                    currentWriter.notify();
-                }
 
-                while (!currentWriter.isPaused())
-                {
-                    // block until it pauses
-                }
-
-                if (!currentWriter.isFinished())
-                {
-                    coordinator.writeHandlers.offer(currentWriter);
-                }
-                else
-                {
-                    coordinator.writeResultMap.put(currentWriter.getRequestId(), currentWriter.getResult());
-                    coordinator.requestCompletionMap.put(currentWriter.getRequestId(), true);
-                }
-            }
-
-            //fetch from write queue, resume, wait for it to pause, put it on end of queue
-            ReadHandler currentReader = coordinator.readHandlers.poll();
-            if (currentReader != null)
-            {
-                synchronized (currentReader)
-                {
-                    currentReader.notify();
-                }
-
-                while (!currentReader.isPaused())
-                {
-                    // block until it pauses
-                }
-
-                if (!currentReader.isFinished())
-                {
-                    coordinator.readHandlers.offer(currentReader);
-                }
-                else
-                {
-                    coordinator.readResultMap.put(currentReader.getRequestId(), currentReader.getResult());
-                    coordinator.requestCompletionMap.put(currentReader.getRequestId(), true);
-                }
-            }
         }
     }
 }

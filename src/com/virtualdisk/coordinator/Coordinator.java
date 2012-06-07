@@ -18,9 +18,6 @@ public class Coordinator
     protected Map<Integer,Map<Long,SegmentGroup>> volumeTable;
     protected Date lastTimestamp;
 
-    protected Queue<WriteHandler> writeHandlers;
-    protected Queue<ReadHandler> readHandlers;
-
     protected Map<Integer, Boolean> requestCompletionMap;
     protected Map<Integer, Boolean> writeResultMap;
     protected Map<Integer, byte[]> readResultMap;
@@ -63,9 +60,6 @@ public class Coordinator
         volumeTable = new ConcurrentHashMap<Integer,Map<Long,SegmentGroup>>();
 
         lastTimestamp = new Date(0);
-
-        writeHandlers = new ConcurrentLinkedQueue<WriteHandler>();
-        readHandlers = new ConcurrentLinkedQueue<ReadHandler>();
 
         requestCompletionMap = new ConcurrentHashMap<Integer, Boolean>();
         writeResultMap = new ConcurrentHashMap<Integer, Boolean>();
@@ -134,8 +128,6 @@ public class Coordinator
         handler.setRequestId(id);
         handler.start();
 
-        writeHandlers.add(handler);
-
         return id;
     }
 
@@ -174,8 +166,6 @@ public class Coordinator
         handler.setRequestId(id);
         handler.start();
 
-        readHandlers.add(handler);
-
         return id;
     }
 
@@ -185,9 +175,9 @@ public class Coordinator
     public boolean readCompleted(Integer requestId)
     {
         Boolean finished = requestCompletionMap.get(requestId);
-        if (finished)
+        if (finished != null)
         {
-            return true;
+            return finished;
         }
         else
         {

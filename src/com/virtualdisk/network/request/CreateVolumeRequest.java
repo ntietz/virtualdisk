@@ -1,10 +1,10 @@
 package com.virtualdisk.network.request;
 
-import com.virtualdisk.network.Sendable;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 
 public class CreateVolumeRequest
 extends Request
-implements Sendable
 {
     private int volumeId;
  
@@ -18,8 +18,30 @@ implements Sendable
         return volumeId;
     }
 
-    public byte messageType()
+    public MessageType messageType()
     {
-        return Sendable.createVolumeRequest;
+        return MessageType.createVolumeRequest;
+    }
+    
+    public ChannelBuffer encode()
+    {
+        ChannelBuffer buffer = ChannelBuffers.dynamicBuffer();
+        
+        buffer.writeInt(volumeId);
+        
+        return buffer;
+    }
+    
+    public boolean decode(ChannelBuffer buffer)
+    {
+        if (buffer.readableBytes() < 4)
+        {
+            return false;
+        }
+        else
+        {
+            volumeId = buffer.readInt();
+            return true;
+        }
     }
 }

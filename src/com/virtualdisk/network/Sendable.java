@@ -1,21 +1,73 @@
 package com.virtualdisk.network;
 
-public interface Sendable
+import org.jboss.netty.buffer.ChannelBuffer;
+
+public abstract class Sendable
 {
-    byte messageType();
+    public abstract MessageType messageType();
+    public abstract boolean decode(ChannelBuffer buffer);
+    public abstract ChannelBuffer encode();
+    
+    /**
+     * 
+     * @param buffer    the channel buffer which contains a 
+     * @return  the message type of the encoded message, or a signal for an empty buffer
+     */
+    public static MessageType encodedMessageType(ChannelBuffer buffer)
+    {
+        if (buffer.readableBytes() < 1)
+        {
+            buffer.resetReaderIndex();
+            return MessageType.emptyBuffer;
+        }
 
-    final byte orderRequestResult = 0;
-    final byte readRequestResult = 1;
-    final byte writeRequestResult = 2;
-    final byte volumeExistsRequestResult = 6;
-    final byte createVolumeRequestResult = 7;
-    final byte deleteVolumeRequestResult = 8;
+        MessageType type = MessageType.fromByte(buffer.readByte());
+        
+        buffer.resetReaderIndex();
+        
+        return type;
+    }
 
-    final byte orderRequest = 3;
-    final byte readRequest = 4;
-    final byte writeRequest = 5;
-    final byte volumeExistsRequest = 9;
-    final byte createVolumeRequest = 10;
-    final byte deleteVolumeRequest = 11;
+    public static enum MessageType {
+        emptyBuffer(0)
+      , unknownRequest(1)
+      , orderRequest(2)
+      , orderRequestResult(3)
+      , readRequest(4)
+      , readRequestResult(5)
+      , writeRequest(6)
+      , writeRequestResult(7)
+      , volumeExistsRequest(8)
+      , volumeExistsRequestResult(9)
+      , createVolumeRequest(10)
+      , createVolumeRequestResult(11)
+      , deleteVolumeRequest(12)
+      , deleteVolumeRequestResult(13);
+          
+        private byte type;
+        
+        private MessageType(int t)
+        {
+            type = (byte)t;
+        }
+        
+        public byte byteValue()
+        {
+            return type;
+        }
+        
+        public static MessageType fromByte(byte t)
+        {
+            for (MessageType each : values())
+            {
+                if (t == each.byteValue())
+                {
+                    return each;
+                }
+            }
+            
+            return unknownRequest;
+        }
+    }
 }
 

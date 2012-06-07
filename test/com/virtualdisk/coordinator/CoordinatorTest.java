@@ -1,7 +1,5 @@
 package com.virtualdisk.coordinator;
 
-
-import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.*;
 
 import org.junit.*;
@@ -88,7 +86,7 @@ public class CoordinatorTest
         assertTrue("Timestamps should be correctly ordered.", secondTs.before(thirdTs));
     }
 
-    @Test
+    @Test(timeout=10000)
     public void testReadWrite()
     throws Throwable
     {
@@ -98,11 +96,13 @@ public class CoordinatorTest
         boolean created = coordinator.createVolume(0);
 
         assertEquals("Volume creation should succeed.", true, created);
+        
+        int numberOfRounds = 100;
 
         List<Integer> writeIds = new ArrayList<Integer>();
         
         // write a few blocks
-        for (int index = 0; index < 50; ++index)
+        for (int index = 0; index < numberOfRounds; ++index)
         {
             byte[] data = new byte[blockSize];
             random.nextBytes(data);
@@ -110,39 +110,39 @@ public class CoordinatorTest
             writeIds.add(coordinator.write(0, index, data));
         }
         
-        for (int index = 0; index < 50; ++index)
+        for (int index = 0; index < numberOfRounds; ++index)
         {
             int id = writeIds.get(index);
             
-            int maxTries = 50;
-            int count = 0;
-            while (count < maxTries && coordinator.writeResultMap.get(id) == null)
+            while (!coordinator.writeCompleted(id))
             {
-                Thread.sleep(10);
-                ++count;
+                // spin!!!
             }
-            assertTrue("Exceed max tries on round " + index + ".", count != maxTries);
 
             assertTrue("Write id should be valid." + index, coordinator.writeResultMap.get(id) != null);
             assertTrue("Write should complete.", coordinator.writeCompleted(id));
             assertTrue("Write should succeed.", coordinator.writeResult(id));
         }
+        
+        List<Integer> readIds = new ArrayList<Integer>();
 
         // read the blocks to verify they are valid
-        for (int index = 0; index < 50; ++index)
+        for (int index = 0; index < numberOfRounds; ++index)
         {
+            readIds.add(coordinator.read(0, index));
+        }
+        
+        for (int index = 0; index < numberOfRounds; ++index)
+        {
+            int id = readIds.get(index);
+            
+            while (!coordinator.readCompleted(id))
+            {
+                // spin!!!
+            }
+            
             byte[] expected = new byte[blockSize];
             testRandom.nextBytes(expected);
-
-            int id = coordinator.read(0, index);
-
-            int maxTries = 50;
-            int count = 0;
-            while (count < maxTries && coordinator.readResultMap.get(id) == null)
-            {
-                Thread.sleep(10);
-                ++count;
-            }
 
             assertTrue("Read id should be valid. " + index, coordinator.readResultMap.get(id) != null);
             assertTrue("Read should complete.", coordinator.readCompleted(id));
@@ -154,28 +154,40 @@ public class CoordinatorTest
     public void testSegmentGroupAssignment()
     {
         coordinator.createVolume(0);
-
-        for (int index = 0; index < 5; ++index)
-        {
-            coordinator.write(0, index, emptyBlock);
-        }
-
-        SegmentGroup first = coordinator.getSegmentGroup(0, 0);
-        SegmentGroup second = coordinator.getSegmentGroup(0, 1);
-        SegmentGroup third = coordinator.getSegmentGroup(0, 2);
-
-        Set<DataNodeIdentifier> firstIds = new HashSet<DataNodeIdentifier>(first.getMembers());
-        Set<DataNodeIdentifier> secondIds = new HashSet<DataNodeIdentifier>(second.getMembers());
-        Set<DataNodeIdentifier> thirdIds = new HashSet<DataNodeIdentifier>(third.getMembers());
-
-        Set<DataNodeIdentifier> firstRemoveSecond = firstIds;
-        firstRemoveSecond.removeAll(secondIds);
-
-        assertTrue("First should not contain second.", firstIds.containsAll(firstRemoveSecond));
-        assertTrue("First should be same size, removing second.", firstIds.size() == firstRemoveSecond.size());
         
-        fail("This test needs to be replaced.");
-        // we should generate 100 segment groups, then verify that within 5%, each node has equal load.
+        int numberOfWrites = 5113;
+        
+        for (int index = 0; index < numberOfWrites; ++index)
+        {
+            coordinator.assignSegmentGroup(0, index);
+        }
+        
+        List<Long> segmentsStored = new ArrayList<Long>();
+        
+        System.out.println("Number of statuses: " + coordinator.datanodeStatuses.size());
+        
+        int size = coordinator.datanodeStatuses.size();
+        for (int index = 0; index < size; ++index)
+        {
+            segmentsStored.add(coordinator.datanodeStatuses.poll().getStatus().getSegmentsStored());
+        }
+        
+        System.out.println(segmentsStored.size());
+        
+        long totalSegmentsStored = 0;
+        
+        for (long each : segmentsStored)
+        {
+            totalSegmentsStored += each;
+        }
+        
+        float average = ((float)totalSegmentsStored)/segmentsStored.size();
+        
+        for (long each : segmentsStored)
+        {
+            float error = Math.abs((each - average)/average);
+            assertTrue("Error should be low.", error < 0.05);
+        }
     }
 }
 

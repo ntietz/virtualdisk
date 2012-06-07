@@ -28,7 +28,8 @@ extends FrameDecoder
         }
 
         byte messageType = buffer.readByte();
-
+        
+        
         switch (messageType)
         {
             case Sendable.orderRequestResult :

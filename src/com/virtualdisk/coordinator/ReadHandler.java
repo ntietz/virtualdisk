@@ -47,8 +47,6 @@ public class ReadHandler extends Handler
     {
         SegmentGroup targets = coordinator.getSegmentGroup(volumeId, logicalOffset);
 
-        pause();
-
         int orderId = coordinator.server.issueReadRequest(targets, volumeId, logicalOffset);
 
         boolean waiting = true;
@@ -100,17 +98,13 @@ public class ReadHandler extends Handler
                     int id = coordinator.write(volumeId, logicalOffset, value);
                     while (!coordinator.writeCompleted(id))
                     {
-                        pause();
+                        // spin!!!
                     }
                     
                     boolean writeSuccess = coordinator.writeResult(id);
                     timestampsMatch = writeSuccess;
                     success = writeSuccess;
                 }
-            }
-            else
-            {
-                pause();
             }
         }
 
@@ -125,7 +119,8 @@ public class ReadHandler extends Handler
             result = value;
         }
 
-        pause();
+        coordinator.readResultMap.put(requestId, result);
+        coordinator.requestCompletionMap.put(requestId, true);
     }
 }
 

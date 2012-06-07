@@ -1,10 +1,10 @@
 package com.virtualdisk.network.request;
 
-import com.virtualdisk.network.Sendable;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 
 public class WriteRequestResult
 extends RequestResult
-implements Sendable
 {
     public WriteRequestResult(boolean c, boolean s)
     {
@@ -12,10 +12,33 @@ implements Sendable
         successful = s;
     }
 
-    public byte messageType()
+    public MessageType messageType()
     {
-        return Sendable.writeRequestResult;
+        return MessageType.writeRequestResult;
     }
-
+    
+    public ChannelBuffer encode()
+    {
+        ChannelBuffer buffer = ChannelBuffers.dynamicBuffer();
+        
+        buffer.writeByte(completed ? 1 : 0);
+        buffer.writeByte(successful ? 1 : 0);
+        
+        return buffer;
+    }
+    
+    public boolean decode(ChannelBuffer buffer)
+    {
+        if (buffer.readableBytes() < 2)
+        {
+            return false;
+        }
+        else
+        {
+            completed = (buffer.readByte() == 1) ? true : false;
+            successful = (buffer.readByte() == 1) ? true : false;
+            return true;
+        }
+    }
 }
 

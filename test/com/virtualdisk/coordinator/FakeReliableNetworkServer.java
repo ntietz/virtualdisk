@@ -46,7 +46,7 @@ extends NetworkServer
     /*
      * This method issues an order request and returns the id we can use to later fetch the results.
      */
-    public int issueOrderRequest(SegmentGroup targets, int volumeId, long logicalOffset, Date timestamp)
+    public synchronized int issueOrderRequest(SegmentGroup targets, int volumeId, long logicalOffset, Date timestamp)
     {
         Integer id = generateNewRequestId();
 
@@ -69,7 +69,7 @@ extends NetworkServer
     /*
      * This method issues a write request and returns the id we can use to later fetch the results.
      */
-    public int issueWriteRequest(SegmentGroup targets, int volumeId, long logicalOffset, byte[] block, Date timestamp)
+    public synchronized int issueWriteRequest(SegmentGroup targets, int volumeId, long logicalOffset, byte[] block, Date timestamp)
     {
         Integer id = generateNewRequestId();
 
@@ -93,7 +93,7 @@ extends NetworkServer
     /*
      * This method issues a read request and returns the id we can use to later fetch the results.
      */
-    public int issueReadRequest(SegmentGroup targets, int volumeId, long logicalOffset)
+    public synchronized int issueReadRequest(SegmentGroup targets, int volumeId, long logicalOffset)
     {
         Integer id = generateNewRequestId();
 
@@ -114,7 +114,7 @@ extends NetworkServer
         return id;
     }
 
-    public int issueVolumeCreationRequest(int volumeId)
+    public synchronized int issueVolumeCreationRequest(int volumeId)
     {
         int id = generateNewRequestId();
         
@@ -133,7 +133,7 @@ extends NetworkServer
         return id;
     }
     
-    public int issueVolumeDeletionRequest(int volumeId)
+    public synchronized int issueVolumeDeletionRequest(int volumeId)
     {
         int id = generateNewRequestId();
         
@@ -152,7 +152,7 @@ extends NetworkServer
         return id;
     }
     
-    public int issueVolumeExistsRequest(int volumeId)
+    public synchronized int issueVolumeExistsRequest(int volumeId)
     {
         int id = generateNewRequestId();
         

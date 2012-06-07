@@ -3,7 +3,6 @@ package com.virtualdisk.coordinator;
 public abstract class Handler extends Thread
 {
     protected boolean finished = false;
-    protected boolean paused = true;
     protected int requestId;
     protected int volumeId;
     protected long logicalOffset;
@@ -23,27 +22,4 @@ public abstract class Handler extends Thread
     {
         return requestId;
     }
-
-    public boolean isPaused()
-    {
-        return paused;
-    }
-
-    protected void pause()
-    {
-        try
-        {
-            synchronized(this)
-            {
-                paused = true;
-                wait();
-            }
-        }
-        catch (Throwable t)
-        {
-            //...
-        }
-        paused = false;
-    }
-
 }
