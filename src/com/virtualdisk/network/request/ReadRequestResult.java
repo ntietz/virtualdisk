@@ -2,6 +2,7 @@ package com.virtualdisk.network.request;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
+import java.util.Arrays;
 import java.util.Date;
 
 public class ReadRequestResult
@@ -69,6 +70,50 @@ extends RequestResult
             successful = (buffer.readByte() == 1) ? true : false;
             return true;
         }
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Arrays.hashCode(this.result);
+        result = prime * result
+                + ((timestamp == null) ? 0 : timestamp.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (!super.equals(obj))
+        {
+            return false;
+        }
+        if (!(obj instanceof ReadRequestResult))
+        {
+            return false;
+        }
+        ReadRequestResult other = (ReadRequestResult) obj;
+        if (!Arrays.equals(result, other.result))
+        {
+            return false;
+        }
+        if (timestamp == null)
+        {
+            if (other.timestamp != null)
+            {
+                return false;
+            }
+        } else if (!timestamp.equals(other.timestamp))
+        {
+            return false;
+        }
+        return true;
     }
 }
 

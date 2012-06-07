@@ -44,4 +44,36 @@ extends Request
             return true;
         }
     }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + volumeId;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null)
+        {
+            return false;
+        }
+        if (!(obj instanceof DeleteVolumeRequest))
+        {
+            return false;
+        }
+        DeleteVolumeRequest other = (DeleteVolumeRequest) obj;
+        if (volumeId != other.volumeId)
+        {
+            return false;
+        }
+        return true;
+    }
 }

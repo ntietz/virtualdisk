@@ -163,16 +163,12 @@ public class CoordinatorTest
         }
         
         List<Long> segmentsStored = new ArrayList<Long>();
-        
-        System.out.println("Number of statuses: " + coordinator.datanodeStatuses.size());
-        
+                
         int size = coordinator.datanodeStatuses.size();
         for (int index = 0; index < size; ++index)
         {
             segmentsStored.add(coordinator.datanodeStatuses.poll().getStatus().getSegmentsStored());
         }
-        
-        System.out.println(segmentsStored.size());
         
         long totalSegmentsStored = 0;
         

@@ -8,6 +8,9 @@ public abstract class Sendable
     public abstract boolean decode(ChannelBuffer buffer);
     public abstract ChannelBuffer encode();
     
+    public abstract int hashCode();
+    public abstract boolean equals(Object obj);
+    
     /**
      * 
      * @param buffer    the channel buffer which contains a 
