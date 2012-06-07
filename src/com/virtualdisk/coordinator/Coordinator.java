@@ -235,7 +235,7 @@ public class Coordinator
      * This method takes a volumeId and logical offset and assigns that pair a segment group.
      * It generates the segment group based off which nodes have the lightest load.
      */
-    protected SegmentGroup assignSegmentGroup(int volumeId, long logicalOffset)
+    protected synchronized SegmentGroup assignSegmentGroup(int volumeId, long logicalOffset)
     {
         SegmentGroup segmentgroup = volumeTable.get(volumeId).get(logicalOffset);
 
@@ -251,7 +251,8 @@ public class Coordinator
             for (int index = 0; index < segmentGroupSize; ++index)
             {
                 DataNodeStatusPair current = datanodeStatuses.poll();
-                current.getStatus().addStoredSegments(1);
+                DataNodeStatus status = current.getStatus();
+                status.addStoredSegments(1);
 
                 segmentGroupMemberPairs.add(current);
                 segmentGroupMembers.add(current.getIdentifier());

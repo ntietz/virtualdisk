@@ -77,4 +77,9 @@ public class VolumeTable
     {
         table.get(volumeId).remove(logicalOffset);
     }
+    
+    public boolean exists(int volumeId)
+    {
+        return table.containsKey(volumeId);
+    }
 }

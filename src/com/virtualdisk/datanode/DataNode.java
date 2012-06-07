@@ -74,7 +74,12 @@ public class DataNode
         orderTimestampTable.addVolume(volumeId);
         valueTimestampTable.addVolume(volumeId);
     }
-
+    
+    public boolean volumeExists(int volumeId)
+    {
+        return volumeTable.exists(volumeId);
+    }
+    
     /*
      * Attempts to delete the volume.
      * Returns the status of the deletion.

@@ -6,20 +6,12 @@ public class VolumeExistsRequestResult
 extends RequestResult
 implements Sendable
 {
-    private boolean exists;
-    
-    public VolumeExistsRequestResult(boolean c, boolean s, boolean e)
+    public VolumeExistsRequestResult(boolean c, boolean s)
     {
         completed = c;
         successful = s;
-        exists = e;
     }
-    
-    public boolean volumeExists()
-    {
-        return exists;
-    }
-    
+        
     public byte messageType()
     {
         return Sendable.volumeExistsRequestResult;

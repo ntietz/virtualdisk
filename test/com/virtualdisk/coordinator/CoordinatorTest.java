@@ -64,7 +64,6 @@ public class CoordinatorTest
         assertEquals("Second volume creation should fail.", false, secondTryCreate);
         assertEquals("First volume deletion should succeed.", true, firstTryDelete);
         assertEquals("Second volume deletion should fail.", false, secondTryDelete);
-
     }
 
     @Test
@@ -100,14 +99,21 @@ public class CoordinatorTest
 
         assertEquals("Volume creation should succeed.", true, created);
 
+        List<Integer> writeIds = new ArrayList<Integer>();
+        
         // write a few blocks
-        for (int index = 0; index < 5; ++index)
+        for (int index = 0; index < 50; ++index)
         {
             byte[] data = new byte[blockSize];
             random.nextBytes(data);
-
-            int id = coordinator.write(0, index, data);
-
+            
+            writeIds.add(coordinator.write(0, index, data));
+        }
+        
+        for (int index = 0; index < 50; ++index)
+        {
+            int id = writeIds.get(index);
+            
             int maxTries = 50;
             int count = 0;
             while (count < maxTries && coordinator.writeResultMap.get(id) == null)
@@ -115,14 +121,15 @@ public class CoordinatorTest
                 Thread.sleep(10);
                 ++count;
             }
+            assertTrue("Exceed max tries on round " + index + ".", count != maxTries);
 
-            assertTrue("Write id should be valid.", coordinator.writeResultMap.get(id) != null);
+            assertTrue("Write id should be valid." + index, coordinator.writeResultMap.get(id) != null);
             assertTrue("Write should complete.", coordinator.writeCompleted(id));
             assertTrue("Write should succeed.", coordinator.writeResult(id));
         }
 
         // read the blocks to verify they are valid
-        for (int index = 0; index < 5; ++index)
+        for (int index = 0; index < 50; ++index)
         {
             byte[] expected = new byte[blockSize];
             testRandom.nextBytes(expected);
@@ -137,7 +144,7 @@ public class CoordinatorTest
                 ++count;
             }
 
-            assertTrue("Read id should be valid.", coordinator.readResultMap.get(id) != null);
+            assertTrue("Read id should be valid. " + index, coordinator.readResultMap.get(id) != null);
             assertTrue("Read should complete.", coordinator.readCompleted(id));
             assertArrayEquals("Read data should match.", expected, coordinator.readResult(id));
         }
@@ -166,6 +173,9 @@ public class CoordinatorTest
 
         assertTrue("First should not contain second.", firstIds.containsAll(firstRemoveSecond));
         assertTrue("First should be same size, removing second.", firstIds.size() == firstRemoveSecond.size());
+        
+        fail("This test needs to be replaced.");
+        // we should generate 100 segment groups, then verify that within 5%, each node has equal load.
     }
 }
 

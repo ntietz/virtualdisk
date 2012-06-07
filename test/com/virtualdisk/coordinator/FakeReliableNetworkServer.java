@@ -5,14 +5,13 @@ import com.virtualdisk.coordinator.NetworkServer;
 import com.virtualdisk.coordinator.SegmentGroup;
 import com.virtualdisk.datanode.*;
 import com.virtualdisk.network.*;
-import com.virtualdisk.network.request.OrderRequestResult;
-import com.virtualdisk.network.request.ReadRequestResult;
-import com.virtualdisk.network.request.WriteRequestResult;
+import com.virtualdisk.network.request.*;
 
 import java.util.*;
 import java.io.*;
 
-public class FakeReliableNetworkServer implements NetworkServer
+public class FakeReliableNetworkServer
+extends NetworkServer
 {
     // This list stores the datanode identifiers.
     List<DataNodeIdentifier> dataNodeIdentifiers;
@@ -24,6 +23,9 @@ public class FakeReliableNetworkServer implements NetworkServer
     Map<Integer, List<OrderRequestResult>> orderRequestResults;
     Map<Integer, List<ReadRequestResult>> readRequestResults;
     Map<Integer, List<WriteRequestResult>> writeRequestResults;
+    Map<Integer, List<CreateVolumeRequestResult>> createVolumeRequestResults;
+    Map<Integer, List<DeleteVolumeRequestResult>> deleteVolumeRequestResults;
+    Map<Integer, List<VolumeExistsRequestResult>> volumeExistsReqestResults;
 
     /*
      * This constructor initializes the datanode with empty node identifier and node lists, and empty result maps.
@@ -36,12 +38,15 @@ public class FakeReliableNetworkServer implements NetworkServer
         orderRequestResults = new HashMap<Integer, List<OrderRequestResult>>();
         readRequestResults = new HashMap<Integer, List<ReadRequestResult>>();
         writeRequestResults = new HashMap<Integer, List<WriteRequestResult>>();
+        createVolumeRequestResults = new HashMap<Integer, List<CreateVolumeRequestResult>>();
+        deleteVolumeRequestResults = new HashMap<Integer, List<DeleteVolumeRequestResult>>();
+        volumeExistsReqestResults = new HashMap<Integer, List<VolumeExistsRequestResult>>();
     }
 
     /*
      * This method issues an order request and returns the id we can use to later fetch the results.
      */
-    public Integer issueOrderRequest(SegmentGroup targets, Integer volumeId, Integer logicalOffset, Date timestamp)
+    public int issueOrderRequest(SegmentGroup targets, int volumeId, long logicalOffset, Date timestamp)
     {
         Integer id = generateNewRequestId();
 
@@ -64,7 +69,7 @@ public class FakeReliableNetworkServer implements NetworkServer
     /*
      * This method issues a write request and returns the id we can use to later fetch the results.
      */
-    public Integer issueWriteRequest(SegmentGroup targets, Integer volumeId, Integer logicalOffset, byte[] block, Date timestamp)
+    public int issueWriteRequest(SegmentGroup targets, int volumeId, long logicalOffset, byte[] block, Date timestamp)
     {
         Integer id = generateNewRequestId();
 
@@ -73,7 +78,7 @@ public class FakeReliableNetworkServer implements NetworkServer
         for (DataNodeIdentifier each : targets.getMembers())
         {
             DataNode node = dataNodes.get(each.getNodeId());
-            node.createVolume(volumeId); // can be done safely each time. would be handled by the datanode server.
+            //node.createVolume(volumeId); // can be done safely each time. would be handled by the datanode server.
             Boolean value = node.write(volumeId, logicalOffset, block, timestamp);
 
             WriteRequestResult result = new WriteRequestResult(true, value);
@@ -88,7 +93,7 @@ public class FakeReliableNetworkServer implements NetworkServer
     /*
      * This method issues a read request and returns the id we can use to later fetch the results.
      */
-    public Integer issueReadRequest(SegmentGroup targets, Integer volumeId, Integer logicalOffset)
+    public int issueReadRequest(SegmentGroup targets, int volumeId, long logicalOffset)
     {
         Integer id = generateNewRequestId();
 
@@ -109,11 +114,66 @@ public class FakeReliableNetworkServer implements NetworkServer
         return id;
     }
 
+    public int issueVolumeCreationRequest(int volumeId)
+    {
+        int id = generateNewRequestId();
+        
+        List<CreateVolumeRequestResult> results = new ArrayList<CreateVolumeRequestResult>();
+        
+        for (DataNode each : dataNodes)
+        {
+            each.createVolume(volumeId);
+            
+            CreateVolumeRequestResult result = new CreateVolumeRequestResult(true, true);
+            results.add(result);
+        }
+        
+        createVolumeRequestResults.put(id, results);
+        
+        return id;
+    }
+    
+    public int issueVolumeDeletionRequest(int volumeId)
+    {
+        int id = generateNewRequestId();
+        
+        List<DeleteVolumeRequestResult> results = new ArrayList<DeleteVolumeRequestResult>();
+        
+        for (DataNode each : dataNodes)
+        {
+            each.deleteVolume(volumeId);
+            
+            DeleteVolumeRequestResult result = new DeleteVolumeRequestResult(true, true);
+            results.add(result);
+        }
+        
+        deleteVolumeRequestResults.put(id, results);
+        
+        return id;
+    }
+    
+    public int issueVolumeExistsRequest(int volumeId)
+    {
+        int id = generateNewRequestId();
+        
+        List<VolumeExistsRequestResult> results = new ArrayList<VolumeExistsRequestResult>();
+        
+        for (DataNode each : dataNodes)
+        {
+            VolumeExistsRequestResult result = new VolumeExistsRequestResult(true, each.volumeExists(volumeId));
+            results.add(result);
+        }
+        
+        volumeExistsReqestResults.put(id, results);
+        
+        return id;
+    }
+    
     /*
      * This method fetches the results of a given order request.
      * If the request id is invalid, it will return null.
      */
-    public List<OrderRequestResult> getOrderRequestResults(Integer requestId)
+    public List<OrderRequestResult> getOrderRequestResults(int requestId)
     {
         return orderRequestResults.get(requestId);
     }
@@ -122,7 +182,7 @@ public class FakeReliableNetworkServer implements NetworkServer
      * This method fetches the results of a given write request.
      * If the request id is invalid, it will return null.
      */
-    public List<WriteRequestResult> getWriteRequestResults(Integer requestId)
+    public List<WriteRequestResult> getWriteRequestResults(int requestId)
     {
         return writeRequestResults.get(requestId);
     }
@@ -131,11 +191,26 @@ public class FakeReliableNetworkServer implements NetworkServer
      * This method fetches the results of a given read request.
      * If the request id is invalid, it will return null.
      */
-    public List<ReadRequestResult> getReadRequestResults(Integer requestId)
+    public List<ReadRequestResult> getReadRequestResults(int requestId)
     {
         return readRequestResults.get(requestId);
     }
-
+    
+    public List<CreateVolumeRequestResult> getVolumeCreationRequestResults(int requestId)
+    {
+        return createVolumeRequestResults.get(requestId);
+    }
+    
+    public List<DeleteVolumeRequestResult> getVolumeDeletionRequestResults(int requestId)
+    {
+        return deleteVolumeRequestResults.get(requestId);
+    }
+    
+    public List<VolumeExistsRequestResult> getVolumeExistsRequestResults(int requestId)
+    {
+        return volumeExistsReqestResults.get(requestId);
+    }
+    
     /*
      * This method fetches the datanodes the server is configured to use.
      */

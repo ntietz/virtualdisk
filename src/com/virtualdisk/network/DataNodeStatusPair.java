@@ -9,6 +9,12 @@ public class DataNodeStatusPair implements Comparable<DataNodeStatusPair>
     protected DataNodeIdentifier datanode;
     protected DataNodeStatus status;
 
+    @SuppressWarnings("unused")
+    private DataNodeStatusPair()
+    {
+        
+    }
+    
     public DataNodeStatusPair(DataNodeIdentifier d, DataNodeStatus s)
     {
         datanode = d;

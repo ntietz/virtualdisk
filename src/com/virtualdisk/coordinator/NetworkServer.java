@@ -59,7 +59,7 @@ public abstract class NetworkServer
     
     public abstract List<DeleteVolumeRequestResult> getVolumeDeletionRequestResults(int requestId);
     
-    public abstract List<VolumeExistsRequestResult> getVolumeExistsRequestResult(int requestId);
+    public abstract List<VolumeExistsRequestResult> getVolumeExistsRequestResults(int requestId);
 
     /*
      * This method should return a list of the datanodes the network server is configured to communicate with;
