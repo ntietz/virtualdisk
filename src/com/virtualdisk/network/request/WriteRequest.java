@@ -10,11 +10,11 @@ public class WriteRequest
 extends Request
 {
     private int volumeId;
-    private int logicalOffset;
+    private long logicalOffset;
     private byte[] block;
     private Date timestamp;
 
-    public WriteRequest(int v, int l, byte[] b, Date t)
+    public WriteRequest(int v, long l, byte[] b, Date t)
     {
         volumeId = v;
         logicalOffset = l;
@@ -32,7 +32,7 @@ extends Request
         return volumeId;
     }
 
-    public int getLogicalOffset()
+    public long getLogicalOffset()
     {
         return logicalOffset;
     }
@@ -54,7 +54,7 @@ extends Request
         buffer.writeInt(block.length);
         buffer.writeBytes(block);
         buffer.writeInt(volumeId);
-        buffer.writeInt(logicalOffset);
+        buffer.writeLong(logicalOffset);
         buffer.writeLong(timestamp.getTime());
         
         return buffer;
@@ -69,7 +69,7 @@ extends Request
         
         int length = buffer.readInt();
         
-        if (buffer.readableBytes() < length + 16)
+        if (buffer.readableBytes() < length + 20)
         {
             buffer.resetReaderIndex();
             return false;
@@ -79,7 +79,7 @@ extends Request
             block = new byte[length];
             buffer.readBytes(block);
             volumeId = buffer.readInt();
-            logicalOffset = buffer.readInt();
+            logicalOffset = buffer.readLong();
             timestamp = new Date(buffer.readLong());
             return true;
         }
@@ -91,7 +91,8 @@ extends Request
         final int prime = 31;
         int result = 1;
         result = prime * result + Arrays.hashCode(block);
-        result = prime * result + logicalOffset;
+        result = prime * result
+                + (int) (logicalOffset ^ (logicalOffset >>> 32));
         result = prime * result
                 + ((timestamp == null) ? 0 : timestamp.hashCode());
         result = prime * result + volumeId;

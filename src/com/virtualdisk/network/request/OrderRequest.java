@@ -9,10 +9,10 @@ public class OrderRequest
 extends Request
 {
     private int volumeId;
-    private int logicalOffset;
+    private long logicalOffset;
     private Date timestamp;
 
-    public OrderRequest(int v, int l, Date t)
+    public OrderRequest(int v, long l, Date t)
     {
         volumeId = v;
         logicalOffset = l;
@@ -29,7 +29,7 @@ extends Request
         return volumeId;
     }
 
-    public int getLogicalOffset()
+    public long getLogicalOffset()
     {
         return logicalOffset;
     }
@@ -44,7 +44,7 @@ extends Request
         ChannelBuffer buffer = ChannelBuffers.dynamicBuffer();
 
         buffer.writeInt(volumeId);
-        buffer.writeInt(logicalOffset);
+        buffer.writeLong(logicalOffset);
         buffer.writeLong(timestamp.getTime());
         
         return buffer;
@@ -52,14 +52,14 @@ extends Request
     
     public boolean decode(ChannelBuffer buffer)
     {
-        if (buffer.readableBytes() < 16)
+        if (buffer.readableBytes() < 20)
         {
             return false;
         }
         else
         {
             volumeId = buffer.readInt();
-            logicalOffset = buffer.readInt();
+            logicalOffset = buffer.readLong();
             timestamp = new Date(buffer.readLong());
             return true;
         }
@@ -70,7 +70,8 @@ extends Request
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + logicalOffset;
+        result = prime * result
+                + (int) (logicalOffset ^ (logicalOffset >>> 32));
         result = prime * result
                 + ((timestamp == null) ? 0 : timestamp.hashCode());
         result = prime * result + volumeId;

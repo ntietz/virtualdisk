@@ -7,9 +7,9 @@ public class ReadRequest
 extends Request
 {
     private int volumeId;
-    private int logicalOffset;
+    private long logicalOffset;
 
-    public ReadRequest(int v, int l)
+    public ReadRequest(int v, long l)
     {
         volumeId = v;
         logicalOffset = l;
@@ -25,7 +25,7 @@ extends Request
         return volumeId;
     }
 
-    public int getLogicalOffset()
+    public long getLogicalOffset()
     {
         return logicalOffset;
     }
@@ -35,21 +35,21 @@ extends Request
         ChannelBuffer buffer = ChannelBuffers.dynamicBuffer();
         
         buffer.writeInt(volumeId);
-        buffer.writeInt(logicalOffset);
+        buffer.writeLong(logicalOffset);
         
         return buffer;
     }
     
     public boolean decode(ChannelBuffer buffer)
     {
-        if (buffer.readableBytes() < 8)
+        if (buffer.readableBytes() < 12) // TODO fix this
         {
             return false;
         }
         else
         {
             volumeId = buffer.readInt();
-            logicalOffset = buffer.readInt();
+            logicalOffset = buffer.readLong();
             return true;
         }
     }
@@ -59,7 +59,8 @@ extends Request
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + logicalOffset;
+        result = prime * result
+                + (int) (logicalOffset ^ (logicalOffset >>> 32));
         result = prime * result + volumeId;
         return result;
     }
