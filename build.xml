@@ -1,0 +1,65 @@
+<project name="virtualdisk" default="compile" basedir=".">
+    <description>
+        Simple build file.
+    </description>
+
+    <property name="src" location="src/" />
+    <property name="lib" location="lib/" />
+    <property name="test" location="test/" />
+    <property name="build" location="build/" />
+    <property name="dist" location="dist/" />
+    <property name="reports" location="reports/" />
+
+    <path id="classpath.base">
+        <fileset dir="${lib}">
+            <include name="**/*.jar" />
+        </fileset>
+        <pathelement location="${build}" />
+        <pathelement name="${src}" />
+    </path>
+
+    <path id="classpath.test">
+        <pathelement location="${test}" />
+        <path refid="classpath.base" />
+    </path>
+
+    <target name="init" description="Sets up the structure for building.">
+        <mkdir dir="${build}" />
+        <mkdir dir="${dist}" />
+        <mkdir dir="${reports}" />
+        <mkdir dir="data" />
+    </target>
+
+    <target name="compile" depends="init" description="Compiles the main source files.">
+        <javac srcdir="${src}" destdir="${build}" debug="on">
+            <classpath refid="classpath.base" />
+        </javac>
+    </target>
+
+    <target name="compile-tests" depends="init,compile" description="Compiles the test source files.">
+        <javac srcdir="${test}" destdir="${build}" debug="on">
+            <classpath refid="classpath.test" />
+        </javac>
+    </target>
+
+    <target name="run-tests" depends="compile-tests" description="Runs the tests, fails if any test fails.">
+        <junit printsummary="yes" failureProperty="test.failure">
+            <classpath refid="classpath.test" />
+            <formatter type="plain" />
+            <batchtest todir="${reports}">
+                <fileset dir="${test}">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+        <fail message="Test failed." if="test.failure" />
+    </target>
+
+    <target name="clean" description="Removes all created files and directories.">
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
+        <delete dir="${reports}" />
+        <delete dir="data" />
+    </target>
+
+</project>
