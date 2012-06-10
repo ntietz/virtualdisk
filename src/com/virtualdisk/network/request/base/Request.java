@@ -2,6 +2,9 @@ package com.virtualdisk.network.request.base;
 
 import com.virtualdisk.network.util.*;
 
+import org.jboss.netty.buffer.*;
+import static org.jboss.netty.buffer.ChannelBuffers.*;
+
 import java.util.*;
 
 public abstract class Request
@@ -20,6 +23,24 @@ extends Sendable
     public int getRequestId()
     {
         return requestId;
+    }
+
+    public int messageSize()
+    {
+        return 4;
+    }
+
+    public ChannelBuffer encode()
+    {
+        ChannelBuffer buffer = dynamicBuffer();
+        buffer.writeInt(requestId);
+
+        return buffer;
+    }
+
+    public void decode(ChannelBuffer buffer)
+    {
+        requestId = buffer.readInt();
     }
 
     public boolean equals(Object obj)

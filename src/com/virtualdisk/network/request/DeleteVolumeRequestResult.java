@@ -3,6 +3,8 @@ package com.virtualdisk.network.request;
 import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.Sendable.*;
 
+import org.jboss.netty.buffer.*;
+
 public class DeleteVolumeRequestResult
 extends VolumeRequestResult
 {
@@ -14,6 +16,21 @@ extends VolumeRequestResult
     public MessageType messageType()
     {
         return MessageType.deleteVolumeRequestResult;
+    }
+
+    public int messageSize()
+    {
+        return 0 + super.messageSize();
+    }
+
+    public ChannelBuffer encode()
+    {
+        return super.encode();
+    }
+
+    public void decode(ChannelBuffer buffer)
+    {
+        super.decode(buffer);
     }
 
     public boolean equals(Object obj)

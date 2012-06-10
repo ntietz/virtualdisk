@@ -1,5 +1,7 @@
 package com.virtualdisk.network.request.base;
 
+import org.jboss.netty.buffer.*;
+
 public abstract class BlockRequest
 extends Request
 {
@@ -27,6 +29,27 @@ extends Request
     public long getLogicalOffset()
     {
         return logicalOffset;
+    }
+
+    public int messageSize()
+    {
+        return 4 + 8 + super.messageSize();
+    }
+
+    public ChannelBuffer encode()
+    {
+        ChannelBuffer buffer = super.encode();
+        buffer.writeInt(volumeId);
+        buffer.writeLong(logicalOffset);
+
+        return buffer;
+    }
+
+    public void decode(ChannelBuffer buffer)
+    {
+        super.decode(buffer);
+        volumeId = buffer.readInt();
+        logicalOffset = buffer.readLong();
     }
 
     public boolean equals(Object obj)

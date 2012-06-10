@@ -2,6 +2,9 @@ package com.virtualdisk.network.request.base;
 
 import com.virtualdisk.network.util.*;
 
+import org.jboss.netty.buffer.*;
+import static org.jboss.netty.buffer.ChannelBuffers.*;
+
 public abstract class RequestResult
 extends Sendable
 {
@@ -35,6 +38,26 @@ extends Sendable
     public boolean wasSuccessful()
     {
         return success;
+    }
+
+    public int messageSize()
+    {
+        return 4 + 1 + 1;
+    }
+
+    public ChannelBuffer encode()
+    {
+        ChannelBuffer buffer = dynamicBuffer();
+        buffer.writeInt(requestId);
+        buffer.writeByte(done ? 1 : 0);
+        buffer.writeByte(success ? 1 : 0);
+    }
+
+    public void decode(ChannelBuffer buffer)
+    {
+        requestId = buffer.readInt();
+        done = (buffer.readByte() == 1);
+        success = (buffer.readByte() == 1);
     }
 
     public boolean equals(Object obj)

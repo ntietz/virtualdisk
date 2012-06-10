@@ -3,6 +3,8 @@ package com.virtualdisk.network.request;
 import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.Sendable.*;
 
+import org.jboss.netty.buffer.*;
+
 import java.util.*;
 
 public class OrderRequest
@@ -24,6 +26,25 @@ extends BlockRequest
     public MessageType messageType()
     {
         return MessageType.orderRequest;
+    }
+
+    public int messageSize()
+    {
+        return 8 + super.messageSize();
+    }
+
+    public ChannelBuffer encode()
+    {
+        ChannelBuffer buffer = super.encode();
+        buffer.writeLong(timestamp.getTime());
+
+        return buffer;
+    }
+
+    public void decode(ChannelBuffer buffer)
+    {
+        super.decode(buffer);
+        timestamp = new Date(buffer.readLong());
     }
 
     public boolean equals(Object obj)
