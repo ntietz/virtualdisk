@@ -1,6 +1,10 @@
 package com.virtualdisk.coordinator;
 
 import com.virtualdisk.network.*;
+import com.virtualdisk.network.util.DataNodeIdentifier;
+import com.virtualdisk.network.util.DataNodeStatus;
+import com.virtualdisk.network.util.DataNodeStatusPair;
+
 import java.util.*;
 import java.util.concurrent.*;
 

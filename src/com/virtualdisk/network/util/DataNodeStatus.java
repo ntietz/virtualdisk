@@ -1,4 +1,4 @@
-package com.virtualdisk.network;
+package com.virtualdisk.network.util;
 
 public class DataNodeStatus
 {

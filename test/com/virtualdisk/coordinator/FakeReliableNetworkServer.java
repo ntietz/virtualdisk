@@ -6,6 +6,7 @@ import com.virtualdisk.coordinator.SegmentGroup;
 import com.virtualdisk.datanode.*;
 import com.virtualdisk.network.*;
 import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.util.DataNodeIdentifier;
 
 import java.util.*;
 import java.io.*;

@@ -1,4 +1,4 @@
-package com.virtualdisk.network;
+package com.virtualdisk.network.util;
 
 /*
  * This class exists to define a comparator, so that datanodes (with their statuses)

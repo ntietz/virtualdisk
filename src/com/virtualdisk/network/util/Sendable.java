@@ -1,14 +1,14 @@
-package com.virtualdisk.network;
+package com.virtualdisk.network.util;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public abstract class Sendable
 {
     public abstract MessageType messageType();
-    public abstract boolean decode(ChannelBuffer buffer);
-    public abstract ChannelBuffer encode();
+    //public abstract boolean decode(ChannelBuffer buffer);
+    //public abstract ChannelBuffer encode();
     
-    public abstract int hashCode();
+    //public abstract int hashCode();
     public abstract boolean equals(Object obj);
     
     /**

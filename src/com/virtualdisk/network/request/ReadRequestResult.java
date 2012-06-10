@@ -1,27 +1,26 @@
 package com.virtualdisk.network.request;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
-import java.util.Arrays;
-import java.util.Date;
+import com.virtualdisk.network.request.base.*;
+import com.virtualdisk.network.util.Sendable.*;
+
+import java.util.*;
 
 public class ReadRequestResult
-extends RequestResult
+extends BlockRequestResult
 {
-    protected byte[] result = null;
-    protected Date timestamp = null;
+    protected Date timestamp;
+    protected byte[] block;
 
-    public ReadRequestResult(boolean c, boolean s, byte[] r, Date ts)
+    public ReadRequestResult( int requestId
+                            , boolean done
+                            , boolean success
+                            , Date timestamp
+                            , byte[] block
+                            )
     {
-        completed = c;
-        successful = s;
-        result = r;
-        timestamp = ts;
-    }
-
-    public MessageType messageType()
-    {
-        return MessageType.readRequestResult;
+        super(requestId, done, success);
+        this.timestamp = timestamp;
+        this.block = block;
     }
 
     public Date getTimestamp()
@@ -29,91 +28,34 @@ extends RequestResult
         return timestamp;
     }
 
-    public byte[] getResult()
+    public byte[] getBlock()
     {
-        return result;
+        return block;
     }
-    
-    public ChannelBuffer encode()
+
+    public MessageType messageType()
     {
-        ChannelBuffer buffer = ChannelBuffers.dynamicBuffer();
-        
-        buffer.writeInt(result.length);
-        buffer.writeBytes(result);
-        buffer.writeLong(timestamp.getTime());
-        buffer.writeByte(completed ? 1 : 0);
-        buffer.writeByte(successful ? 1 : 0);
-        
-        return buffer;
+        return MessageType.readRequestResult;
     }
-    
-    public boolean decode(ChannelBuffer buffer)
+
+    public boolean equals(Object obj)
     {
-        if (buffer.readableBytes() < 4)
+        if (obj == null)
         {
             return false;
         }
-        
-        int length = buffer.readInt();
-        
-        if (buffer.readableBytes() < length + 6)
+        else if (obj instanceof ReadRequestResult)
         {
-            buffer.resetReaderIndex();
-            return false;
+            ReadRequestResult other = (ReadRequestResult) obj;
+
+            return super.equals(other)
+                && timestamp.equals(other.getTimestamp())
+                && Arrays.equals(block, other.getBlock());
         }
         else
         {
-            result = new byte[length];
-            buffer.readBytes(result);
-            timestamp = new Date(buffer.readLong());
-            completed = (buffer.readByte() == 1) ? true : false;
-            successful = (buffer.readByte() == 1) ? true : false;
-            return true;
-        }
-    }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + Arrays.hashCode(this.result);
-        result = prime * result
-                + ((timestamp == null) ? 0 : timestamp.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (!super.equals(obj))
-        {
             return false;
         }
-        if (!(obj instanceof ReadRequestResult))
-        {
-            return false;
-        }
-        ReadRequestResult other = (ReadRequestResult) obj;
-        if (!Arrays.equals(result, other.result))
-        {
-            return false;
-        }
-        if (timestamp == null)
-        {
-            if (other.timestamp != null)
-            {
-                return false;
-            }
-        } else if (!timestamp.equals(other.timestamp))
-        {
-            return false;
-        }
-        return true;
     }
 }
 

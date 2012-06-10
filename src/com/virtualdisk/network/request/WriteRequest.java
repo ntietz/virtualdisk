@@ -1,40 +1,26 @@
 package com.virtualdisk.network.request;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
+import com.virtualdisk.network.request.base.*;
+import com.virtualdisk.network.util.Sendable.*;
 
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 
 public class WriteRequest
-extends Request
+extends BlockRequest
 {
-    private int volumeId;
-    private long logicalOffset;
-    private byte[] block;
-    private Date timestamp;
+    protected Date timestamp;
+    protected byte[] block;
 
-    public WriteRequest(int v, long l, byte[] b, Date t)
+    public WriteRequest(int requestId, int volumeId, long logicalOffset, Date timestamp, byte[] block)
     {
-        volumeId = v;
-        logicalOffset = l;
-        block = b;
-        timestamp = t;
+        super(requestId, volumeId, logicalOffset);
+        this.timestamp = timestamp;
+        this.block = block;
     }
 
-    public MessageType messageType()
+    public Date getTimestamp()
     {
-        return MessageType.writeRequest;
-    }
-
-    public int getVolumeId()
-    {
-        return volumeId;
-    }
-
-    public long getLogicalOffset()
-    {
-        return logicalOffset;
+        return timestamp;
     }
 
     public byte[] getBlock()
@@ -42,102 +28,30 @@ extends Request
         return block;
     }
 
-    public Date getTimestamp()
+    public MessageType messageType()
     {
-        return timestamp;
-    }
-    
-    public ChannelBuffer encode()
-    {
-        ChannelBuffer buffer = ChannelBuffers.dynamicBuffer();
-        
-        buffer.writeInt(block.length);
-        buffer.writeBytes(block);
-        buffer.writeInt(volumeId);
-        buffer.writeLong(logicalOffset);
-        buffer.writeLong(timestamp.getTime());
-        
-        return buffer;
-    }
-    
-    public boolean decode(ChannelBuffer buffer)
-    {
-        if (buffer.readableBytes() < 4)
-        {
-            return false;
-        }
-        
-        int length = buffer.readInt();
-        
-        if (buffer.readableBytes() < length + 20)
-        {
-            buffer.resetReaderIndex();
-            return false;
-        }
-        else
-        {
-            block = new byte[length];
-            buffer.readBytes(block);
-            volumeId = buffer.readInt();
-            logicalOffset = buffer.readLong();
-            timestamp = new Date(buffer.readLong());
-            return true;
-        }
+        return MessageType.writeRequest;
     }
 
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(block);
-        result = prime * result
-                + (int) (logicalOffset ^ (logicalOffset >>> 32));
-        result = prime * result
-                + ((timestamp == null) ? 0 : timestamp.hashCode());
-        result = prime * result + volumeId;
-        return result;
-    }
-
-    @Override
     public boolean equals(Object obj)
     {
-        if (this == obj)
-        {
-            return true;
-        }
         if (obj == null)
         {
             return false;
         }
-        if (!(obj instanceof WriteRequest))
+        else if (obj instanceof WriteRequest)
+        {
+            WriteRequest other = (WriteRequest) obj;
+
+            return super.equals(other)
+                && timestamp.equals(other.getTimestamp())
+                && Arrays.equals(block, other.getBlock());
+        }
+        else
         {
             return false;
         }
-        WriteRequest other = (WriteRequest) obj;
-        if (!Arrays.equals(block, other.block))
-        {
-            return false;
-        }
-        if (logicalOffset != other.logicalOffset)
-        {
-            return false;
-        }
-        if (timestamp == null)
-        {
-            if (other.timestamp != null)
-            {
-                return false;
-            }
-        } else if (!timestamp.equals(other.timestamp))
-        {
-            return false;
-        }
-        if (volumeId != other.volumeId)
-        {
-            return false;
-        }
-        return true;
     }
+
 }
 

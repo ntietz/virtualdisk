@@ -1,43 +1,38 @@
 package com.virtualdisk.network.request;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
+import com.virtualdisk.network.request.base.*;
+import com.virtualdisk.network.util.Sendable.*;
 
 public class DeleteVolumeRequestResult
-extends RequestResult
+extends VolumeRequestResult
 {
-    public DeleteVolumeRequestResult(boolean c, boolean s)
+    public DeleteVolumeRequestResult(int requestId, boolean done, boolean success)
     {
-        completed = c;
-        successful = s;
+        super(requestId, done, success);
     }
 
     public MessageType messageType()
     {
         return MessageType.deleteVolumeRequestResult;
     }
-    
-    public ChannelBuffer encode()
+
+    public boolean equals(Object obj)
     {
-        ChannelBuffer buffer = ChannelBuffers.dynamicBuffer();
-        
-        buffer.writeByte(completed ? 1 : 0);
-        buffer.writeByte(successful ? 1 : 0);
-        
-        return buffer;
-    }
-    
-    public boolean decode(ChannelBuffer buffer)
-    {
-        if (buffer.readableBytes() < 2)
+        if (obj == null)
         {
             return false;
         }
+        else if (obj instanceof DeleteVolumeRequestResult)
+        {
+            DeleteVolumeRequestResult other = (DeleteVolumeRequestResult) obj;
+
+            return super.equals(other);
+        }
         else
         {
-            completed = (buffer.readByte() == 1) ? true : false;
-            successful = (buffer.readByte() == 1) ? true : false;
-            return true;
+            return false;
         }
     }
+
 }
+

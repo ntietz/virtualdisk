@@ -1,6 +1,7 @@
 package com.virtualdisk.coordinator;
 
 import com.virtualdisk.network.*;
+import com.virtualdisk.network.util.DataNodeIdentifier;
 
 import org.junit.*;
 import static org.junit.Assert.*;
