@@ -58,7 +58,7 @@ extends NetworkServer
             DataNode node = dataNodes.get(each.getNodeId());
             Boolean value = node.order(volumeId, logicalOffset, timestamp);
 
-            OrderRequestResult result = new OrderRequestResult(true, value);
+            OrderRequestResult result = new OrderRequestResult(id, true, value);
             results.add(result);
         }
 
@@ -82,7 +82,7 @@ extends NetworkServer
             //node.createVolume(volumeId); // can be done safely each time. would be handled by the datanode server.
             Boolean value = node.write(volumeId, logicalOffset, block, timestamp);
 
-            WriteRequestResult result = new WriteRequestResult(true, value);
+            WriteRequestResult result = new WriteRequestResult(id, true, value);
             results.add(result);
         }
 
@@ -106,7 +106,7 @@ extends NetworkServer
             byte[] value = node.read(volumeId, logicalOffset);
             Date ts = node.getValueTimestamp(volumeId, logicalOffset);
 
-            ReadRequestResult result = new ReadRequestResult(true, true, value, ts);
+            ReadRequestResult result = new ReadRequestResult(id, true, true, ts, value);
             results.add(result);
         }
 
@@ -125,7 +125,7 @@ extends NetworkServer
         {
             each.createVolume(volumeId);
             
-            CreateVolumeRequestResult result = new CreateVolumeRequestResult(true, true);
+            CreateVolumeRequestResult result = new CreateVolumeRequestResult(id, true, true);
             results.add(result);
         }
         
@@ -144,7 +144,7 @@ extends NetworkServer
         {
             each.deleteVolume(volumeId);
             
-            DeleteVolumeRequestResult result = new DeleteVolumeRequestResult(true, true);
+            DeleteVolumeRequestResult result = new DeleteVolumeRequestResult(id, true, true);
             results.add(result);
         }
         
@@ -161,7 +161,7 @@ extends NetworkServer
         
         for (DataNode each : dataNodes)
         {
-            VolumeExistsRequestResult result = new VolumeExistsRequestResult(true, each.volumeExists(volumeId));
+            VolumeExistsRequestResult result = new VolumeExistsRequestResult(id, true, each.volumeExists(volumeId));
             results.add(result);
         }
         

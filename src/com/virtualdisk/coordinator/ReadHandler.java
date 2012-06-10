@@ -62,14 +62,14 @@ public class ReadHandler extends Handler
 
             for (ReadRequestResult each : results)
             {
-                if (each.completed())
+                if (each.isDone())
                 {
                     ++completed;
 
                     if (timestamp == null)
                     {
                         timestamp = each.getTimestamp();
-                        value = each.getResult();
+                        value = each.getBlock();
                     }
 
                     if ( !each.getTimestamp().equals(timestamp) )
@@ -79,7 +79,7 @@ public class ReadHandler extends Handler
                         if (each.getTimestamp().after(timestamp))
                         {
                             timestamp = each.getTimestamp();
-                            value = each.getResult();
+                            value = each.getBlock();
                         }
                     }
                 }

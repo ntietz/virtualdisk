@@ -51,6 +51,8 @@ extends Sendable
         buffer.writeInt(requestId);
         buffer.writeByte(done ? 1 : 0);
         buffer.writeByte(success ? 1 : 0);
+
+        return buffer;
     }
 
     public void decode(ChannelBuffer buffer)

@@ -60,11 +60,11 @@ public class WriteHandler extends Handler
 
             for (OrderRequestResult each : results)
             {
-                if (each.completed())
+                if (each.isDone())
                 {
                     ++completed;
 
-                    if (each.successful())
+                    if (each.wasSuccessful())
                     {
                         ++successful;
                     }
@@ -106,11 +106,11 @@ public class WriteHandler extends Handler
 
             for (WriteRequestResult each : results)
             {
-                if (each.completed())
+                if (each.isDone())
                 {
                     ++completed;
 
-                    if (each.successful())
+                    if (each.wasSuccessful())
                     {
                         ++successful;
                     }
