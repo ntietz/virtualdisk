@@ -1,0 +1,71 @@
+
+request
+    requestId
+
+blockRequest
+    (shared)
+        volumeId
+        logicalOffset
+    write
+        timestamp
+        block
+    read
+        (none)
+    order
+        timestamp
+
+volumeRequest
+    (shared)
+        volumeId
+    create
+        (none)
+    delete
+        (none)
+    exists
+        (none)
+
+=================================================
+
+requestResult
+    requestId
+    done        (true: got a response or timed out, false: still waiting)
+    success     (true: write succeeded, false: write failed for any reason)
+
+blockRequestResult
+    write
+        (none)
+    read
+        timestamp
+        block
+    order
+        (none)
+
+volumeRequestResult
+    create
+        (none)
+    delete
+        (none)
+    exists
+        (none)
+
+
+=================================================
+    ENCODING / DECODING SCHEME
+=================================================
+
+encode:
+    message-type    (1 byte)
+    message-length  (4 bytes - int)
+    super-class's encoding
+    encode members
+
+decode:
+    read message-type
+    read message-length
+    if enough-readable-bytes
+        decode super-class's members
+        decode members
+    else
+        reset buffer index
+        wait for more input
+
