@@ -1,9 +1,7 @@
 package com.virtualdisk.network.request;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.Random;

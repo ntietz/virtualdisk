@@ -60,5 +60,14 @@ extends Sendable
             return false;
         }
     }
+
+    public int hashCode()
+    {
+        int hash = super.hashCode();
+
+        hash = prime*hash + requestId;
+
+        return hash;
+    }
 }
 

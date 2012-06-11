@@ -51,5 +51,9 @@ extends VolumeRequestResult
         }
     }
 
+    public int hashCode()
+    {
+        return super.hashCode();
+    }
 }
 

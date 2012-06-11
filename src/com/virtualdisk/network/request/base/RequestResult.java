@@ -81,5 +81,16 @@ extends Sendable
             return false;
         }
     }
+
+    public int hashCode()
+    {
+        int hash = super.hashCode();
+
+        hash = prime*hash + requestId;
+        hash = prime*hash + (done ? 1 : 0);
+        hash = prime*hash + (success ? 1 : 0);
+
+        return hash;
+    }
 }
 

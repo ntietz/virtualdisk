@@ -58,5 +58,14 @@ extends Request
             return false;
         }
     }
+
+    public int hashCode()
+    {
+        int hash = super.hashCode();
+
+        hash = prime*hash + volumeId;
+
+        return hash;
+    }
 }
 

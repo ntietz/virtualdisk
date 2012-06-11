@@ -71,5 +71,15 @@ extends Request
             return false;
         }
     }
+
+    public int hashCode()
+    {
+        int hash = super.hashCode();
+
+        hash = hash*prime + volumeId;
+        hash = hash*prime + (int) (logicalOffset ^ (logicalOffset >>> 32));
+
+        return hash;
+    }
 }
 

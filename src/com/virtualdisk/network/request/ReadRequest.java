@@ -50,5 +50,10 @@ extends BlockRequest
             return false;
         }
     }
+
+    public int hashCode()
+    {
+        return super.hashCode();
+    }
 }
 

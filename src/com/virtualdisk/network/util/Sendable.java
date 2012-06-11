@@ -4,6 +4,8 @@ import org.jboss.netty.buffer.*;
 
 public abstract class Sendable
 {
+    public static final int prime = 31;
+
     public abstract MessageType messageType();
     public abstract void decode(ChannelBuffer buffer);
     public abstract ChannelBuffer encode();
@@ -15,7 +17,10 @@ public abstract class Sendable
         return 5; // 1 byte for message type, 4 for message length
     }
 
-    //public abstract int hashCode();
+    public int hashCode()
+    {
+        return 17;
+    }
     public abstract boolean equals(Object obj);
     
     /**

@@ -83,5 +83,20 @@ extends BlockRequestResult
             return false;
         }
     }
+
+    public int hashCode()
+    {
+        int hash = super.hashCode();
+
+        long t = timestamp.getTime();
+        hash = prime*hash + ((int) (t ^ (t >>> 32)));
+
+        for (byte each : block)
+        {
+            hash = prime*hash + (int) each;
+        }
+
+        return hash;
+    }
 }
 

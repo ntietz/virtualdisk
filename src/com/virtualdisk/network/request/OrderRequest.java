@@ -65,5 +65,15 @@ extends BlockRequest
             return false;
         }
     }
+
+    public int hashCode()
+    {
+        int hash = super.hashCode();
+
+        long t = timestamp.getTime();
+        hash = prime*hash + ((int) (t ^ (t >>> 32)));
+
+        return hash;
+    }
 }
 

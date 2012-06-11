@@ -24,5 +24,10 @@ extends RequestResult
     {
         super.decode(buffer);
     }
+
+    public int hashCode()
+    {
+        return super.hashCode();
+    }
 }
 
