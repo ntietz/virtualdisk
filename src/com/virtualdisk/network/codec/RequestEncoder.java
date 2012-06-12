@@ -1,7 +1,20 @@
 package com.virtualdisk.network.codec;
 
-public class RequestEncoder
-{
+import com.virtualdisk.network.util.*;
 
+import org.jboss.netty.channel.*;
+import org.jboss.netty.buffer.*;
+
+public class RequestEncoder
+extends SimpleChannelHandler
+{
+    public void writeRequested(ChannelHandlerContext context, MessageEvent event)
+    {
+        Sendable message = (Sendable) event;
+        
+        ChannelBuffer buffer = message.encode();
+
+        Channels.write(context, event.getFuture(), buffer);
+    }
 }
 
