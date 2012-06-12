@@ -5,10 +5,14 @@
 
     <property name="src" location="src/" />
     <property name="lib" location="lib/" />
+    <property name="extern" location="extern/" />
     <property name="test" location="test/" />
     <property name="build" location="build/" />
+    <property name="instrumented" location="instrumented/" />
     <property name="dist" location="dist/" />
     <property name="reports" location="reports/" />
+    <property name="reports.test" location="reports/test" />
+    <property name="reports.coverage" location="reports/coverage" />
 
     <path id="classpath.base">
         <fileset dir="${lib}">
@@ -19,14 +23,22 @@
     </path>
 
     <path id="classpath.test">
+        <pathelement location="${instrumented}" />
+        <fileset dir="${extern}">
+            <include name="**/*.jar" />
+        </fileset>
         <pathelement location="${test}" />
         <path refid="classpath.base" />
     </path>
+
+    <taskdef classpathref="classpath.test" resource="tasks.properties" />
 
     <target name="init" description="Sets up the structure for building.">
         <mkdir dir="${build}" />
         <mkdir dir="${dist}" />
         <mkdir dir="${reports}" />
+        <mkdir dir="${reports.test}" />
+        <mkdir dir="${reports.coverage}" />
         <mkdir dir="data" />
     </target>
 
@@ -53,8 +65,20 @@
         </javac>
     </target>
 
-    <target name="run-tests" depends="compile-tests" description="Runs the tests, fails if any test fails.">
+    <target name="instrument" depends="compile-tests" description="Instruments the class files to measure code coverage.">
+        <cobertura-instrument todir="${instrumented}" datafile="cobertura.ser">
+            <fileset dir="${build}">
+                <include name="**/*.class" />
+                <exclude name="**/*Test.class" />
+                <exclude name="TestFile.class" />
+                <exclude name="**/Fake*NetworkServer.class" />
+            </fileset>
+        </cobertura-instrument>
+    </target>
+
+    <target name="run-tests" depends="compile-tests,instrument" description="Runs the tests, fails if any test fails.">
         <junit printsummary="yes" failureProperty="test.failure">
+            <sysproperty key="net.sourceforge.cobertura.datafile" value="cobertura.ser" />
             <classpath refid="classpath.test" />
             <formatter type="plain" />
             <batchtest todir="${reports}">
@@ -66,11 +90,18 @@
         <fail message="Test failed." if="test.failure" />
     </target>
 
+    <target name="coverage-report" description="Generates the coverage report.">
+        <cobertura-report datafile="cobertura.ser"
+            format="html" destdir="${reports.coverage}" srcdir="${src}" />
+    </target>
+
     <target name="clean" description="Removes all created files and directories.">
         <delete dir="${build}" />
         <delete dir="${dist}" />
+        <delete dir="${instrumented}" />
         <delete dir="${reports}" />
         <delete dir="data" />
+        <delete file="cobertura.ser" />
     </target>
 
 </project>
