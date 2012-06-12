@@ -10,7 +10,7 @@ public abstract class Sendable
     public abstract void decode(ChannelBuffer buffer);
     public abstract ChannelBuffer encode();
     public abstract ChannelBuffer addHeader(ChannelBuffer buffer);
-    //public abstract ChannelBuffer encodeWithHeader();
+    public abstract ChannelBuffer encodeWithHeader();
     public abstract int messageSize(); // EXCLUDES header size
     public int headerSize()
     {

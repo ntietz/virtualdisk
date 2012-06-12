@@ -47,6 +47,11 @@ extends BlockRequestResult
         return message;
     }
 
+    public ChannelBuffer encodeWithHeader()
+    {
+        return addHeader(encode());
+    }
+
     public boolean equals(Object obj)
     {
         if (obj == null)
