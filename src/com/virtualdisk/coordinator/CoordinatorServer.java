@@ -29,9 +29,9 @@ public class CoordinatorServer
         
         List<DataNodeIdentifier> nodes; // TODO initialize
 
-        ServerBootstrap serverBootstrap = new ServerBootstrap(
-            new NioServerSocketChannelFactory( Executors.newCachedThreadPool()
-                                             , Executors.newCachedThreadPool()));
+        //ServerBootstrap serverBootstrap = new ServerBootstrap(
+        //    new NioServerSocketChannelFactory( Executors.newCachedThreadPool()
+        //                                     , Executors.newCachedThreadPool()));
 
         ClientBootstrap clientBootstrap = new ClientBootstrap(
             new NioClientSocketChannelFactory( Executors.newCachedThreadPool()
