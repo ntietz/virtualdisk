@@ -12,8 +12,14 @@ import java.util.concurrent.*;
 
 public class CoordinatorServer
 {
-    static private final ChannelGroup allChannels = new DefaultChannelGroup("CoordinatorServer");
-    static private Coordinator coordinator;
+    private final ChannelGroup allChannels;
+    private final Coordinator coordinator;
+
+    private CoordinatorServer()
+    {
+        allChannels = new DefaultChannelGroup("CoordinatorServer");
+        //coordinator = new Coordinator(0, 0, 0, 0, null, null);
+    }
 
     public static void main(String... args)
     {
