@@ -56,44 +56,52 @@ public class RequestFuture
         }
         else
         {
+            boolean done;
+            if (isTimedOut())
+            {
+                done = true;
+            }
+            else
+            {
+                done = false;
+            }
+
             switch (requestType)
             {
                 case orderRequest:
                 case orderRequestResult:
-                    result = new OrderRequestResult(requestId, true, false);
+                    result = new OrderRequestResult(requestId, done, false);
                     return result;
 
                 case readRequest:
                 case readRequestResult:
-                    result = new ReadRequestResult(requestId, true, false, null, null);
+                    result = new ReadRequestResult(requestId, done, false, null, null);
                     return result;
 
                 case writeRequest:
                 case writeRequestResult:
-                    result = new WriteRequestResult(requestId, true, false);
+                    result = new WriteRequestResult(requestId, done, false);
                     return result;
 
                 case volumeExistsRequest:
                 case volumeExistsRequestResult:
-                    //...
-                    break;
+                    result = new VolumeExistsRequestResult(requestId, done, false, false);
+                    return result;
 
                 case createVolumeRequest:
                 case createVolumeRequestResult:
-                    //...
-                    break;
+                    result = new CreateVolumeRequestResult(requestId, done, false);
+                    return result;
 
                 case deleteVolumeRequest:
                 case deleteVolumeRequestResult:
-                    //...
-                    break;
+                    result = new DeleteVolumeRequestResult(requestId, done, false);
+                    return result;
 
                 default:
                     return null;
             }
         }
-        // TODO TODO TODO remove this line, here just temporarily for compiling
-        return null;
     }
 }
 
