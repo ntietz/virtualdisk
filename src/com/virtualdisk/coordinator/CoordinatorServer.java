@@ -1,7 +1,8 @@
 package com.virtualdisk.coordinator;
 
 import com.virtualdisk.network.*;
-import com.virtualdisk.network.util.DataNodeIdentifier;
+import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.util.*;
 
 import org.jboss.netty.bootstrap.*;
 import org.jboss.netty.channel.group.*;
@@ -12,40 +13,54 @@ import java.util.concurrent.*;
 
 public class CoordinatorServer
 {
-    private final ChannelGroup allChannels;
-    private final Coordinator coordinator;
+    private static ChannelGroup allChannels;
+    private static Coordinator coordinator;
+    private static CoordinatorServer instance;
+    private static int lastAssignedId;
 
     private CoordinatorServer()
     {
         allChannels = new DefaultChannelGroup("CoordinatorServer");
         //coordinator = new Coordinator(0, 0, 0, 0, null, null);
+
+        lastAssignedId = 0;
+
+        instance = this;
     }
 
-    public static void main(String... args)
+    public static CoordinatorServer getInstance()
     {
-        /*
-         *  USAGE:  coordinator.sh
-         *          coordinator.sh conf.xml
-         *  configuration is read in from a configuration file.
-         *  this configuration file is conf.xml by default.
-         */
-        // TODO determine usage and implement it
+        if (instance == null)
+        {
+            instance = new CoordinatorServer();
+        }
+        return instance;
+    }
 
-        int port = Integer.valueOf(args[0]);
-        
-        List<DataNodeIdentifier> nodes; // TODO initialize
+    public static Coordinator getCoordinator()
+    {
+        if (instance == null)
+        {
+            instance = new CoordinatorServer();
+        }
+        return coordinator;
+    }
 
-        //ServerBootstrap serverBootstrap = new ServerBootstrap(
-        //    new NioServerSocketChannelFactory( Executors.newCachedThreadPool()
-        //                                     , Executors.newCachedThreadPool()));
+    public int issueOrderRequest(SegmentGroup targets, int volumeId, long logicalOffset, Date timestamp)
+    {
+        int id = generateNewRequestId();
 
-        ClientBootstrap clientBootstrap = new ClientBootstrap(
-            new NioClientSocketChannelFactory( Executors.newCachedThreadPool()
-                                             , Executors.newCachedThreadPool()));
+        OrderRequest request = new OrderRequest(id, volumeId, logicalOffset, timestamp);
 
-        // TODO connect to all the nodes
+        // TODO write it to the network
 
+        return id;
+    }
 
+    protected synchronized int generateNewRequestId()
+    {
+        ++lastAssignedId;
+        return lastAssignedId;
     }
 
 }

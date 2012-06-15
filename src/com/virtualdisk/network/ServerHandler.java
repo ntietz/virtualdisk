@@ -1,5 +1,6 @@
 package com.virtualdisk.network.codec;
 
+import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.util.*;
 import com.virtualdisk.network.util.Sendable.MessageType;
 
@@ -8,6 +9,8 @@ import org.jboss.netty.channel.*;
 public class ServerHandler
 extends SimpleChannelHandler
 {
+    Coordinator coordinator = CoordinatorServer.getCoordinator();
+
     public void messageReceived( ChannelHandlerContext context
                                , MessageEvent event
                                )
@@ -33,6 +36,26 @@ extends SimpleChannelHandler
                 break;
 
             case deleteVolumeRequestResult:
+                break;
+
+            case writeRequest:
+                // user-program writing
+                break;
+
+            case readRequest:
+                // user-program reading
+                break;
+
+            case createVolumeRequest:
+                // user-program creating volume
+                break;
+
+            case deleteVolumeRequest:
+                // user-program deleting volume
+                break;
+
+            case volumeExistsRequest:
+                // user-program checking volume
                 break;
 
             default:
