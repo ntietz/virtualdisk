@@ -9,9 +9,17 @@ import static org.jboss.netty.buffer.ChannelBuffers.*;
 public class VolumeExistsRequestResult
 extends VolumeRequestResult
 {
-    public VolumeExistsRequestResult(int requestId, boolean done, boolean success)
+    private boolean exists;
+
+    public VolumeExistsRequestResult(int requestId, boolean done, boolean success, boolean exists)
     {
         super(requestId, done, success);
+        this.exists = exists;
+    }
+
+    public boolean volumeExists()
+    {
+        return exists;
     }
 
     public MessageType messageType()
@@ -21,17 +29,21 @@ extends VolumeRequestResult
 
     public int messageSize()
     {
-        return 0 + super.messageSize();
+        return 1 + super.messageSize();
     }
 
     public ChannelBuffer encode()
     {
-        return super.encode();
+        ChannelBuffer buffer = super.encode();
+        buffer.writeByte(exists ? 1 : 0);
+
+        return buffer;
     }
 
     public void decode(ChannelBuffer buffer)
     {
         super.decode(buffer);
+        exists = (buffer.readByte() == 1);
     }
 
     public ChannelBuffer addHeader(ChannelBuffer buffer)
@@ -62,7 +74,8 @@ extends VolumeRequestResult
         {
             VolumeExistsRequestResult other = (VolumeExistsRequestResult) obj;
 
-            return super.equals(other);
+            return super.equals(other)
+                && exists == other.exists;
         }
         else
         {
@@ -72,7 +85,11 @@ extends VolumeRequestResult
 
     public int hashCode()
     {
-        return super.hashCode();
+        int hash = super.hashCode();
+
+        hash = prime*hash + (exists ? 1 : 0);
+
+        return hash;
     }
 }
 

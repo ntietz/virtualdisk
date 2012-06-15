@@ -13,6 +13,17 @@ import java.util.*;
 
 public abstract class NetworkServer
 {
+    private static long timeoutLength = 0;
+
+    public static void setTimeoutLength(long timeoutLength)
+    {
+        NetworkServer.timeoutLength = timeoutLength;
+    }
+
+    public static long timeoutLength()
+    {
+        return timeoutLength;
+    }
 
     /*
      * This method should issue an order request to the nodes/node-servers and return the identifier for the request.

@@ -32,12 +32,22 @@ extends Sendable
         return done;
     }
 
+    public void setDone(boolean done)
+    {
+        this.done = done;
+    }
+
     /**
      * @return  true if the request succeeded, false if it failed for any reason
      */
     public boolean wasSuccessful()
     {
         return success;
+    }
+
+    public void setSuccess(boolean success)
+    {
+        this.success = success;
     }
 
     public int messageSize()

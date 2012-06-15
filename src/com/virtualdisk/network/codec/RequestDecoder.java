@@ -74,7 +74,7 @@ extends FrameDecoder
                 return volumeExistsRequest;
 
             case volumeExistsRequestResult:
-                VolumeExistsRequestResult volumeExistsRequestResult = new VolumeExistsRequestResult(0, false, false);
+                VolumeExistsRequestResult volumeExistsRequestResult = new VolumeExistsRequestResult(0, false, false, false);
                 volumeExistsRequestResult.decode(buffer);
                 return volumeExistsRequestResult;
 

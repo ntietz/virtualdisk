@@ -54,15 +54,13 @@ extends NetworkServer
 
         OrderRequest request = new OrderRequest(id, volumeId, logicalOffset, timestamp);
 
-        // TODO write it to the network
-
-        /*
+        /* TODO
             for (each target)
             {
                 write each to the network
-                add an (id, requestFuture) pair to the result store
+                add a Future to the request store
+                    (as results come back, they get written into the Future)
             }
-
         */
 
         return id;
