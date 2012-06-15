@@ -1,5 +1,6 @@
 package com.virtualdisk.coordinator;
 
+import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.*;
 import com.virtualdisk.network.request.*;
 import com.virtualdisk.network.util.*;
@@ -12,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class CoordinatorServer
+extends NetworkServer
 {
     private static ChannelGroup allChannels;
     private static Coordinator coordinator;
@@ -54,7 +56,91 @@ public class CoordinatorServer
 
         // TODO write it to the network
 
+        /*
+            for (each target)
+            {
+                write each to the network
+                add an (id, requestFuture) pair to the result store
+            }
+
+        */
+
         return id;
+    }
+
+    public int issueWriteRequest( SegmentGroup targets
+                                , int volumeId
+                                , long logicalOffset
+                                , byte[] block
+                                , Date timestamp
+                                )
+    {
+        return 0;
+    }
+
+    public int issueReadRequest(SegmentGroup targets, int volumeId, long logicalOffset)
+    {
+        return 0;
+    }
+
+    public int issueVolumeCreationRequest(int volumeId)
+    {
+        return 0;
+    }
+
+    public int issueVolumeDeletionRequest(int volumeId)
+    {
+        return 0;
+    }
+
+    public int issueVolumeExistsRequest(int volumeId)
+    {
+        return 0;
+    }
+
+    public List<OrderRequestResult> getOrderRequestResults(int requestId)
+    {
+        return null;
+    }
+
+    public List<WriteRequestResult> getWriteRequestResults(int requestId)
+    {
+        return null;
+    }
+
+    public List<ReadRequestResult> getReadRequestResults(int requestId)
+    {
+        return null;
+    }
+
+    public List<CreateVolumeRequestResult> getVolumeCreationRequestResults(int requestId)
+    {
+        return null;
+    }
+
+    public List<DeleteVolumeRequestResult> getVolumeDeletionRequestResults(int requestId)
+    {
+        return null;
+    }
+
+    public List<VolumeExistsRequestResult> getVolumeExistsRequestResults(int requestId)
+    {
+        return null;
+    }
+
+    public List<DataNodeIdentifier> getDataNodes()
+    {
+        return null;
+    }
+
+    public boolean attachDataNode(DataNodeIdentifier node)
+    {
+        return false;
+    }
+
+    public boolean detachDataNode(DataNodeIdentifier node)
+    {
+        return false;
     }
 
     protected synchronized int generateNewRequestId()
