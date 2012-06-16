@@ -6,7 +6,7 @@ import com.virtualdisk.network.request.*;
 import com.virtualdisk.network.util.*;
 
 import org.jboss.netty.bootstrap.*;
-import org.jboss.netty.channel.group.*;
+import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.nio.*;
 
 import java.util.*;
@@ -15,17 +15,24 @@ import java.util.concurrent.*;
 public class CoordinatorServer
 extends NetworkServer
 {
-    private static ChannelGroup allChannels;
     private static Coordinator coordinator;
     private static CoordinatorServer instance;
-    private static int lastAssignedId;
+
+    private int lastAssignedId;
+
+    private List<DataNodeIdentifier> allNodes;
+    private Map<Integer, Channel> channelMap;
+    private Map<Integer, List<RequestFuture>> resultMap;
 
     private CoordinatorServer()
     {
-        allChannels = new DefaultChannelGroup("CoordinatorServer");
         //coordinator = new Coordinator(0, 0, 0, 0, null, null);
 
         lastAssignedId = 0;
+
+        allNodes = new ArrayList<DataNodeIdentifier>();
+        channelMap = new HashMap<Integer, Channel>();
+        resultMap = new ConcurrentHashMap<Integer, List<RequestFuture>>();
 
         instance = this;
     }
@@ -48,20 +55,31 @@ extends NetworkServer
         return coordinator;
     }
 
-    public int issueOrderRequest(SegmentGroup targets, int volumeId, long logicalOffset, Date timestamp)
+    public int issueOrderRequest( SegmentGroup targets
+                                , int volumeId
+                                , long logicalOffset
+                                , Date timestamp
+                                )
     {
         int id = generateNewRequestId();
 
         OrderRequest request = new OrderRequest(id, volumeId, logicalOffset, timestamp);
 
-        /* TODO
-            for (each target)
-            {
-                write each to the network
-                add a Future to the request store
-                    (as results come back, they get written into the Future)
-            }
-        */
+        List<RequestFuture> futures = new ArrayList<RequestFuture>();
+        for (int index = 0; index < targets.getMembers().size(); ++index)
+        {
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            futures.add(future);
+        }
+
+        resultMap.put(id, futures);
+
+        for (DataNodeIdentifier eachTarget : targets.getMembers())
+        {
+            int targetId = eachTarget.getNodeId();
+            Channel channel = channelMap.get(targetId);
+            channel.write(request);
+        }
 
         return id;
     }
@@ -73,62 +91,266 @@ extends NetworkServer
                                 , Date timestamp
                                 )
     {
-        return 0;
+        int id = generateNewRequestId();
+
+        WriteRequest request = new WriteRequest(id, volumeId, logicalOffset, timestamp, block);
+
+        List<RequestFuture> futures = new ArrayList<RequestFuture>();
+        for (int index = 0; index < targets.getMembers().size(); ++index)
+        {
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            futures.add(future);
+        }
+
+        resultMap.put(id, futures);
+
+        for (DataNodeIdentifier eachTarget : targets.getMembers())
+        {
+            int targetId = eachTarget.getNodeId();
+            Channel channel = channelMap.get(targetId);
+            channel.write(request);
+        }
+
+        return id;
     }
 
-    public int issueReadRequest(SegmentGroup targets, int volumeId, long logicalOffset)
+    public int issueReadRequest( SegmentGroup targets
+                               , int volumeId
+                               , long logicalOffset
+                               )
     {
-        return 0;
+        int id = generateNewRequestId();
+
+        ReadRequest request = new ReadRequest(id, volumeId, logicalOffset);
+
+        List<RequestFuture> futures = new ArrayList<RequestFuture>();
+        for (int index = 0; index < targets.getMembers().size(); ++index)
+        {
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            futures.add(future);
+        }
+
+        resultMap.put(id, futures);
+
+        for (DataNodeIdentifier eachTarget : targets.getMembers())
+        {
+            int targetId = eachTarget.getNodeId();
+            Channel channel = channelMap.get(targetId);
+            channel.write(request);
+        }
+
+        return id;
     }
 
     public int issueVolumeCreationRequest(int volumeId)
     {
-        return 0;
+        List<DataNodeIdentifier> targets = allNodes;
+        int id = generateNewRequestId();
+
+        CreateVolumeRequest request = new CreateVolumeRequest(id, volumeId);
+
+        List<RequestFuture> futures = new ArrayList<RequestFuture>();
+        for (int index = 0; index < targets.size(); ++index)
+        {
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            futures.add(future);
+        }
+
+        resultMap.put(id, futures);
+
+        for (DataNodeIdentifier eachTarget : targets)
+        {
+            int targetId = eachTarget.getNodeId();
+            Channel channel = channelMap.get(targetId);
+            channel.write(request);
+        }
+
+        return id;
     }
 
     public int issueVolumeDeletionRequest(int volumeId)
     {
-        return 0;
+        List<DataNodeIdentifier> targets = allNodes;
+        int id = generateNewRequestId();
+
+        DeleteVolumeRequest request = new DeleteVolumeRequest(id, volumeId);
+
+        List<RequestFuture> futures = new ArrayList<RequestFuture>();
+        for (int index = 0; index < targets.size(); ++index)
+        {
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            futures.add(future);
+        }
+
+        resultMap.put(id, futures);
+
+        for (DataNodeIdentifier eachTarget : targets)
+        {
+            int targetId = eachTarget.getNodeId();
+            Channel channel = channelMap.get(targetId);
+            channel.write(request);
+        }
+
+        return id;
+
     }
 
     public int issueVolumeExistsRequest(int volumeId)
     {
-        return 0;
+        List<DataNodeIdentifier> targets = allNodes;
+        int id = generateNewRequestId();
+
+        VolumeExistsRequest request = new VolumeExistsRequest(id, volumeId);
+
+        List<RequestFuture> futures = new ArrayList<RequestFuture>();
+        for (int index = 0; index < targets.size(); ++index)
+        {
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            futures.add(future);
+        }
+
+        resultMap.put(id, futures);
+
+        for (DataNodeIdentifier eachTarget : targets)
+        {
+            int targetId = eachTarget.getNodeId();
+            Channel channel = channelMap.get(targetId);
+            channel.write(request);
+        }
+
+        return id;
+
     }
 
     public List<OrderRequestResult> getOrderRequestResults(int requestId)
     {
-        return null;
+        List<RequestFuture> futures = resultMap.get(requestId);
+
+        if (futures == null)
+        {
+            return new ArrayList<OrderRequestResult>();
+        }
+        else
+        {
+            List<OrderRequestResult> results = new ArrayList<OrderRequestResult>();
+
+            for (RequestFuture each : futures)
+            {
+                results.add((OrderRequestResult)each.getResult());
+            }
+
+            return results;
+        }
     }
 
     public List<WriteRequestResult> getWriteRequestResults(int requestId)
     {
-        return null;
+        List<RequestFuture> futures = resultMap.get(requestId);
+
+        if (futures == null)
+        {
+            return new ArrayList<WriteRequestResult>();
+        }
+        else
+        {
+            List<WriteRequestResult> results = new ArrayList<WriteRequestResult>();
+
+            for (RequestFuture each : futures)
+            {
+                results.add((WriteRequestResult)each.getResult());
+            }
+
+            return results;
+        }
     }
 
     public List<ReadRequestResult> getReadRequestResults(int requestId)
     {
-        return null;
+        List<RequestFuture> futures = resultMap.get(requestId);
+
+        if (futures == null)
+        {
+            return new ArrayList<ReadRequestResult>();
+        }
+        else
+        {
+            List<ReadRequestResult> results = new ArrayList<ReadRequestResult>();
+
+            for (RequestFuture each : futures)
+            {
+                results.add((ReadRequestResult)each.getResult());
+            }
+
+            return results;
+        }
     }
 
     public List<CreateVolumeRequestResult> getVolumeCreationRequestResults(int requestId)
     {
-        return null;
+        List<RequestFuture> futures = resultMap.get(requestId);
+
+        if (futures == null)
+        {
+            return new ArrayList<CreateVolumeRequestResult>();
+        }
+        else
+        {
+            List<CreateVolumeRequestResult> results = new ArrayList<CreateVolumeRequestResult>();
+
+            for (RequestFuture each : futures)
+            {
+                results.add((CreateVolumeRequestResult)each.getResult());
+            }
+
+            return results;
+        }
     }
 
     public List<DeleteVolumeRequestResult> getVolumeDeletionRequestResults(int requestId)
     {
-        return null;
+        List<RequestFuture> futures = resultMap.get(requestId);
+
+        if (futures == null)
+        {
+            return new ArrayList<DeleteVolumeRequestResult>();
+        }
+        else
+        {
+            List<DeleteVolumeRequestResult> results = new ArrayList<DeleteVolumeRequestResult>();
+
+            for (RequestFuture each : futures)
+            {
+                results.add((DeleteVolumeRequestResult)each.getResult());
+            }
+
+            return results;
+        }
     }
 
     public List<VolumeExistsRequestResult> getVolumeExistsRequestResults(int requestId)
     {
-        return null;
+        List<RequestFuture> futures = resultMap.get(requestId);
+
+        if (futures == null)
+        {
+            return new ArrayList<VolumeExistsRequestResult>();
+        }
+        else
+        {
+            List<VolumeExistsRequestResult> results = new ArrayList<VolumeExistsRequestResult>();
+
+            for (RequestFuture each : futures)
+            {
+                results.add((VolumeExistsRequestResult)each.getResult());
+            }
+
+            return results;
+        }
     }
 
     public List<DataNodeIdentifier> getDataNodes()
     {
-        return null;
+        return new ArrayList<DataNodeIdentifier>(allNodes);
     }
 
     public boolean attachDataNode(DataNodeIdentifier node)
