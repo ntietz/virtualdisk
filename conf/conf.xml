@@ -1,0 +1,33 @@
+<cluster>
+    <coordinator>
+        <hostname>localhost</hostname>
+        <port>12000</port>
+        <segmentgroupsize>3</segmentgroupsize>
+        <segmentgroupspernode>2</segmentgroupspernode>
+        <quorumsize>2</quorumsize>
+    </coordinator>
+
+    <datanode>
+        <hostname>localhost</hostname>
+        <port>12001</port>
+        <disk>/tmp/node0</disk>
+    </datanode>
+
+    <datanode>
+        <hostname>localhost</hostname>
+        <port>12002</port>
+        <disk>/tmp/node1</disk>
+    </datanode>
+
+    <datanode>
+        <hostname>localhost</hostname>
+        <port>12003</port>
+        <disk>/tmp/node2</disk>
+    </datanode>
+
+    <datanode>
+        <hostname>localhost</hostname>
+        <port>12004</port>
+        <disk>/tmp/node3</disk>
+    </datanode>
+</cluster>
