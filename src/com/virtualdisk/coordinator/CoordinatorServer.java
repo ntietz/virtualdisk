@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 public class CoordinatorServer
 extends NetworkServer
 {
-    private static Coordinator coordinator;
+    //private static Coordinator coordinator;
     private static CoordinatorServer instance;
 
     private int lastAssignedId;
@@ -46,6 +46,7 @@ extends NetworkServer
         return instance;
     }
 
+    /*
     public static Coordinator getCoordinator()
     {
         if (instance == null)
@@ -54,6 +55,7 @@ extends NetworkServer
         }
         return coordinator;
     }
+    */
 
     public int issueOrderRequest( SegmentGroup targets
                                 , int volumeId

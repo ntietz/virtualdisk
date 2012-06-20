@@ -9,7 +9,8 @@ import org.jboss.netty.channel.*;
 public class ServerHandler
 extends SimpleChannelHandler
 {
-    Coordinator coordinator = CoordinatorServer.getCoordinator();
+    //Coordinator coordinator = CoordinatorServer.getCoordinator();
+    Coordinator coordinator = null;
 
     public void messageReceived( ChannelHandlerContext context
                                , MessageEvent event
