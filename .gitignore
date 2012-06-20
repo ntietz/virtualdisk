@@ -1,6 +1,7 @@
 *.class
 *.swp
 *.swo
+dist/
 
 # Package Files #
 *.war
