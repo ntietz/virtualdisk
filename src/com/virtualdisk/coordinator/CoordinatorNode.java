@@ -31,7 +31,7 @@ public class CoordinatorNode
         }
         else
         {
-            this = new CoordinatorNode();
+            node = new CoordinatorNode();
             return node;
         }
     }

@@ -1,10 +1,13 @@
 package com.virtualdisk.network.codec;
 
 import com.virtualdisk.coordinator.*;
+import com.virtualdisk.network.request.*;
 import com.virtualdisk.network.util.*;
 import com.virtualdisk.network.util.Sendable.MessageType;
 
 import org.jboss.netty.channel.*;
+
+import java.util.*;
 
 public class ServerHandler
 extends SimpleChannelHandler
@@ -39,9 +42,13 @@ extends SimpleChannelHandler
             case deleteVolumeRequestResult:
                 break;
 
-            case writeRequest:
-                // user-program writing
-                break;
+            case writeRequest: {
+                WriteRequest request = (WriteRequest) result;
+                int volumeId = request.getVolumeId();
+                long logicalOffset = request.getLogicalOffset();
+                byte[] block = request.getBlock();
+                coordinator.write(volumeId, logicalOffset, block);
+                } break;
 
             case readRequest:
                 // user-program reading
