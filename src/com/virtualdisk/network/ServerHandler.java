@@ -48,23 +48,34 @@ extends SimpleChannelHandler
                 long logicalOffset = request.getLogicalOffset();
                 byte[] block = request.getBlock();
                 coordinator.write(volumeId, logicalOffset, block);
+
+                // TODO register a callback to return the results to the user
                 } break;
 
-            case readRequest:
-                // user-program reading
-                break;
+            case readRequest: {
+                ReadRequest request = (ReadRequest) result;
+                int volumeId = request.getVolumeId();
+                long logicalOffset = request.getLogicalOffset();
+                coordinator.read(volumeId, logicalOffset);
 
-            case createVolumeRequest:
-                // user-program creating volume
-                break;
+                // TODO register a callback to return the results to the user
+                } break;
 
-            case deleteVolumeRequest:
-                // user-program deleting volume
-                break;
+            case createVolumeRequest: {
+                CreateVolumeRequest request = (CreateVolumeRequest) result;
+                int volumeId = request.getVolumeId();
+                coordinator.createVolume(volumeId);
 
-            case volumeExistsRequest:
-                // user-program checking volume
-                break;
+                // TODO register a callback to return the results to the user
+                } break;
+
+            case deleteVolumeRequest: {
+                DeleteVolumeRequest request = (DeleteVolumeRequest) result;
+                int volumeId = request.getVolumeId();
+                coordinator.deleteVolume(volumeId);
+
+                // TODO register a callback to return the results to the user
+                } break;
 
             default:
                 break;
