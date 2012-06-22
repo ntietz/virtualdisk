@@ -24,21 +24,27 @@ extends SimpleChannelHandler
         switch (type)
         {
             case orderRequestResult:
+                // TODO update to return result to user of the API
                 break;
 
             case readRequestResult:
+                // TODO update to return result to user of the API
                 break;
 
             case writeRequestResult:
+                // TODO update to return result to user of the API
                 break;
 
             case volumeExistsRequestResult:
+                // TODO update to return result to user of the API
                 break;
 
             case createVolumeRequestResult:
+                // TODO update to return result to user of the API
                 break;
 
             case deleteVolumeRequestResult:
+                // TODO update to return result to user of the API
                 break;
 
             case writeRequest: {
@@ -46,7 +52,7 @@ extends SimpleChannelHandler
                 int volumeId = request.getVolumeId();
                 long logicalOffset = request.getLogicalOffset();
                 byte[] block = request.getBlock();
-                coordinator.write(volumeId, logicalOffset, block);
+                int requestId = coordinator.write(volumeId, logicalOffset, block);
 
                 // TODO register a callback to return the results to the user
                 } break;
@@ -55,7 +61,7 @@ extends SimpleChannelHandler
                 ReadRequest request = (ReadRequest) result;
                 int volumeId = request.getVolumeId();
                 long logicalOffset = request.getLogicalOffset();
-                coordinator.read(volumeId, logicalOffset);
+                int requestId = coordinator.read(volumeId, logicalOffset);
 
                 // TODO register a callback to return the results to the user
                 } break;
