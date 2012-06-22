@@ -1,12 +1,12 @@
 package com.virtualdisk.coordinator;
 
-public class CoordinatorNode
+public class SingletonCoordinator
 {
     private static Coordinator coordinator;
     private static CoordinatorServer server;
-    private static CoordinatorNode node;
+    private static SingletonCoordinator singleton;
 
-    private CoordinatorNode()
+    private SingletonCoordinator()
     {
         // if coordinator is null, initialize it
 
@@ -23,16 +23,12 @@ public class CoordinatorNode
         return server;
     }
 
-    public static CoordinatorNode getNode()
+    public static void setup()
     {
-        if (node != null)
+        if (singleton == null)
         {
-            return node;
-        }
-        else
-        {
-            node = new CoordinatorNode();
-            return node;
+            // TODO make this use the correct constructor
+            singleton = new SingletonCoordinator();
         }
     }
 }
