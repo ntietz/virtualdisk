@@ -2,6 +2,8 @@
     <coordinator>
         <hostname>localhost</hostname>
         <port>12000</port>
+        <blocksize>16</blocksize>
+        <segmentsize>16</segmentsize>
         <segmentgroupsize>3</segmentgroupsize>
         <segmentgroupspernode>2</segmentgroupspernode>
         <quorumsize>2</quorumsize>
