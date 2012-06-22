@@ -12,8 +12,7 @@ import java.util.*;
 public class ServerHandler
 extends SimpleChannelHandler
 {
-    //Coordinator coordinator = CoordinatorServer.getCoordinator();
-    Coordinator coordinator = null;
+    Coordinator coordinator = SingletonCoordinator.getCoordinator();
 
     public void messageReceived( ChannelHandlerContext context
                                , MessageEvent event
