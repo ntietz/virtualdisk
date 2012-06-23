@@ -31,7 +31,13 @@ public class ServerMain
             new NioClientSocketChannelFactory( Executors.newCachedThreadPool()
                                              , Executors.newCachedThreadPool()));
 
-        // TODO connect to all the nodes
+        // TODO 
     }
-}
 
+    public static void start( int port
+                            )
+    {
+
+    }
+
+}
