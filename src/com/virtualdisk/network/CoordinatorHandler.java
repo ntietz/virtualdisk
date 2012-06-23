@@ -39,7 +39,7 @@ extends SimpleChannelHandler
                 byte[] block = request.getBlock();
                 int requestId = coordinator.write(volumeId, logicalOffset, block);
 
-                // TODO register a callback to return the results to the user
+                SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
 
             case readRequest: {
@@ -48,7 +48,7 @@ extends SimpleChannelHandler
                 long logicalOffset = request.getLogicalOffset();
                 int requestId = coordinator.read(volumeId, logicalOffset);
 
-                // TODO register a callback to return the results to the user
+                SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
 
             case createVolumeRequest: {
@@ -57,6 +57,7 @@ extends SimpleChannelHandler
                 coordinator.createVolume(volumeId);
 
                 // TODO register a callback to return the results to the user
+                //SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
 
             case deleteVolumeRequest: {
@@ -65,6 +66,7 @@ extends SimpleChannelHandler
                 coordinator.deleteVolume(volumeId);
 
                 // TODO register a callback to return the results to the user
+                //SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
 
             default:
