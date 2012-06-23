@@ -5,7 +5,7 @@ import com.virtualdisk.network.util.Sendable.MessageType;
 
 import org.jboss.netty.channel.*;
 
-public class ClientHandler
+public class DataNodeHandler
 extends SimpleChannelHandler
 {
     public void messageReceived( ChannelHandlerContext context

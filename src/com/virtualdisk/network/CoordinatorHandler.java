@@ -1,4 +1,4 @@
-package com.virtualdisk.network.codec;
+package com.virtualdisk.network;
 
 import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.request.*;
@@ -9,7 +9,7 @@ import org.jboss.netty.channel.*;
 
 import java.util.*;
 
-public class ServerHandler
+public class CoordinatorHandler
 extends SimpleChannelHandler
 {
     Coordinator coordinator = SingletonCoordinator.getCoordinator();
@@ -24,27 +24,12 @@ extends SimpleChannelHandler
         switch (type)
         {
             case orderRequestResult:
-                // TODO update to return result to user of the API
-                break;
-
             case readRequestResult:
-                // TODO update to return result to user of the API
-                break;
-
             case writeRequestResult:
-                // TODO update to return result to user of the API
-                break;
-
             case volumeExistsRequestResult:
-                // TODO update to return result to user of the API
-                break;
-
             case createVolumeRequestResult:
-                // TODO update to return result to user of the API
-                break;
-
             case deleteVolumeRequestResult:
-                // TODO update to return result to user of the API
+                SingletonCoordinator.sendToClient(result, event.getChannel());
                 break;
 
             case writeRequest: {

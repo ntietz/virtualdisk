@@ -10,7 +10,7 @@ extends SimpleChannelHandler
 {
     public void writeRequested(ChannelHandlerContext context, MessageEvent event)
     {
-        Sendable message = (Sendable) event;
+        Sendable message = (Sendable) event.getMessage();
         
         ChannelBuffer buffer = message.encode();
 
