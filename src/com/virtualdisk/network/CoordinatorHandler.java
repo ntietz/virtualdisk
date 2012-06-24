@@ -29,7 +29,7 @@ extends SimpleChannelHandler
             case volumeExistsRequestResult:
             case createVolumeRequestResult:
             case deleteVolumeRequestResult:
-                SingletonCoordinator.sendToClient(result, event.getChannel());
+                SingletonCoordinator.sendToClient(result, result.getRequestId());
                 break;
 
             case writeRequest: {

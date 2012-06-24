@@ -23,22 +23,26 @@ extends NetworkServer
     private Map<Integer, Channel> channelMap;
     private Map<Integer, List<RequestFuture>> resultMap;
 
-    private CoordinatorServer()
+    private CoordinatorServer( List<DataNodeIdentifier> allNodes
+                             , Map<Integer, Channel> channelMap
+                             )
     {
         lastAssignedId = 0;
 
-        allNodes = new ArrayList<DataNodeIdentifier>();
-        channelMap = new HashMap<Integer, Channel>();
+        this.allNodes = allNodes;
+        this.channelMap = channelMap;
         resultMap = new ConcurrentHashMap<Integer, List<RequestFuture>>();
 
         instance = this;
     }
 
-    public static CoordinatorServer getInstance()
+    public static CoordinatorServer getInstance( List<DataNodeIdentifier> allNodes
+                                               , Map<Integer, Channel> channelMap
+                                               )
     {
         if (instance == null)
         {
-            instance = new CoordinatorServer();
+            instance = new CoordinatorServer(allNodes, channelMap);
         }
         return instance;
     }

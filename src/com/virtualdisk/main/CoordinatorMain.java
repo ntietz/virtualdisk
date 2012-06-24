@@ -1,5 +1,6 @@
 package com.virtualdisk.main;
 
+import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.*;
 import com.virtualdisk.network.util.*;
 
@@ -44,12 +45,12 @@ public class CoordinatorMain
         List<DataNodeIdentifier> nodes = new ArrayList<DataNodeIdentifier>();
         // TODO construct the datanode identifiers
 
-        start(port, nodes);
+        connectToDataNodes(nodes);
+        startClientListener(port);
     }
 
-    public static void start( int coordinatorPort
-                            , List<DataNodeIdentifier> nodes
-                            )
+    public static void connectToDataNodes( List<DataNodeIdentifier> nodes
+                                         )
     {
 
         ChannelFactory channelFactory = new NioClientSocketChannelFactory
@@ -58,16 +59,50 @@ public class CoordinatorMain
             );
 
         ClientBootstrap bootstrap = new ClientBootstrap(channelFactory);
-
         bootstrap.setPipelineFactory(new CoordinatorPipelineFactory());
 
-        // TODO keep track of the channel futures
+        List<DataNodeIdentifier> connectedNodes = new ArrayList<DataNodeIdentifier>();
+        Map<Integer, Channel> channelMap = new HashMap<Integer, Channel>();
         for (DataNodeIdentifier node : nodes)
         {
             String host = node.getNodeAddress();
             int port = node.getPort();
-            bootstrap.connect(new InetSocketAddress(host, port));
+            System.out.println("Attempting to connect to " + host + ":" + port + "...");
+            ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
+            future.awaitUninterruptibly();
+            if (future.isDone() && future.isSuccess())
+            {
+                connectedNodes.add(node);
+                channelMap.put(node.getNodeId(), future.getChannel());
+                System.out.println("Connected!");
+            }
+            else
+            {
+                System.out.println("Connection failed.");
+            }
         }
+
+        SingletonCoordinator.setup( blockSize
+                                  , segmentSize
+                                  , segmentGroupSize
+                                  , quorumSize
+                                  , connectedNodes
+                                  , channelMap
+                                  );
+    }
+
+    public static void startClientListener( int port
+                                          )
+    {
+        ChannelFactory channelFactory = new NioServerSocketChannelFactory
+            ( Executors.newCachedThreadPool()
+            , Executors.newCachedThreadPool()
+            );
+
+        ServerBootstrap bootstrap = new ServerBootstrap(channelFactory);
+        bootstrap.setPipelineFactory(new CoordinatorPipelineFactory());
+
+        bootstrap.bind(new InetSocketAddress(port));
     }
 }
 

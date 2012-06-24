@@ -1,5 +1,6 @@
 package com.virtualdisk.main;
 
+import com.virtualdisk.network.*;
 import com.virtualdisk.network.util.*;
 
 import org.jboss.netty.bootstrap.*;
@@ -44,6 +45,7 @@ public class DataNodeMain
             );
 
         ServerBootstrap bootstrap = new ServerBootstrap(channelFactory);
+        bootstrap.setPipelineFactory(new DataNodePipelineFactory());
 
         bootstrap.bind(new InetSocketAddress(port));
     }

@@ -17,11 +17,18 @@ public class SingletonCoordinator
     private static Map<Channel, Integer> clientRegistry;
     private static Map<Integer, Integer> requestCallbacks;
 
-    private SingletonCoordinator()
-    {
-        // if coordinator is null, initialize it
+    private static int lastClientId = 0;
 
-        // if server is null, initialize it
+    private SingletonCoordinator( int blockSize
+                                , int segmentSize
+                                , int segmentGroupSize
+                                , int quorumSize
+                                , List<DataNodeIdentifier> nodes
+                                , Map<Integer, Channel> channelMap
+                                )
+    {
+        server = CoordinatorServer.getInstance(nodes, channelMap);
+        coordinator = new Coordinator(blockSize, segmentSize, segmentGroupSize, quorumSize, nodes, server);
     }
 
     public static Coordinator getCoordinator()
@@ -34,13 +41,30 @@ public class SingletonCoordinator
         return server;
     }
 
-    public static void setup()
+    public static void setup( int blockSize
+                            , int segmentSize
+                            , int segmentGroupSize
+                            , int quorumSize
+                            , List<DataNodeIdentifier> nodes
+                            , Map<Integer, Channel> channelMap
+                            )
     {
         if (singleton == null)
         {
-            // TODO make this use the correct constructor
-            singleton = new SingletonCoordinator();
+            singleton = new SingletonCoordinator( blockSize
+                                                , segmentSize
+                                                , segmentGroupSize
+                                                , quorumSize
+                                                , nodes
+                                                , channelMap
+                                                );
         }
+    }
+
+    public static void registerNewClient(Channel client)
+    {
+        ++lastClientId;
+        clientRegistry.put(client, lastClientId);
     }
 
     public static int getClientId(Channel client)
@@ -60,9 +84,10 @@ public class SingletonCoordinator
         requestCallbacks.put(requestId, getClientId(channel));
     }
 
-    public static void sendToClient(Sendable result, Channel channel)
+    public static void sendToClient(int requestId, Sendable result)
     {
-        // TODO 
+        Channel channel = requestCallbacks.get(requestId);
+        channel.write(result);
     }
 }
 
