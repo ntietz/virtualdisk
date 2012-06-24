@@ -14,23 +14,19 @@ public class DataNode
      * The volume table maps integer volume IDs onto diskmaps.
      * Diskmaps are simply maps of integers onto logical offsets (integers) onto physical offsets (integers).
      */
-    //protected Map<Integer,Map<Integer,DriveOffsetPair>> volumeTable;
     protected VolumeTable volumeTable;
 
     /*
      * The free space table contains ranges of free space which are able to be allocated.
      * It is indexed as freeSpaceTable[drive][rangeNumber]
      */
-    //protected List<List<Range>> freeSpaceTable;
     protected FreeSpaceTable freeSpaceTable;
 
     /*
      * The timestamp tables map each volume ID to a map of each logical offset to a timestamp.
      * The timestamps are Dates, so they are millisecond precision.
      */
-    //protected Map<Integer,Map<Integer,Date>> orderTimestampTable;
     protected TimestampTable orderTimestampTable;
-    //protected Map<Integer,Map<Integer,Date>> valueTimestampTable;
     protected TimestampTable valueTimestampTable;
 
     /*

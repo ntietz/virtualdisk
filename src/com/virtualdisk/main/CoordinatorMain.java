@@ -7,6 +7,7 @@ import org.jboss.netty.bootstrap.*;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.nio.*;
 
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -46,7 +47,7 @@ public class CoordinatorMain
         start(port, nodes);
     }
 
-    public static void start( int port
+    public static void start( int coordinatorPort
                             , List<DataNodeIdentifier> nodes
                             )
     {
@@ -59,6 +60,14 @@ public class CoordinatorMain
         ClientBootstrap bootstrap = new ClientBootstrap(channelFactory);
 
         bootstrap.setPipelineFactory(new CoordinatorPipelineFactory());
+
+        // TODO keep track of the channel futures
+        for (DataNodeIdentifier node : nodes)
+        {
+            String host = node.getNodeAddress();
+            int port = node.getPort();
+            bootstrap.connect(new InetSocketAddress(host, port));
+        }
     }
 }
 
