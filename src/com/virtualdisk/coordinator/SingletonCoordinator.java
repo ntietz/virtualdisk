@@ -1,7 +1,5 @@
 package com.virtualdisk.coordinator;
 
-//import com.virtualdisk.network.request.*;
-//import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.*;
 
 import org.jboss.netty.channel.*;
