@@ -2,6 +2,7 @@ package com.virtualdisk.network;
 
 import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.*;
 import com.virtualdisk.network.util.Sendable.MessageType;
 
@@ -29,7 +30,7 @@ extends SimpleChannelHandler
             case volumeExistsRequestResult:
             case createVolumeRequestResult:
             case deleteVolumeRequestResult:
-                SingletonCoordinator.sendToClient(result, result.getRequestId());
+                SingletonCoordinator.sendToClient(((RequestResult)result).getRequestId(), result);
                 break;
 
             case writeRequest: {

@@ -36,8 +36,8 @@ public class DataNodeMain
         start(port);
     }
 
-    public static void start( int port
-                            )
+    public static void startDataNodeListener( int port
+                                            )
     {
         ChannelFactory channelFactory = new NioServerSocketChannelFactory
             ( Executors.newCachedThreadPool()
