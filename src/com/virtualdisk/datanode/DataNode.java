@@ -64,11 +64,13 @@ public class DataNode
      * Creates a diskmap for a new volume with the given volume ID.
      * Returns the status of the insertion.
      */
-    public void createVolume(int volumeId)
+    public boolean createVolume(int volumeId)
     {
         volumeTable.addVolume(volumeId);
         orderTimestampTable.addVolume(volumeId);
         valueTimestampTable.addVolume(volumeId);
+
+        return true;
     }
     
     public boolean volumeExists(int volumeId)

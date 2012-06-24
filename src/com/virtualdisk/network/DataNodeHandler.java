@@ -79,13 +79,32 @@ extends SimpleChannelHandler
                 coordinatorChannel.write(result);
                 } break;
 
-            case volumeExistsRequest:
-                // TODO
-                break;
+            case volumeExistsRequest: {
+                VolumeExistsRequest request = (VolumeExistsRequest) rawRequest;
+                int volumeId = request.getVolumeId();
 
-            case createVolumeRequest:
-                // TODO
-                break;
+                int requestId = request.getRequestId();
+                boolean done = true;
+                boolean success = true;
+                boolean exists = dataNode.volumeExists(volumeId);
+
+                Channel coordinatorChannel = event.getChannel();
+                VolumeExistsRequestResult result = new VolumeExistsRequestResult(requestId, done, success, exists);
+                coordinatorChannel.write(result);
+                } break;
+
+            case createVolumeRequest: {
+                CreateVolumeRequest request = (CreateVolumeRequest) rawRequest;
+                int volumeId = request.getVolumeId();
+
+                int requestId = request.getRequestId();
+                boolean done = true;
+                boolean success = dataNode.createVolume(volumeId);
+
+                Channel coordinatorChannel = event.getChannel();
+                CreateVolumeRequestResult result = new CreateVolumeRequestResult(requestId, done, success);
+                coordinatorChannel.write(result);
+                } break;
 
             case deleteVolumeRequest:
                 // TODO
