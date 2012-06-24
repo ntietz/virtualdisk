@@ -8,7 +8,7 @@ import org.jboss.netty.channel.socket.nio.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-public class ServerMain
+public class DataNodeMain
 {
     public static void main(String... args)
     {
@@ -27,6 +27,7 @@ public class ServerMain
         //    new NioServerSocketChannelFactory( Executors.newCachedThreadPool()
         //                                     , Executors.newCachedThreadPool()));
 
+        // TODO switch to be server bootstrap!!!
         ClientBootstrap clientBootstrap = new ClientBootstrap(
             new NioClientSocketChannelFactory( Executors.newCachedThreadPool()
                                              , Executors.newCachedThreadPool()));

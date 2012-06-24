@@ -4,11 +4,13 @@ public class DataNodeIdentifier
 {
     protected int nodeId;
     protected String nodeAddress;
+    protected int nodePort;
 
-    public DataNodeIdentifier(int id, String address)
+    public DataNodeIdentifier(int id, String address, int port)
     {
         nodeId = id;
         nodeAddress = address;
+        nodePort = port;
     }
 
     public int getNodeId()
@@ -19,6 +21,11 @@ public class DataNodeIdentifier
     public String getNodeAddress()
     {
         return nodeAddress;
+    }
+
+    public int getPort()
+    {
+        return nodePort;
     }
 
     public boolean equals(Object pThat)
