@@ -63,11 +63,21 @@ extends SimpleChannelHandler
                 coordinatorChannel.write(result);
                 } break;
 
-            case writeRequest:
-                // TODO
-                // perform the write request
-                // return the result
-                break;
+            case writeRequest: {
+                WriteRequest request = (WriteRequest) rawRequest;
+                int volumeId = request.getVolumeId();
+                long logicalOffset = request.getLogicalOffset();
+                byte[] block = request.getBlock();
+                Date timestamp = request.getTimestamp();
+
+                int requestId = request.getRequestId();
+                boolean done = true;
+                boolean success = dataNode.write(volumeId, logicalOffset, block, timestamp);
+
+                Channel coordinatorChannel = event.getChannel();
+                WriteRequestResult result = new WriteRequestResult(requestId, done, success);
+                coordinatorChannel.write(result);
+                } break;
 
             case volumeExistsRequest:
                 // TODO
