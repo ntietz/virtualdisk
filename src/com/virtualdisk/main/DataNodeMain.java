@@ -1,5 +1,6 @@
 package com.virtualdisk.main;
 
+import com.virtualdisk.datanode.*;
 import com.virtualdisk.network.*;
 import com.virtualdisk.network.util.*;
 
@@ -30,8 +31,17 @@ public class DataNodeMain
         // TODO determine usage and implement it
         int port = Integer.valueOf(args[0]);
 
-        // TODO assign drive info lists
-        // TODO instantiate DataNode using SingletonDataNode
+        List<String> driveHandles = new ArrayList<String>();
+        List<Long> driveSizes = new ArrayList<Long>();
+        for (int index = 0; index < args.length; index += 2)
+        {
+            String driveHandle = args[index];
+            driveHandles.add(driveHandle);
+            long driveSize = Long.valueOf(args[index+1]);
+            driveSizes.add(driveSize);
+        }
+
+        SingletonDataNode.setup(port, driveHandles, driveSizes);
 
         startDataNodeListener(port);
     }
