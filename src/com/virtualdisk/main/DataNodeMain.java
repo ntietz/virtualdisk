@@ -33,7 +33,7 @@ public class DataNodeMain
         // TODO assign drive info lists
         // TODO instantiate DataNode using SingletonDataNode
 
-        start(port);
+        startDataNodeListener(port);
     }
 
     public static void startDataNodeListener( int port

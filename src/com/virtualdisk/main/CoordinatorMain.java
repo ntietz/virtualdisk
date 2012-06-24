@@ -40,13 +40,21 @@ public class CoordinatorMain
                 2n  ->  datanoden port
         */
 
-        int port = Integer.valueOf(args[0]);
+        int coordinatorPort = Integer.valueOf(args[0]);
 
         List<DataNodeIdentifier> nodes = new ArrayList<DataNodeIdentifier>();
-        // TODO construct the datanode identifiers
+        int id = 1;
+        for (int index = 1; index < args.length; index += 2)
+        {
+            String hostname = args[index];
+            int port = Integer.valueOf(args[index+1]);
+            DataNodeIdentifier identifier = new DataNodeIdentifier(id, hostname, port);
+            nodes.add(identifier);
+            ++id;
+        }
 
         connectToDataNodes(nodes);
-        startClientListener(port);
+        startClientListener(coordinatorPort);
     }
 
     public static void connectToDataNodes( List<DataNodeIdentifier> nodes
