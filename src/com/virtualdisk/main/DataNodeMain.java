@@ -3,8 +3,10 @@ package com.virtualdisk.main;
 import com.virtualdisk.network.util.*;
 
 import org.jboss.netty.bootstrap.*;
+import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.nio.*;
 
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -26,25 +28,24 @@ public class DataNodeMain
          */
         // TODO determine usage and implement it
         int port = Integer.valueOf(args[0]);
-        
-        List<DataNodeIdentifier> nodes; // TODO initialize
 
-        //ServerBootstrap serverBootstrap = new ServerBootstrap(
-        //    new NioServerSocketChannelFactory( Executors.newCachedThreadPool()
-        //                                     , Executors.newCachedThreadPool()));
+        // TODO assign drive info lists
+        // TODO instantiate DataNode using SingletonDataNode
 
-        // TODO switch to be server bootstrap!!!
-        ClientBootstrap clientBootstrap = new ClientBootstrap(
-            new NioClientSocketChannelFactory( Executors.newCachedThreadPool()
-                                             , Executors.newCachedThreadPool()));
-
-        // TODO 
+        start(port);
     }
 
     public static void start( int port
                             )
     {
+        ChannelFactory channelFactory = new NioServerSocketChannelFactory
+            ( Executors.newCachedThreadPool()
+            , Executors.newCachedThreadPool()
+            );
 
+        ServerBootstrap bootstrap = new ServerBootstrap(channelFactory);
+
+        bootstrap.bind(new InetSocketAddress(port));
     }
 
 }
