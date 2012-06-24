@@ -33,7 +33,7 @@ public class DataNodeMain
 
         List<String> driveHandles = new ArrayList<String>();
         List<Long> driveSizes = new ArrayList<Long>();
-        for (int index = 0; index < args.length; index += 2)
+        for (int index = 1; index < args.length; index += 2)
         {
             String driveHandle = args[index];
             driveHandles.add(driveHandle);
