@@ -10,6 +10,12 @@ import java.util.concurrent.*;
 
 public class DataNodeMain
 {
+    private static final int DEFAULT_BLOCK_SIZE = 1024;
+
+    private static int blockSize = DEFAULT_BLOCK_SIZE;
+    private static List<String> driveHandles = new ArrayList<String>();
+    private static List<Long> driveSizes = new ArrayList<Long>();
+
     public static void main(String... args)
     {
         /*
