@@ -106,9 +106,18 @@ extends SimpleChannelHandler
                 coordinatorChannel.write(result);
                 } break;
 
-            case deleteVolumeRequest:
-                // TODO
-                break;
+            case deleteVolumeRequest: {
+                DeleteVolumeRequest request = (DeleteVolumeRequest) rawRequest;
+                int volumeId = request.getVolumeId();
+
+                int requestId = request.getRequestId();
+                boolean done = true;
+                boolean success = dataNode.deleteVolume(volumeId);
+
+                Channel coordinatorChannel = event.getChannel();
+                DeleteVolumeRequestResult result = new DeleteVolumeRequestResult(requestId, done, success);
+                coordinatorChannel.write(result);
+                } break;
 
             default:
                 break;
