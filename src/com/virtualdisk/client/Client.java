@@ -68,8 +68,15 @@ public class Client
 
     public void disconnect()
     {
-        channel.close().awaitUninterruptibly();
-        channelFactory.releaseExternalResources();
+        try
+        {
+            channel.close().awaitUninterruptibly();
+            channelFactory.releaseExternalResources();
+        }
+        catch (Exception e)
+        {
+            // ...
+        }
     }
 }
 
