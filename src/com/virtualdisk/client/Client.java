@@ -76,6 +76,14 @@ public class Client
     {
         ++requestId;
         WriteRequest request = new WriteRequest(requestId, volumeId, logicalOffset, new Date(), block);
+        channel.write(request);
+    }
+
+    public void read(int volumeId, long logicalOffset)
+    {
+        ++requestId;
+        ReadRequest request = new ReadRequest(requestId, volumeId, logicalOffset);
+        channel.write(request);
     }
 
     public void disconnect()
@@ -87,7 +95,7 @@ public class Client
         }
         catch (Exception e)
         {
-            // ...
+            System.exit(0);
         }
     }
 }

@@ -30,6 +30,7 @@ extends SimpleChannelHandler
             case volumeExistsRequestResult:
             case createVolumeRequestResult:
             case deleteVolumeRequestResult:
+                System.out.println("sending result to client");
                 SingletonCoordinator.sendToClient(((RequestResult)result).getRequestId(), result);
                 break;
 
@@ -39,6 +40,7 @@ extends SimpleChannelHandler
                 long logicalOffset = request.getLogicalOffset();
                 byte[] block = request.getBlock();
                 int requestId = coordinator.write(volumeId, logicalOffset, block);
+                System.out.println("handling write request");
 
                 SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
@@ -48,6 +50,7 @@ extends SimpleChannelHandler
                 int volumeId = request.getVolumeId();
                 long logicalOffset = request.getLogicalOffset();
                 int requestId = coordinator.read(volumeId, logicalOffset);
+                System.out.println("handling read request");
 
                 SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
@@ -56,6 +59,7 @@ extends SimpleChannelHandler
                 CreateVolumeRequest request = (CreateVolumeRequest) result;
                 int volumeId = request.getVolumeId();
                 coordinator.createVolume(volumeId);
+                System.out.println("handling volume request");
 
                 // TODO register a callback to return the results to the user
                 //SingletonCoordinator.registerCallback(requestId, event.getChannel());
@@ -65,12 +69,14 @@ extends SimpleChannelHandler
                 DeleteVolumeRequest request = (DeleteVolumeRequest) result;
                 int volumeId = request.getVolumeId();
                 coordinator.deleteVolume(volumeId);
+                System.out.println("handling volume request");
 
                 // TODO register a callback to return the results to the user
                 //SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
 
             default:
+                System.out.println("unknown request");
                 break;
         }
     }

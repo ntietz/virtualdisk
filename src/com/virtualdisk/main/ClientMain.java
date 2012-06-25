@@ -3,6 +3,7 @@ package com.virtualdisk.main;
 import com.virtualdisk.client.*;
 
 import java.lang.*;
+import java.util.*;
 
 public class ClientMain
 {
@@ -11,6 +12,7 @@ public class ClientMain
     {
         String host = args[0];
         int port = Integer.valueOf(args[1]);
+        Random random = new Random(2012);
 
         System.out.println("Connecting to the coordinator on " + host + ":" + port + "...");
 
@@ -25,6 +27,24 @@ public class ClientMain
         System.out.println("Created.");
 
         // ...... issue some reads/writes........
+        Thread.sleep(100);
+
+        byte[] block = new byte[client.getBlockSize()];
+
+
+        for (int index = 0; index < 10; ++index)
+        {
+            System.out.println("Writing a block to volume 0, location " + index + "...");
+            random.nextBytes(block);
+            client.write(0, index, block);
+        }
+
+        for (int index = 0; index < 10; ++index)
+        {
+            System.out.println("Reading a block from volume 0, location " + index + "...");
+            client.read(0, index);
+        }
+
         Thread.sleep(100);
 
         System.out.println("Deleting volume 0...");

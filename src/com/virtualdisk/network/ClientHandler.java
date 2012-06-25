@@ -26,30 +26,30 @@ extends SimpleChannelHandler
             System.out.print(result.wasSuccessful() ? "success" : "failed"); System.out.print(" ");
         }
 
-        switch(type)
+        switch (type)
         {
             case orderRequestResult: {
-                }break;
+                } break;
 
             case readRequestResult: {
                 ReadRequestResult result = (ReadRequestResult) rawResult;
                 System.out.print(result.getTimestamp()); System.out.print(" ");
                 System.out.print(new String(result.getBlock()));
-                }break;
+                } break;
 
             case writeRequestResult: {
-                }break;
+                } break;
 
             case volumeExistsRequestResult: {
                 VolumeExistsRequestResult result = (VolumeExistsRequestResult) rawResult;
                 System.out.print(result.volumeExists() ? "exists" : "missing"); System.out.print(" ");
-                }break;
+                } break;
 
             case createVolumeRequestResult: {
-                }break;
+                } break;
 
             case deleteVolumeRequestResult: {
-                }break;
+                } break;
 
             default: {
                 System.out.print("error.");
