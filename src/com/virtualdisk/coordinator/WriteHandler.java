@@ -8,7 +8,8 @@ import java.util.*;
 /*
  * This class handles write requests.
  */
-public class WriteHandler extends Handler
+public class WriteHandler
+extends Handler
 {
     private byte[] block;
 

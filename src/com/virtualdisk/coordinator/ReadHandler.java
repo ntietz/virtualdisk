@@ -7,7 +7,8 @@ import java.util.*;
 /*
  * This class handles read requests.
  */
-public class ReadHandler extends Handler
+public class ReadHandler
+extends Handler
 {
     private byte[] result = null;
 

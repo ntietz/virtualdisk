@@ -1,9 +1,8 @@
 package com.virtualdisk.coordinator;
 
 import com.virtualdisk.network.*;
-import com.virtualdisk.network.util.DataNodeIdentifier;
-import com.virtualdisk.network.util.DataNodeStatus;
-import com.virtualdisk.network.util.DataNodeStatusPair;
+import com.virtualdisk.network.request.base.*;
+import com.virtualdisk.network.util.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -25,6 +24,7 @@ public class Coordinator
     protected Map<Integer, Boolean> requestCompletionMap;
     protected Map<Integer, Boolean> writeResultMap;
     protected Map<Integer, byte[]> readResultMap;
+    protected Map<Integer, Boolean> volumeRequestMap;
 
     protected int lastAssignedId = 0;
 
@@ -68,6 +68,7 @@ public class Coordinator
         requestCompletionMap = new ConcurrentHashMap<Integer, Boolean>();
         writeResultMap = new ConcurrentHashMap<Integer, Boolean>();
         readResultMap = new ConcurrentHashMap<Integer, byte[]>();
+        volumeRequestMap = new ConcurrentHashMap<Integer, Boolean>();
 
         handlerManager = new HandlerManager(this);
         handlerManager.start();
@@ -76,40 +77,34 @@ public class Coordinator
     /*
      * This method creates a new logical volume within the coordinator.
      */
-    public boolean createVolume(int volumeId)
+    public int createVolume(int volumeId)
     {
-        if (volumeTable.get(volumeId) != null)
-        {
-            return false;
-        }
-        else
-        {
-            Map<Long,SegmentGroup> volumeMap = new ConcurrentHashMap<Long,SegmentGroup>();
-            volumeTable.put(volumeId, volumeMap);
+        int id = generateNewRequestId();
 
-            server.issueVolumeCreationRequest(volumeId);
+        CreateVolumeHandler handler = new CreateVolumeHandler(volumeId, this);
+        handler.setRequestId(id);
+        handler.start();
 
-            return true;
-        }
+        Map<Long, SegmentGroup> volumeMap = new ConcurrentHashMap<Long, SegmentGroup>();
+        volumeTable.put(volumeId, volumeMap);
+
+        return id;
     }
 
     /*
      * This method deletes a logical volume within the coordinator.
      */
-    public boolean deleteVolume(int volumeId)
+    public int deleteVolume(int volumeId)
     {
-        if (volumeTable.get(volumeId) != null)
-        {
-            volumeTable.remove(volumeId);
+        int id = generateNewRequestId();
 
-            server.issueVolumeDeletionRequest(volumeId);
+        DeleteVolumeHandler handler = new DeleteVolumeHandler(volumeId, this);
+        handler.setRequestId(id);
+        handler.start();
 
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        volumeTable.remove(volumeId);
+
+        return id;
     }
 
     /*

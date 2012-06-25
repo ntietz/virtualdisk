@@ -61,21 +61,21 @@ extends SimpleChannelHandler
             case createVolumeRequest: {
                 CreateVolumeRequest request = (CreateVolumeRequest) result;
                 int volumeId = request.getVolumeId();
-                coordinator.createVolume(volumeId);
+                int requestId = coordinator.createVolume(volumeId);
                 System.out.println("handling volume request");
 
                 // TODO register a callback to return the results to the user
-                //SingletonCoordinator.registerCallback(requestId, event.getChannel());
+                SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
 
             case deleteVolumeRequest: {
                 DeleteVolumeRequest request = (DeleteVolumeRequest) result;
                 int volumeId = request.getVolumeId();
-                coordinator.deleteVolume(volumeId);
+                int requestId = coordinator.deleteVolume(volumeId);
                 System.out.println("handling volume request");
 
                 // TODO register a callback to return the results to the user
-                //SingletonCoordinator.registerCallback(requestId, event.getChannel());
+                SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
 
             default:
