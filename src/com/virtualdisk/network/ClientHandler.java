@@ -58,5 +58,14 @@ extends SimpleChannelHandler
 
         System.out.println("");
     }
+
+    public void exceptionCaught( ChannelHandlerContext context
+                               , ExceptionEvent event
+                               )
+    {
+        event.getCause().printStackTrace();
+        event.getChannel().close();
+        System.exit(1);
+    }
 }
 

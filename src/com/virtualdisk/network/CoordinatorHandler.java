@@ -27,11 +27,14 @@ extends SimpleChannelHandler
             case orderRequestResult:
             case readRequestResult:
             case writeRequestResult:
+                System.out.println("sending result to client");
+                SingletonCoordinator.sendToClient(((RequestResult)result).getRequestId(), result);
+                break;
+
             case volumeExistsRequestResult:
             case createVolumeRequestResult:
             case deleteVolumeRequestResult:
-                System.out.println("sending result to client");
-                SingletonCoordinator.sendToClient(((RequestResult)result).getRequestId(), result);
+                System.out.println("eating volume results");
                 break;
 
             case writeRequest: {
@@ -79,6 +82,15 @@ extends SimpleChannelHandler
                 System.out.println("unknown request");
                 break;
         }
+    }
+
+    public void exceptionCaught( ChannelHandlerContext context
+                               , ExceptionEvent event
+                               )
+    {
+        event.getCause().printStackTrace();
+        event.getChannel().close();
+        System.exit(1);
     }
 }
 

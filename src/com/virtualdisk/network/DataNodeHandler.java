@@ -123,5 +123,14 @@ extends SimpleChannelHandler
                 break;
         }
     }
+
+    public void exceptionCaught( ChannelHandlerContext context
+                               , ExceptionEvent event
+                               )
+    {
+        event.getCause().printStackTrace();
+        event.getChannel().close();
+        System.exit(1);
+    }
 }
 
