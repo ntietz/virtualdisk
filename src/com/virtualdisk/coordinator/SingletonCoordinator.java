@@ -95,5 +95,10 @@ public class SingletonCoordinator
         Channel channel = clientRegistry.inverse().get(clientId);
         channel.write(result);
     }
+
+    public synchronized static void setResult(int requestId, RequestResult result)
+    {
+        // TODO
+    }
 }
 

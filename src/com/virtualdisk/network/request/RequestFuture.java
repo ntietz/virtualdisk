@@ -36,6 +36,11 @@ public class RequestFuture
         }
     }
 
+    public void setResult(RequestResult result)
+    {
+        this.result = result;
+    }
+
     public boolean isDone()
     {
         if (result == null)

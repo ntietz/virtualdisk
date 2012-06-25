@@ -14,6 +14,7 @@ public class CoordinatorHandler
 extends SimpleChannelHandler
 {
     Coordinator coordinator = SingletonCoordinator.getCoordinator();
+    CoordinatorServer server = SingletonCoordinator.getServer();
 
     public void messageReceived( ChannelHandlerContext context
                                , MessageEvent event
@@ -28,12 +29,14 @@ extends SimpleChannelHandler
             case readRequestResult:
             case writeRequestResult:
                 System.out.println("sending result to client");
-                SingletonCoordinator.sendToClient(((RequestResult)result).getRequestId(), result);
+                SingletonCoordinator.setResult(((RequestResult)result).getRequestId(), (RequestResult)result);
+                //SingletonCoordinator.sendToClient(((RequestResult)result).getRequestId(), result);
                 break;
 
             case volumeExistsRequestResult:
             case createVolumeRequestResult:
             case deleteVolumeRequestResult:
+                SingletonCoordinator.setResult(((RequestResult)result).getRequestId(), (RequestResult)result);
                 System.out.println("eating volume results");
                 break;
 
