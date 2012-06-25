@@ -2,24 +2,41 @@ package com.virtualdisk.main;
 
 import com.virtualdisk.client.*;
 
+import java.lang.*;
+
 public class ClientMain
 {
     public static void main(String... args)
+    throws Exception
     {
         String host = args[0];
         int port = Integer.valueOf(args[1]);
 
+        System.out.println("Connecting to the coordinator on " + host + ":" + port + "...");
+
         Client client = new Client(host, port);
         client.connect();
 
+        System.out.println("Connected.");
+        System.out.println("Creating volume 0...");
+
         client.createVolume(0);
 
-        // ...... issue some reads/writes........
+        System.out.println("Created.");
 
+        // ...... issue some reads/writes........
+        Thread.sleep(100);
+
+        System.out.println("Deleting volume 0...");
 
         client.deleteVolume(0);
 
+        System.out.println("Deleted.");
+        System.out.println("Disconnecting from the coordinator...");
+
         client.disconnect();
+
+        System.out.println("Disconnected. Now exiting.");
     }
 }
 

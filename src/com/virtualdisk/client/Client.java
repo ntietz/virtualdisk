@@ -8,6 +8,7 @@ import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.nio.*;
 
 import java.net.*;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class Client
@@ -26,6 +27,11 @@ public class Client
     {
         this.host = host;
         this.port = port;
+    }
+
+    public int getBlockSize()
+    {
+        return blockSize;
     }
 
     public void connect()
@@ -64,6 +70,12 @@ public class Client
         ++requestId;
         DeleteVolumeRequest request = new DeleteVolumeRequest(requestId, volumeId);
         channel.write(request);
+    }
+
+    public void write(int volumeId, long logicalOffset, byte[] block)
+    {
+        ++requestId;
+        WriteRequest request = new WriteRequest(requestId, volumeId, logicalOffset, new Date(), block);
     }
 
     public void disconnect()
