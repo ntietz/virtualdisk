@@ -1,31 +1,43 @@
 package com.virtualdisk.datanode;
 
-import com.virtualdisk.util.DriveOffsetPair;
+import com.virtualdisk.util.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.*;
 
+/**
+ * Manages storing timestamps for a data node.
+ * Currently, java.util.Date objects are used for timestamps.
+ * @author  Nicholas Tietz
+ */
 public class TimestampTable
 {
+    /**
+     * A map which maps (volumeId, logicalOffset) to a timestamp.
+     */
     Map<Integer, Map<Long, Date>> table;
     
+    /**
+     * Standard constructor, which initializes an empty table.
+     */
     public TimestampTable()
     {
-        table = new HashMap<Integer, Map<Long, Date>>();
+        table = new ConcurrentHashMap<Integer, Map<Long, Date>>();
     }
     
     /**
-     * @param volumeId  the id of the volume to create
+     * Adds a new volume to store timestamps for.
+     * @param   volumeId    the id of the volume to create
      */
     public void addVolume(int volumeId)
     {
-        Map<Long, Date> volumeMap = new HashMap<Long, Date>();
+        Map<Long, Date> volumeMap = new ConcurrentHashMap<Long, Date>();
         table.put(volumeId, volumeMap);
     }
     
     /**
-     * @param volumeId  the id of the volume to delete
+     * Removes a volume from the timestamp table.
+     * @param   volumeId    the id of the volume to delete
      */
     public void removeVolume(int volumeId)
     {
@@ -33,29 +45,35 @@ public class TimestampTable
     }
     
     /**
-     * @param location  the disk location to fetch the timestamp for
+     * Returns the timestamp for the supplied location.
+     * @param   volumeId        the volume to fetch from
+     * @param   logicalOffset   the logical offset of the location
      * @return  the timestamp of the requested location
      */
-    public Date getTimestamp(DriveOffsetPair location)
+    public Date getTimestamp(int volumeId, long logicalOffset)
     {
-        return table.get(location.getDriveNumber()).get(location.getOffset());
+        return table.get(volumeId).get(logicalOffset);
     }
     
     /**
-     * @param location  the disk location to set the timestamp for
-     * @param timestamp the timestamp to assign
+     * Sets the timestamp for a given location.
+     * @param   volumeId        the volume to fetch from
+     * @param   logicalOffset   the logical offset of the location
+     * @param   timestamp       the timestamp to assign
      */
-    public void setTimestamp(DriveOffsetPair location, Date timestamp)
+    public void setTimestamp(int volumeId, long logicalOffset, Date timestamp)
     
     {
-        table.get(location.getDriveNumber()).put(location.getOffset(), timestamp);
+        table.get(volumeId).put(logicalOffset, timestamp);
     }
 
     /**
-     * @param location  the disk location to remove the timestamp for
+     * Removes the timestamp for a given location.
+     * @param   volumeId        the volume to fetch from
+     * @param   logicalOffset   the logical offset of the location
      */
-    public void removeTimestamp(DriveOffsetPair location)
+    public void removeTimestamp(int volumeId, long logicalOffset)
     {
-        table.get(location.getDriveNumber()).remove(location.getOffset());
+        table.get(volumeId).remove(logicalOffset);
     }
 }

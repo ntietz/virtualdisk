@@ -224,7 +224,7 @@ public class DataNode
      */
     public Date getOrderTimestamp(int volumeId, long logicalOffset)
     {
-        return orderTimestampTable.getTimestamp(new DriveOffsetPair(volumeId, logicalOffset));
+        return orderTimestampTable.getTimestamp(volumeId, logicalOffset);
     }
 
     /*
@@ -232,7 +232,7 @@ public class DataNode
      */
     public Date getValueTimestamp(int volumeId, long logicalOffset)
     {
-        return valueTimestampTable.getTimestamp(new DriveOffsetPair(volumeId, logicalOffset));
+        return valueTimestampTable.getTimestamp(volumeId, logicalOffset);
     }
 
     /*
@@ -240,7 +240,7 @@ public class DataNode
      */
     public void setOrderTimestamp(int volumeId, long logicalOffset, Date timestamp)
     {
-        orderTimestampTable.setTimestamp(new DriveOffsetPair(volumeId, logicalOffset), timestamp);
+        orderTimestampTable.setTimestamp(volumeId, logicalOffset, timestamp);
     }
 
     /*
@@ -248,7 +248,7 @@ public class DataNode
      */
     public void setValueTimestamp(int volumeId, long logicalOffset, Date timestamp)
     {
-        valueTimestampTable.setTimestamp(new DriveOffsetPair(volumeId, logicalOffset), timestamp);
+        valueTimestampTable.setTimestamp(volumeId, logicalOffset, timestamp);
     }
 
     /*
