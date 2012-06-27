@@ -50,19 +50,21 @@ public class CoordinatorTest
 
     }
 
-    @Test
+    @Test(timeout=10000)
     public void testCreateVolume()
     {
-        boolean firstTryCreate = coordinator.createVolume(0);
-        boolean secondTryCreate = coordinator.createVolume(0);
+        int firstCreateId = coordinator.createVolume(0);
 
-        boolean firstTryDelete = coordinator.deleteVolume(0);
-        boolean secondTryDelete = coordinator.deleteVolume(0);
+        int firstDeleteId = coordinator.deleteVolume(0);
+
+        while (!coordinator.createVolumeCompleted(firstCreateId));
+        while (!coordinator.deleteVolumeCompleted(firstDeleteId));
+
+        boolean firstTryCreate = coordinator.createVolumeResult(firstCreateId);
+        boolean firstTryDelete = coordinator.deleteVolumeResult(firstDeleteId);
 
         assertEquals("First volume creation should succeed.", true, firstTryCreate);
-        assertEquals("Second volume creation should fail.", false, secondTryCreate);
         assertEquals("First volume deletion should succeed.", true, firstTryDelete);
-        assertEquals("Second volume deletion should fail.", false, secondTryDelete);
     }
 
     @Test
@@ -94,7 +96,9 @@ public class CoordinatorTest
         Random random = new Random(seed);
         Random testRandom = new Random(seed);
 
-        boolean created = coordinator.createVolume(0);
+        int createId = coordinator.createVolume(0);
+        while (!coordinator.createVolumeCompleted(createId));
+        boolean created = coordinator.createVolumeResult(createId);
 
         assertEquals("Volume creation should succeed.", true, created);
         

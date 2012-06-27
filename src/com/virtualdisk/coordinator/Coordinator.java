@@ -24,7 +24,7 @@ public class Coordinator
     protected Map<Integer, Boolean> requestCompletionMap;
     protected Map<Integer, Boolean> writeResultMap;
     protected Map<Integer, byte[]> readResultMap;
-    protected Map<Integer, Boolean> volumeRequestMap;
+    protected Map<Integer, Boolean> volumeResultMap;
 
     protected int lastAssignedId = 0;
 
@@ -68,7 +68,7 @@ public class Coordinator
         requestCompletionMap = new ConcurrentHashMap<Integer, Boolean>();
         writeResultMap = new ConcurrentHashMap<Integer, Boolean>();
         readResultMap = new ConcurrentHashMap<Integer, byte[]>();
-        volumeRequestMap = new ConcurrentHashMap<Integer, Boolean>();
+        volumeResultMap = new ConcurrentHashMap<Integer, Boolean>();
 
         handlerManager = new HandlerManager(this);
         handlerManager.start();
@@ -91,6 +91,24 @@ public class Coordinator
         return id;
     }
 
+    public boolean createVolumeCompleted(int requestId)
+    {
+        Boolean finished = requestCompletionMap.get(requestId);
+        if (finished != null)
+        {
+            return finished;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean createVolumeResult(int requestId)
+    {
+        return volumeResultMap.get(requestId);
+    }
+
     /*
      * This method deletes a logical volume within the coordinator.
      */
@@ -105,6 +123,24 @@ public class Coordinator
         volumeTable.remove(volumeId);
 
         return id;
+    }
+
+    public boolean deleteVolumeCompleted(int requestId)
+    {
+        Boolean finished = requestCompletionMap.get(requestId);
+        if (finished != null)
+        {
+            return finished;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean deleteVolumeResult(int requestId)
+    {
+        return volumeResultMap.get(requestId);
     }
 
     /*

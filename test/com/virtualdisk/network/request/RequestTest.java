@@ -107,9 +107,9 @@ public class RequestTest
     @Test
     public void testVERRCodec()
     {
-        VolumeExistsRequestResult result = new VolumeExistsRequestResult(103, true, true);
+        VolumeExistsRequestResult result = new VolumeExistsRequestResult(103, true, true, true);
         
-        VolumeExistsRequestResult decodedResult = new VolumeExistsRequestResult(0, false, false);
+        VolumeExistsRequestResult decodedResult = new VolumeExistsRequestResult(0, false, false, false);
         decodedResult.decode(result.encode());
         assertEquals("Results should be equal", result, decodedResult);
     }

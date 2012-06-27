@@ -45,7 +45,7 @@ extends Handler
         }
 
         requestResult = new DeleteVolumeRequestResult(requestId, true, success);
-        coordinator.volumeRequestMap.put(requestId, success);
+        coordinator.volumeResultMap.put(requestId, success);
         coordinator.requestCompletionMap.put(requestId, true);
         finished = true;
     }

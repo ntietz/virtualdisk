@@ -45,7 +45,7 @@ extends Handler
         }
 
         requestResult = new VolumeExistsRequestResult(requestId, true, true, exists);
-        coordinator.volumeRequestMap.put(requestId, exists);
+        coordinator.volumeResultMap.put(requestId, exists);
         coordinator.requestCompletionMap.put(requestId, true);
         finished = true;
     }

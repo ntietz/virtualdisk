@@ -161,7 +161,7 @@ extends NetworkServer
         
         for (DataNode each : dataNodes)
         {
-            VolumeExistsRequestResult result = new VolumeExistsRequestResult(id, true, each.volumeExists(volumeId));
+            VolumeExistsRequestResult result = new VolumeExistsRequestResult(id, true, true, each.volumeExists(volumeId));
             results.add(result);
         }
         
@@ -269,7 +269,7 @@ extends NetworkServer
                 }
             }
 
-            DataNodeIdentifier currentId = new DataNodeIdentifier(index, Integer.toString(index));
+            DataNodeIdentifier currentId = new DataNodeIdentifier(index, Integer.toString(index), index);
             DataNode current = new DataNode(blockSize, Arrays.asList(handles), Arrays.asList(sizes));
 
             ids.add(index, currentId);
