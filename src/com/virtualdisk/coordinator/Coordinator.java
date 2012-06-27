@@ -1,5 +1,6 @@
 package com.virtualdisk.coordinator;
 
+import com.virtualdisk.coordinator.handler.*;
 import com.virtualdisk.network.*;
 import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.*;
@@ -9,46 +10,46 @@ import java.util.concurrent.*;
 
 public class Coordinator
 {
-    protected int blockSize;
-    protected int segmentSize;
-    protected int segmentGroupSize;
-    protected int quorumSize;
+    private int blockSize;
+    private int segmentSize;
+    private int segmentGroupSize;
+    private int quorumSize;
 
-    protected List<DataNodeIdentifier> datanodes;
+    private List<DataNodeIdentifier> datanodes;
 
-    protected PriorityBlockingQueue<DataNodeStatusPair> datanodeStatuses;
-    protected List<SegmentGroup> segmentGroupList;
-    protected Map<Integer,Map<Long,SegmentGroup>> volumeTable;
-    protected Date lastTimestamp;
+    private PriorityBlockingQueue<DataNodeStatusPair> datanodeStatuses;
+    private List<SegmentGroup> segmentGroupList;
+    private Map<Integer,Map<Long,SegmentGroup>> volumeTable;
+    private Date lastTimestamp;
 
-    protected Map<Integer, Boolean> requestCompletionMap;
-    protected Map<Integer, Boolean> writeResultMap;
-    protected Map<Integer, byte[]> readResultMap;
-    protected Map<Integer, Boolean> volumeResultMap;
+    private Map<Integer, Boolean> requestCompletionMap;
+    private Map<Integer, Boolean> writeResultMap;
+    private Map<Integer, byte[]> readResultMap;
+    private Map<Integer, Boolean> volumeResultMap;
 
-    protected int lastAssignedId = 0;
+    private int lastAssignedId = 0;
 
-    protected HandlerManager handlerManager;
+    private HandlerManager handlerManager;
 
-    protected NetworkServer server;
+    private NetworkServer server;
 
     /*
      * This constructor initializes all the necessary information for the coordinator.
      */
-    public Coordinator( int bs
-                      , int ss
-                      , int sgs
-                      , int qs
+    public Coordinator( int blockSize
+                      , int segmentSize
+                      , int segmentGroupSize
+                      , int quorumSize
                       , List<DataNodeIdentifier> initialNodes
-                      , NetworkServer s
+                      , NetworkServer server
                       )
     {
-        blockSize = bs;
-        segmentSize = ss;
-        segmentGroupSize = sgs;
-        quorumSize = qs;
+        this.blockSize = blockSize;
+        this.segmentSize = segmentSize;
+        this.segmentGroupSize = segmentGroupSize;
+        this.quorumSize = quorumSize;
 
-        server = s;
+        this.server = server;
 
         datanodes = Collections.synchronizedList(new ArrayList<DataNodeIdentifier>(initialNodes));
         datanodeStatuses = new PriorityBlockingQueue<DataNodeStatusPair>();
@@ -146,7 +147,7 @@ public class Coordinator
     /*
      * A synchronized method to generate new unique request IDs.
      */
-    protected synchronized int generateNewRequestId()
+    private synchronized int generateNewRequestId()
     {
         ++lastAssignedId;
         return lastAssignedId;
@@ -244,7 +245,7 @@ public class Coordinator
      * This method returns the segment group for a volumeId and logical offset.
      * If the volumeId and logical offset pair do not have a segment group, it will be assigned.
      */
-    protected SegmentGroup getSegmentGroup(int volumeId, long logicalOffset)
+    private SegmentGroup getSegmentGroup(int volumeId, long logicalOffset)
     {
         SegmentGroup segmentgroup = volumeTable.get(volumeId).get(logicalOffset);
 
@@ -260,7 +261,7 @@ public class Coordinator
      * This method takes a volumeId and logical offset and assigns that pair a segment group.
      * It generates the segment group based off which nodes have the lightest load.
      */
-    protected synchronized SegmentGroup assignSegmentGroup(int volumeId, long logicalOffset)
+    private synchronized SegmentGroup assignSegmentGroup(int volumeId, long logicalOffset)
     {
         SegmentGroup segmentgroup = volumeTable.get(volumeId).get(logicalOffset);
 
@@ -299,7 +300,7 @@ public class Coordinator
     /*
      * This method generates a unique timestamp for use in network requests.
      */
-    protected synchronized Date getNewTimestamp()
+    private synchronized Date getNewTimestamp()
     {
         long current = lastTimestamp.getTime();
         lastTimestamp = new Date(current+1);

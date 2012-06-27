@@ -1,13 +1,14 @@
-package com.virtualdisk.coordinator;
+package com.virtualdisk.coordinator.handler;
 
+import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.request.*;
 
 import java.util.*;
 
-public class VolumeExistsHandler
+public class CreateVolumeHandler
 extends Handler
 {
-    public VolumeExistsHandler(int volumeId, Coordinator coordinator)
+    public CreateVolumeHandler(int volumeId, Coordinator coordinator)
     {
         this.volumeId = volumeId;
         this.coordinator = coordinator;
@@ -15,22 +16,22 @@ extends Handler
 
     public void action()
     {
-        int existsId = coordinator.server.issueVolumeExistsRequest(volumeId);
+        int createId = coordinator.server.issueVolumeCreationRequest(volumeId);
         boolean waiting = true;
-        boolean exists = false;
+        boolean success = false;
 
         while (waiting)
         {
-            List<VolumeExistsRequestResult> results = coordinator.server.getVolumeExistsRequestResults(existsId);
+            List<CreateVolumeRequestResult> results = coordinator.server.getVolumeCreationRequestResults(createId);
             int completed = 0;
             int successful = 0;
 
-            for (VolumeExistsRequestResult each : results)
+            for (CreateVolumeRequestResult each : results)
             {
                 if (each.isDone())
                 {
                     ++completed;
-                    if (each.wasSuccessful() && each.volumeExists())
+                    if (each.wasSuccessful())
                     {
                         ++successful;
                     }
@@ -40,12 +41,12 @@ extends Handler
             if (completed == results.size())
             {
                 waiting = false;
-                exists = (successful == results.size());
+                success = (successful == results.size());
             }
         }
 
-        requestResult = new VolumeExistsRequestResult(requestId, true, true, exists);
-        coordinator.volumeResultMap.put(requestId, exists);
+        requestResult = new CreateVolumeRequestResult(requestId, true, success);
+        coordinator.volumeResultMap.put(requestId, success);
         coordinator.requestCompletionMap.put(requestId, true);
         finished = true;
     }

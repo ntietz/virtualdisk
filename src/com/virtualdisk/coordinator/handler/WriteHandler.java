@@ -1,7 +1,7 @@
-package com.virtualdisk.coordinator;
+package com.virtualdisk.coordinator.handler;
 
-import com.virtualdisk.network.request.OrderRequestResult;
-import com.virtualdisk.network.request.WriteRequestResult;
+import com.virtualdisk.coordinator.*;
+import com.virtualdisk.network.request.*;
 
 import java.util.*;
 
