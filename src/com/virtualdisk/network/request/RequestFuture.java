@@ -53,6 +53,11 @@ public class RequestFuture
         }
     }
 
+    public boolean hasResultSet()
+    {
+        return result == null;
+    }
+
     public RequestResult getResult()
     {
         if (result != null)

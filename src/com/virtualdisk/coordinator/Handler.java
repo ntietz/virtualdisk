@@ -1,5 +1,8 @@
 package com.virtualdisk.coordinator;
 
+import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.util.*;
+
 public abstract class Handler extends Thread
 {
     protected boolean finished = false;
@@ -7,6 +10,7 @@ public abstract class Handler extends Thread
     protected int volumeId;
     protected long logicalOffset;
     protected Coordinator coordinator;
+    protected Sendable result;
 
     public boolean isFinished()
     {
@@ -22,4 +26,12 @@ public abstract class Handler extends Thread
     {
         return requestId;
     }
+
+    public void run()
+    {
+        action();
+        SingletonCoordinator.sendToClient(requestId, result);
+    }
+
+    public abstract void action();
 }

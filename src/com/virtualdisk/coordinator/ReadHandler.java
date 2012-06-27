@@ -23,14 +23,6 @@ extends Handler
     }
 
     /*
-     * Overloaded for Thread interface. Simply calls the read method.
-     */
-    public void run()
-    {
-        read();
-    }
-
-    /*
      * This method returns the result of the read request.
      */
     public byte[] getResult()
@@ -44,7 +36,7 @@ extends Handler
      * to pause and execution will go to the next request handler in the queue.
      * This uses the algorithm for reading described in the paper about "FAB".
      */
-    public void read()
+    public void action()
     {
         SegmentGroup targets = coordinator.getSegmentGroup(volumeId, logicalOffset);
 

@@ -13,12 +13,7 @@ extends Handler
         this.coordinator = coordinator;
     }
 
-    public void run()
-    {
-        create();
-    }
-
-    public void create()
+    public void action()
     {
         int createId = coordinator.server.issueVolumeCreationRequest(volumeId);
         boolean waiting = true;

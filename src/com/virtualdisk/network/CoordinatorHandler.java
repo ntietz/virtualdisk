@@ -28,16 +28,11 @@ extends SimpleChannelHandler
             case orderRequestResult:
             case readRequestResult:
             case writeRequestResult:
-                System.out.println("sending result to client");
-                SingletonCoordinator.setResult(((RequestResult)result).getRequestId(), (RequestResult)result);
-                //SingletonCoordinator.sendToClient(((RequestResult)result).getRequestId(), result);
-                break;
-
             case volumeExistsRequestResult:
             case createVolumeRequestResult:
             case deleteVolumeRequestResult:
+                System.out.println("setting result");
                 SingletonCoordinator.setResult(((RequestResult)result).getRequestId(), (RequestResult)result);
-                System.out.println("eating volume results");
                 break;
 
             case writeRequest: {
@@ -67,7 +62,6 @@ extends SimpleChannelHandler
                 int requestId = coordinator.createVolume(volumeId);
                 System.out.println("handling volume request");
 
-                // TODO register a callback to return the results to the user
                 SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
 
@@ -77,7 +71,6 @@ extends SimpleChannelHandler
                 int requestId = coordinator.deleteVolume(volumeId);
                 System.out.println("handling volume request");
 
-                // TODO register a callback to return the results to the user
                 SingletonCoordinator.registerCallback(requestId, event.getChannel());
                 } break;
 

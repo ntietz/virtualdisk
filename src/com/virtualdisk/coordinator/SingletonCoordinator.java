@@ -1,5 +1,7 @@
 package com.virtualdisk.coordinator;
 
+import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.*;
 
 import com.google.common.collect.*;
@@ -98,7 +100,18 @@ public class SingletonCoordinator
 
     public synchronized static void setResult(int requestId, RequestResult result)
     {
-        // TODO
+        List<RequestFuture> futures = server.resultMap.get(requestId);
+
+        for (RequestFuture each : futures)
+        {
+            if (!each.hasResultSet())
+            {
+                each.setResult(result);
+                break;
+            }
+        }
+
+        server.resultMap.put(requestId, futures);
     }
 }
 

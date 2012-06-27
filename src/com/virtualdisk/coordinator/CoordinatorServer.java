@@ -19,9 +19,9 @@ extends NetworkServer
 
     private int lastAssignedId;
 
-    private List<DataNodeIdentifier> allNodes;
-    private Map<Integer, Channel> channelMap;
-    private Map<Integer, List<RequestFuture>> resultMap;
+    protected List<DataNodeIdentifier> allNodes;
+    protected Map<Integer, Channel> channelMap;
+    protected Map<Integer, List<RequestFuture>> resultMap;
 
     private CoordinatorServer( List<DataNodeIdentifier> allNodes
                              , Map<Integer, Channel> channelMap
@@ -57,7 +57,7 @@ extends NetworkServer
 
         OrderRequest request = new OrderRequest(id, volumeId, logicalOffset, timestamp);
 
-        List<RequestFuture> futures = new ArrayList<RequestFuture>();
+        List<RequestFuture> futures = Collections.synchronizedList(new ArrayList<RequestFuture>());
         for (int index = 0; index < targets.getMembers().size(); ++index)
         {
             RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());

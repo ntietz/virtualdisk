@@ -13,12 +13,7 @@ extends Handler
         this.coordinator = coordinator;
     }
 
-    public void run()
-    {
-        delete();
-    }
-
-    public void delete()
+    public void action()
     {
         int deleteId = coordinator.server.issueVolumeDeletionRequest(volumeId);
         boolean waiting = true;

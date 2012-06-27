@@ -25,20 +25,12 @@ extends Handler
     }
 
     /*
-     * Kicks off the write, required by Thread.
-     */
-    public void run()
-    {
-        write();
-    }
-
-    /*
      * This method performs a write request, as configured in the constructor.
      * At any point where the request may block on IO, blocking will cause the handler
      * to pause and execution will go to the next request handler in the queue.
      * This uses the algorithm for writing described in the paper about "FAB".
      */
-    public void write()
+    public void action()
     {
         Date currentTime = coordinator.getNewTimestamp();
 
