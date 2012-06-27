@@ -7,35 +7,41 @@ import java.util.Date;
 import java.util.Collection;
 import java.util.ArrayList;
 
+/**
+ * The DataNode class manages all the storage and timestamps on for the data nodes in virtualdisk.
+ * All the network requests received are handled separately, then the interpreted requests are performed using this class.
+ * @author  Nicholas Tietz
+ */
 public class DataNode
 {
 
-    /*
-     * The volume table maps integer volume IDs onto diskmaps.
-     * Diskmaps are simply maps of integers onto logical offsets (integers) onto physical offsets (integers).
+    /**
+     * The volume table translates (volumeId, logicalOffset) pairs into phsyical locations, and manages all of the volume information.
      */
-    protected VolumeTable volumeTable;
+    private VolumeTable volumeTable;
 
-    /*
-     * The free space table contains ranges of free space which are able to be allocated.
-     * It is indexed as freeSpaceTable[drive][rangeNumber]
+    /**
+     * The free space table contains all the free space on the disks, and allows easy allocation of space.
      */
-    protected FreeSpaceTable freeSpaceTable;
+    private FreeSpaceTable freeSpaceTable;
 
-    /*
-     * The timestamp tables map each volume ID to a map of each logical offset to a timestamp.
+    /**
+     * The timestamp tables store timestamps for each (volumeId, logicalOffset) pair.
      * The timestamps are Dates, so they are millisecond precision.
      */
-    protected TimestampTable orderTimestampTable;
-    protected TimestampTable valueTimestampTable;
+    private TimestampTable orderTimestampTable;
+    private TimestampTable valueTimestampTable;
 
-    /*
+    /**
      * A list of all the drives the node can use.
      */
-    protected List<Drive> drives;
+    private List<Drive> drives;
 
-    /*
-     * Sets up a DataNode with the provided characteristics
+    /**
+     * Sets up a DataNode with the provided characteristics.
+     * @param   blockSize       the size of a block, in bytes
+     * @param   driveHandles    the handles for the drives for this datanode
+     * @param   driveSizes      the sizes of each drive, in blocks
      */
     public DataNode(int blockSize, List<String> driveHandles, List<Long> driveSizes)
     {
@@ -60,29 +66,31 @@ public class DataNode
         valueTimestampTable = new TimestampTable();
     }
 
-    /*
-     * Creates a diskmap for a new volume with the given volume ID.
-     * Returns the status of the insertion.
+    /**
+     * Creates a new volume.
+     * @param   volumeId    the id of the volume we wish to create
      */
-    public boolean createVolume(int volumeId)
+    public void createVolume(int volumeId)
     {
         volumeTable.addVolume(volumeId);
         orderTimestampTable.addVolume(volumeId);
         valueTimestampTable.addVolume(volumeId);
-
-        return true;
     }
     
+    /**
+     * Deteremines whether or not a given volume exists on this datanode.
+     * @param   volumeId    the id of the volume we wish to check
+     */
     public boolean volumeExists(int volumeId)
     {
         return volumeTable.exists(volumeId);
     }
     
-    /*
-     * Attempts to delete the volume.
-     * Returns the status of the deletion.
+    /**
+     * Deletes the given volume.
+     * @param   volumeId    the id of the volume we want to delete
      */
-    public boolean deleteVolume(int volumeId)
+    public void deleteVolume(int volumeId)
     {
         Collection<DriveOffsetPair> allocatedLocations = volumeTable.getAllPhysicalLocations(volumeId);
 
@@ -94,12 +102,15 @@ public class DataNode
         volumeTable.removeVolume(volumeId);
         orderTimestampTable.removeVolume(volumeId);
         valueTimestampTable.removeVolume(volumeId);
-
-        return true;
     }
 
-    /*
-     * This function performs an order request.
+    /**
+     * Performs an order request on the data node.
+     * To be successful, the supplied timestamp must be after the existing order and value timestamps, or there must be no existing timestamp.
+     * @param   volumeId        the id of the volume we are ordering on
+     * @param   logicalOffset   the logical offset we wish to order
+     * @param   timestamp       the timestamp of the order request
+     * @return  true of the ordering works, false otherwise
      */
     public boolean order(int volumeId, long logicalOffset, Date timestamp)
     {
@@ -128,20 +139,16 @@ public class DataNode
         }
     }
 
-    /*
-     * This function writes a single block to the disk.
-     * It chooses the first available location on the disk and writes it in that location, along with updating all the necessary timestamps.
+    /**
+     * This function attempts to perform a write operation: if the timestamp is correct, it will write the block to the disk; otherwise, no data will be written.
+     * @param   volumeId        the volume we want to write to
+     * @param   logicalOffset   the logical offset we want to write to
+     * @param   block           the data we are trying to write
+     * @param   timestamp       the timestamp from the request:
+     * @return  true if the write succeeds, false otherwise
      */
     public boolean write(int volumeId, long logicalOffset, byte[] block, Date timestamp)
     {
-        // for each byte in the data:
-        //      update/write timestamp
-        //      check if it already has a written value
-        //      if yes, then overwrite
-        //      if no, then allocate space and write the value in
-
-        //TODO: add exception-checking for the correct length of data (block size)
-
         Date orderTimestamp = null;
         Date valueTimestamp = null;
         
@@ -168,7 +175,6 @@ public class DataNode
 
         if (writeable)
         {
-
             DriveOffsetPair location = getDriveOffsetPair(volumeId, logicalOffset);
 
             if (location == null)
@@ -184,7 +190,9 @@ public class DataNode
             setValueTimestamp(volumeId, logicalOffset, timestamp);
             freeSpaceTable.claim(location);
 
-            return drives.get(location.getDriveNumber()).write(location.getOffset(), block);
+            int driveId = location.getDriveNumber();
+            long physicalOffset = location.getOffset();
+            return drives.get(driveId).write(physicalOffset, block);
         }
         else
         {
@@ -192,9 +200,12 @@ public class DataNode
         }
     }
 
-    /*
-     * This method reads and returns the specified block from the disk.
+    /**
+     * This function attempts to perform a read operation and returns the result.
      * If the block is empty, null is returned.
+     * @param   volumeId        the volume id of the read request
+     * @param   logicalOffset   the logical offset for the read request
+     * @return  null if nothing has been written, and the data from the requested location otherwise
      */
     public byte[] read(int volumeId, long logicalOffset)
     {
@@ -219,54 +230,76 @@ public class DataNode
         }
     }
 
-    /*
+    /**
      * Fetches the ordering timestamp for a given volume ID and logical offset.
+     * @param   volumeId        the volume we want the timestamp for
+     * @param   logicalOffset   the logical offset we want the timestamp for
+     * @return  the timsetamp for the requested location, or null if it has not been set
      */
     public Date getOrderTimestamp(int volumeId, long logicalOffset)
     {
         return orderTimestampTable.getTimestamp(volumeId, logicalOffset);
     }
 
-    /*
+    /**
      * Fetches the value timestamp for a given volume ID and the logical offset.
+     * @param   volumeId        the volume we want the timestamp for
+     * @param   logicalOffset   the logical offset we want the timestamp for
+     * @return  the timestamp for the requested location, or null if it has not been set
      */
     public Date getValueTimestamp(int volumeId, long logicalOffset)
     {
         return valueTimestampTable.getTimestamp(volumeId, logicalOffset);
     }
 
-    /*
+    /**
      * Sets the ordering timestamp for a given volume ID and logical offset.
+     * @param   volumeId        the volume we want to set the timestamp for
+     * @param   logicalOffset   the logical offset we want to set the timestamp for
+     * @param   timestamp       the timestamp we wish to set
      */
     public void setOrderTimestamp(int volumeId, long logicalOffset, Date timestamp)
     {
         orderTimestampTable.setTimestamp(volumeId, logicalOffset, timestamp);
     }
 
-    /*
+    /**
      * Sets the value timestamp for a given volume ID and the logical offset.
+     * @param   volumeId        the volume we want to set the timestamp for
+     * @param   logicalOffset   the logical offset we want to set the timestamp for
+     * @param   timestamp       the timestamp we wish to set
      */
     public void setValueTimestamp(int volumeId, long logicalOffset, Date timestamp)
     {
         valueTimestampTable.setTimestamp(volumeId, logicalOffset, timestamp);
     }
 
-    /*
+    /**
      * Fetches the drive-offset-pair for the specified values.
+     * @param   volumeId        the volume we want the physical drive for
+     * @param   logicalOffset   the logical offset we want the physical offset for
+     * @return  the (drive, physicalOffset) pair for the request location
      */
     public DriveOffsetPair getDriveOffsetPair(int volumeId, long logicalOffset)
     {
         return volumeTable.getPhysicalLocation(volumeId, logicalOffset);
     }
 
-    /*
+    /**
      * Sets the drive-offset-pair for the specified value.
+     * @param   volumeId        the volume we want to set the drive of
+     * @param   logicalOffset   the logical offset we want to set the physical offset of
+     * @param   location        the (drive, physicalOffset) pair we wish to assign to the location
      */
     public void setDriveOffsetPair(int volumeId, long logicalOffset, DriveOffsetPair location)
     {
         volumeTable.setPhysicalLocation(volumeId, logicalOffset, location);
     }
-    
+
+    /**
+     * Returns the total free space for this data node.
+     * @return  the total free space for this node
+     */
     public long totalFreeSpace()
     {
         return freeSpaceTable.totalFreeSpace();

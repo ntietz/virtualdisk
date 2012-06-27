@@ -54,7 +54,14 @@ public class VolumeTable
      */
     public DriveOffsetPair getPhysicalLocation(int volumeId, long logicalOffset)
     {
-        return table.get(volumeId).get(logicalOffset);
+        try
+        {
+            return table.get(volumeId).get(logicalOffset);
+        }
+        catch (NullPointerException npe)
+        {
+            return null;
+        }
     }
     
     /**
@@ -65,7 +72,14 @@ public class VolumeTable
      */
     public Collection<DriveOffsetPair> getAllPhysicalLocations(int volumeId)
     {
-        return table.get(volumeId).values();
+        try
+        {
+            return table.get(volumeId).values();
+        }
+        catch (NullPointerException npe)
+        {
+            return new ArrayList<DriveOffsetPair>();
+        }
     }
     
     /**
@@ -76,7 +90,14 @@ public class VolumeTable
      */
     public void setPhysicalLocation(int volumeId, long logicalOffset, DriveOffsetPair location)
     {
-        table.get(volumeId).put(logicalOffset, location);
+        try
+        {
+            table.get(volumeId).put(logicalOffset, location);
+        }
+        catch (NullPointerException npe)
+        {
+            // .... eat the error
+        }
     }
     
     /**
@@ -86,7 +107,14 @@ public class VolumeTable
      */
     public void unsetPhysicalLocation(int volumeId, long logicalOffset)
     {
-        table.get(volumeId).remove(logicalOffset);
+        try
+        {
+            table.get(volumeId).remove(logicalOffset);
+        }
+        catch (NullPointerException npe)
+        {
+            // .... eat the error
+        }
     }
     
     /**

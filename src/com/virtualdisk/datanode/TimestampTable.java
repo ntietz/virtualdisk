@@ -52,7 +52,14 @@ public class TimestampTable
      */
     public Date getTimestamp(int volumeId, long logicalOffset)
     {
-        return table.get(volumeId).get(logicalOffset);
+        try
+        {
+            return table.get(volumeId).get(logicalOffset);
+        }
+        catch (NullPointerException npe)
+        {
+            return null;
+        }
     }
     
     /**
@@ -64,7 +71,14 @@ public class TimestampTable
     public void setTimestamp(int volumeId, long logicalOffset, Date timestamp)
     
     {
-        table.get(volumeId).put(logicalOffset, timestamp);
+        try
+        {
+            table.get(volumeId).put(logicalOffset, timestamp);
+        }
+        catch (NullPointerException npe)
+        {
+            // .... eat the error
+        }
     }
 
     /**
@@ -74,6 +88,13 @@ public class TimestampTable
      */
     public void removeTimestamp(int volumeId, long logicalOffset)
     {
-        table.get(volumeId).remove(logicalOffset);
+        try
+        {
+            table.get(volumeId).remove(logicalOffset);
+        }
+        catch (NullPointerException npe)
+        {
+            // .... eat the error
+        }
     }
 }
