@@ -2,6 +2,7 @@ package com.virtualdisk.coordinator;
 
 import com.virtualdisk.coordinator.handler.*;
 import com.virtualdisk.network.*;
+import com.virtualdisk.network.request.*;
 import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.*;
 
@@ -10,31 +11,84 @@ import java.util.concurrent.*;
 
 public class Coordinator
 {
+    /**
+     * The block size (in bytes) for the system.
+     */
     private int blockSize;
+
+    /**
+     * The segment size (in blocks) for the system.
+     */
     private int segmentSize;
+
+    /**
+     * The segment group size (in datanodes) for the system.
+     */
     private int segmentGroupSize;
+
+    /**
+     * The quorum size for the system; a quorum is the minimum number of nodes you need to reach a consensus.
+     */
     private int quorumSize;
 
+    /**
+     * All the identifiers for the datanodes which are connected to this coordinator.
+     * This is safe to use concurrently, as it is made synchronized within the constructor.
+     */
     private List<DataNodeIdentifier> datanodes;
 
+    /**
+     * A priority queue which puts the least loaded nodes first.
+     * This is safe to use concurrently.
+     */
     private PriorityBlockingQueue<DataNodeStatusPair> datanodeStatuses;
+
+    /**
+     * A list of all the segment groups this coordinator has.
+     * This will likely be converted to a PriorityBlockingQueue in the future so that assignments
+     * go first to the least loaded groups.
+     */
     private List<SegmentGroup> segmentGroupList;
+
+    /**
+     * The coordinator's volume table maps (volumeId, logicalOffset) onto a segment group.
+     * This will likely be converted to a custom class in the future; probably a segment group manager
+     * along with an address resolver.
+     */
     private Map<Integer,Map<Long,SegmentGroup>> volumeTable;
-    private Date lastTimestamp;
 
+    /**
+     * The completion map maps request ids onto booleans; true means the request finished, false means it did not.
+     * Note: "finished" includes timing out and having errors.
+     * Note: having a true completion implies that there will be a non-null result in the result map.
+     * This member can be used concurrently safely, as it is made synchronized in the constructor.
+     */
     private Map<Integer, Boolean> requestCompletionMap;
-    private Map<Integer, Boolean> writeResultMap;
-    private Map<Integer, byte[]> readResultMap;
-    private Map<Integer, Boolean> volumeResultMap;
 
+    /**
+     * The result map maps request ids onto RequestResults, which are castable to their specific request type.
+     * This member can be used concurrently safely, as it is made synchronized in the constructor.
+     */
+    private Map<Integer, RequestResult> resultMap;
+
+    /**
+     * This is the last assigned id; it is tracked for the purposes of assigning new request ids.
+     */
     private int lastAssignedId = 0;
 
-    private HandlerManager handlerManager;
-
+    /**
+     * This is a reference to the server which the coordinator uses to send and receive requests.
+     */
     private NetworkServer server;
 
-    /*
-     * This constructor initializes all the necessary information for the coordinator.
+    /**
+     * Standard constructor which makes sure all the data structures are safe to use concurrently.
+     * @param   blockSize           the size of the blocks, in bytes
+     * @param   segmentSize         the size of the segments, in blocks
+     * @param   segmentGroupSize    the size of the segment groups for the system
+     * @param   quorumSize          the quorum size for the system
+     * @param   initialNodes        the first nodes to add to the system and connect to
+     * @param   server              the server to be used for network requests
      */
     public Coordinator( int blockSize
                       , int segmentSize
@@ -48,10 +102,9 @@ public class Coordinator
         this.segmentSize = segmentSize;
         this.segmentGroupSize = segmentGroupSize;
         this.quorumSize = quorumSize;
-
         this.server = server;
-
         datanodes = Collections.synchronizedList(new ArrayList<DataNodeIdentifier>(initialNodes));
+
         datanodeStatuses = new PriorityBlockingQueue<DataNodeStatusPair>();
         for (DataNodeIdentifier each : datanodes)
         {
@@ -61,22 +114,18 @@ public class Coordinator
         }
 
         segmentGroupList = Collections.synchronizedList(new ArrayList<SegmentGroup>());
+        // TODO initialize segment groups here.
 
         volumeTable = new ConcurrentHashMap<Integer,Map<Long,SegmentGroup>>();
 
-        lastTimestamp = new Date(0);
-
         requestCompletionMap = new ConcurrentHashMap<Integer, Boolean>();
-        writeResultMap = new ConcurrentHashMap<Integer, Boolean>();
-        readResultMap = new ConcurrentHashMap<Integer, byte[]>();
-        volumeResultMap = new ConcurrentHashMap<Integer, Boolean>();
-
-        handlerManager = new HandlerManager(this);
-        handlerManager.start();
+        resultMap = new ConcurrentHashMap<Integer, RequestResult>();
     }
 
-    /*
-     * This method creates a new logical volume within the coordinator.
+    /**
+     * This method creates a new logical volume within the coordinator and tells the datanodes to do the same.
+     * @param   volumeId    the id of the volume to create
+     * @return  the request id, which is used to determine the success or failure of the attempt
      */
     public int createVolume(int volumeId)
     {
@@ -92,6 +141,11 @@ public class Coordinator
         return id;
     }
 
+    /**
+     * This method indicates whether or not a certain request has finished.
+     * @param   requestId   the id of the request we want to check
+     * @return  true if the request is done (including time-outs or errors), false otherwise
+     */
     public boolean createVolumeCompleted(int requestId)
     {
         Boolean finished = requestCompletionMap.get(requestId);
@@ -105,9 +159,23 @@ public class Coordinator
         }
     }
 
-    public boolean createVolumeResult(int requestId)
+    /**
+     * This method returns the result of a create volume request.
+     * Note: if it has not yet been set (for example, if the request is not finished), it will return null.
+     * @param   requestId   the id of the request we want the result of
+     * 
+     */
+    public CreateVolumeRequestResult createVolumeResult(int requestId)
     {
-        return volumeResultMap.get(requestId);
+        RequestResult result = resultMap.get(requestId);
+        if (result instanceof CreateVolumeRequestResult)
+        {
+            return (CreateVolumeRequestResult) result;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /*
@@ -139,9 +207,17 @@ public class Coordinator
         }
     }
 
-    public boolean deleteVolumeResult(int requestId)
+    public DeleteVolumeRequestResult deleteVolumeResult(int requestId)
     {
-        return volumeResultMap.get(requestId);
+        RequestResult result = resultMap.get(requestId);
+        if (result instanceof DeleteVolumeRequestResult)
+        {
+            return (DeleteVolumeRequestResult) result;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /*
@@ -186,9 +262,17 @@ public class Coordinator
     /*
      * This method fetches the result of the write request (success or failure).
      */
-    public boolean writeResult(int requestId)
+    public WriteRequestResult writeResult(int requestId)
     {
-        return writeResultMap.get(requestId);
+        RequestResult result = resultMap.get(requestId);
+        if (result instanceof WriteRequestResult)
+        {
+            return (WriteRequestResult) result;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /*
@@ -224,9 +308,17 @@ public class Coordinator
     /*
      * This method fetches the results of a read request; If the request is in progress, it returns null.
      */
-    public byte[] readResult(Integer requestId)
+    public ReadRequestResult readResult(Integer requestId)
     {
-        return readResultMap.get(requestId);
+        RequestResult result = resultMap.get(requestId);
+        if (result instanceof ReadRequestResult)
+        {
+            return (ReadRequestResult) result;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     // TODO: IMPLEMENT LATER
@@ -297,14 +389,13 @@ public class Coordinator
         }
     }
 
-    /*
-     * This method generates a unique timestamp for use in network requests.
+    /**
+     * This method generates a new timestamp for use in network requests.
+     * @return  a new timestamp corresponding to the system time.
      */
     private synchronized Date getNewTimestamp()
     {
-        long current = lastTimestamp.getTime();
-        lastTimestamp = new Date(current+1);
-        return lastTimestamp;
+        return new Date();
     }
 
 }

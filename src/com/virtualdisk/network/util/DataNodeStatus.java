@@ -2,18 +2,16 @@ package com.virtualdisk.network.util;
 
 public class DataNodeStatus
 {
+    private int blockSizeInBytes;
+    private int segmentSizeInBlocks;
+    //private int driveCapacityInSegments;
+    private long segmentsStored;
+    //private float percentFull;
 
-    protected int blockSizeInBytes;
-    protected int segmentSizeInBlocks;
-    protected int driveCapacityInSegments;
-
-    protected long segmentsStored;
-    protected float percentFull;
-
-    public DataNodeStatus(int bs, int ss)
+    public DataNodeStatus(int blockSize, int segmentSize)
     {
-        blockSizeInBytes = bs;
-        segmentSizeInBlocks = ss;
+        blockSizeInBytes = blockSize;
+        segmentSizeInBlocks = segmentSize;
 
         segmentsStored = 0;
     }
