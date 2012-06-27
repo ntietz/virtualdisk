@@ -4,37 +4,53 @@ import com.virtualdisk.util.DriveOffsetPair;
 import com.virtualdisk.util.Range;
 
 import java.util.*;
+import java.util.concurrent.*;
 
+/**
+ * FreeSpaceTable keeps track of where free locations are on disks for a DataNode.
+ * @author  Nicholas Tietz
+ */
 public class FreeSpaceTable
 {
-    List<List<Range>> table;
-    int numberOfDrives;
+    /**
+     * Stores the free space available.
+     * Each range is a block of free space (where the end points, and everything between, are free)
+     * Each list of ranges is the free space for one disk.
+     * The list of lists of ranges is the free space for all disks.
+     */
+    private List<List<Range>> table;
+
+    /**
+     * The number of disks the freespace table is managing.
+     */
+    private int numberOfDrives;
     
     /**
-     * @param n             the number of drives the table describes
-     * @param driveSize     a list of drive sizes 
+     * Standard constructor.
+     * @param numberOfDrives    the number of drives to manage
+     * @param driveSize         a list of the sizes of the drives, in number of blocks
      */
-    public FreeSpaceTable(int n, List<Long> driveSize)
+    public FreeSpaceTable(int numberOfDrives, List<Long> driveSize)
     {
-        numberOfDrives = n;
-        table = new ArrayList<List<Range>>(numberOfDrives);
+        this.numberOfDrives = numberOfDrives;
+        table = Collections.synchronizedList(new ArrayList<List<Range>>(numberOfDrives));
         
         for (int drive = 0; drive < numberOfDrives; ++drive)
         {
             Range wholeDrive = new Range(0, driveSize.get(drive)-1);
-            List<Range> driveSpace = new ArrayList<Range>();
+            List<Range> driveSpace = Collections.synchronizedList(new ArrayList<Range>());
             driveSpace.add(wholeDrive);
             table.add(driveSpace);
         }
     }
     
     /**
-     * @return  the next free disk location
+     * Selects and returns the next available disk location. Naive algorithm which picks the first free block and does not attempt to optimize locations.
+     * @return  the next free disk location as a DriveOffsetPair
      */
     public DriveOffsetPair next()
     {
-        // iterate through the drives for a free location until one is found
-        // construct a drive-offset pair from the free location and return it
+        // Naive algorithm which simply selects the first free block.
         for (int drive = 0; drive < numberOfDrives; ++drive)
         {
             List<Range> driveTable = table.get(drive);
@@ -52,8 +68,9 @@ public class FreeSpaceTable
     }
     
     /**
-     * @param location  the disk location we are checking to see if is free
-     * @return          true if the location is free, false if it is in use
+     * Checks whether or not the supplied disk location is available to assign.
+     * @param   location    the disk location we are checking to see if is free
+     * @return  true if the location is free, false if it is in use
      */
     public boolean isFree(DriveOffsetPair location)
     {
@@ -72,8 +89,9 @@ public class FreeSpaceTable
     }
     
     /**
-     * @param location  the disk location we are trying to claim set as in-use
-     * @return          false if it is already in use, true if we successfully claim it
+     * Attempts to put the supplied disk location into use; it returns whether or not it was able to do so.
+     * @param   location    the disk location we are trying to claim set as in-use
+     * @return  false if it is already in use, true if we successfully claim it
      */
     public boolean claim(DriveOffsetPair location)
     {
@@ -106,8 +124,9 @@ public class FreeSpaceTable
     }
     
     /**
-     * @param location  the disk location we wish to release
-     * @return          true if we released the location, false if it was not already in use
+     * Attempts to release a given disk location.
+     * @param   location    the disk location we wish to release
+     * @return  true if we released the location, false if it was not already in use
      */
     public boolean release(DriveOffsetPair location)
     {
@@ -142,6 +161,7 @@ public class FreeSpaceTable
     }
 
     /**
+     * Checks the total number of free blocks in the drives the table is configured for.
      * @return  the total number of free blocks the FreeSpaceTable describes
      */
     public long totalFreeSpace()

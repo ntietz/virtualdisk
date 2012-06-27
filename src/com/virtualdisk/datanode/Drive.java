@@ -12,17 +12,17 @@ public class Drive
     /**
      * The size of disk blocks in bytes. This size should match the block sizes in all the data nodes and the coordinators.
      */
-    protected int blockSize;
+    private int blockSize;
 
     /**
      * The size of the disk in blocks. This is a long to allow effectively unlimited drive sizes; the actual limit for a drive size is over 2^64 bytse, which is sufficiently large for the foreseeable future.
      */
-    protected long driveSize;
+    private long driveSize;
 
     /**
      * A string holding the handle for the drive. This should be something like "/dev/sda" to allow raw disk access on unix systems.
      */
-    protected String handle;
+    private String handle;
 
     /**
      * A standard constructor.
