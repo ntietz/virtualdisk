@@ -46,12 +46,12 @@ extends Handler
         boolean success = false;
         boolean timestampsMatch = true;
         byte[] value = null;
+        Date timestamp = null;
 
         while (waiting)
         {
             List<ReadRequestResult> results = coordinator.server.getReadRequestResults(orderId);
             int completed = 0;
-            Date timestamp = null;
 
             for (ReadRequestResult each : results)
             {
@@ -105,15 +105,17 @@ extends Handler
 
         if (!success)
         {
-            result = null;
+            result = new byte[0];
         }
         else
         {
             result = value;
         }
 
+        requestResult = new ReadRequestResult(requestId, true, success, timestamp, result);
         coordinator.readResultMap.put(requestId, result);
         coordinator.requestCompletionMap.put(requestId, true);
+        finished = true;
     }
 }
 

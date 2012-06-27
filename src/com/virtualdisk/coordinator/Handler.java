@@ -10,7 +10,7 @@ public abstract class Handler extends Thread
     protected int volumeId;
     protected long logicalOffset;
     protected Coordinator coordinator;
-    protected Sendable result;
+    protected Sendable requestResult;
 
     public boolean isFinished()
     {
@@ -30,7 +30,7 @@ public abstract class Handler extends Thread
     public void run()
     {
         action();
-        SingletonCoordinator.sendToClient(requestId, result);
+        SingletonCoordinator.sendToClient(requestId, requestResult);
     }
 
     public abstract void action();

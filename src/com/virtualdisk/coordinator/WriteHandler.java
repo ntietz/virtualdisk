@@ -122,10 +122,10 @@ extends Handler
             }
         }
 
-        finished = true;
-
+        requestResult = new WriteRequestResult(requestId, true, success);
         coordinator.writeResultMap.put(requestId, success);
         coordinator.requestCompletionMap.put(requestId, true);
+        finished = true;
     }
 }
 
