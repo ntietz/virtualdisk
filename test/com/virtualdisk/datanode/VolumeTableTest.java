@@ -21,7 +21,9 @@ public class VolumeTableTest
     {
         VolumeTable volumeTable = new VolumeTable();
         
+        assertTrue("Volume should not exist", !volumeTable.exists(0));
         volumeTable.addVolume(0);
+        assertTrue("Volume should exist", volumeTable.exists(0));
         volumeTable.addVolume(0);
         volumeTable.addVolume(1);
         

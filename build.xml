@@ -13,6 +13,7 @@
     <property name="reports" location="reports/" />
     <property name="reports.test" location="reports/test" />
     <property name="reports.coverage" location="reports/coverage" />
+    <property name="reports.javadoc" location="reports/javadoc" />
 
     <path id="classpath.base">
         <fileset dir="${lib}">
@@ -39,6 +40,7 @@
         <mkdir dir="${reports}" />
         <mkdir dir="${reports.test}" />
         <mkdir dir="${reports.coverage}" />
+        <mkdir dir="${reports.javadoc}" />
         <mkdir dir="data" />
     </target>
 
@@ -93,6 +95,14 @@
     <target name="coverage-report" description="Generates the coverage report.">
         <cobertura-report datafile="cobertura.ser"
             format="html" destdir="${reports.coverage}" srcdir="${src}" />
+    </target>
+
+    <target name="javadoc" depends="init" description="Generates the documentation.">
+        <javadoc destdir="${reports.javadoc}" classpathref="classpath.base">
+            <fileset dir="${src}">
+                <include name="**/*.java" />
+            </fileset>
+        </javadoc>
     </target>
 
     <target name="clean" description="Removes all created files and directories.">

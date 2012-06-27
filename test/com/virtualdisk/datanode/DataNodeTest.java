@@ -74,6 +74,7 @@ public class DataNodeTest
         }
         
         dataNode.createVolume(0);
+        assertTrue("Volume should exist", dataNode.volumeExists(0));
 
         assertNull("Unordered location should be null", dataNode.getOrderTimestamp(0, 0L));
         assertTrue("Order should succeed", dataNode.order(0, 0L, new Date(0)));

@@ -51,7 +51,7 @@ public class VolumeTable
     }
     
     /**
-     * @param volumed   the volume id we want to get all locations of
+     * @param volumeId  the volume id we want to get all locations of
      * @return          a collection of the DriveOffsetPairs which are allocated for the volume
      */
     public Collection<DriveOffsetPair> getAllPhysicalLocations(int volumeId)
