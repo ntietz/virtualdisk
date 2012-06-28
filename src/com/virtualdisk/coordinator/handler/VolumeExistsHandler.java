@@ -2,6 +2,7 @@ package com.virtualdisk.coordinator.handler;
 
 import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.request.base.*;
 
 import java.util.*;
 
@@ -16,13 +17,13 @@ extends Handler
 
     public void action()
     {
-        int existsId = coordinator.server.issueVolumeExistsRequest(volumeId);
+        int existsId = coordinator.getServer().issueVolumeExistsRequest(volumeId);
         boolean waiting = true;
         boolean exists = false;
 
         while (waiting)
         {
-            List<VolumeExistsRequestResult> results = coordinator.server.getVolumeExistsRequestResults(existsId);
+            List<VolumeExistsRequestResult> results = coordinator.getServer().getVolumeExistsRequestResults(existsId);
             int completed = 0;
             int successful = 0;
 
@@ -46,8 +47,7 @@ extends Handler
         }
 
         requestResult = new VolumeExistsRequestResult(requestId, true, true, exists);
-        coordinator.volumeResultMap.put(requestId, exists);
-        coordinator.requestCompletionMap.put(requestId, true);
+        coordinator.setRequestResult(requestId, (RequestResult)requestResult);
         finished = true;
     }
 }

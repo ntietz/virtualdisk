@@ -123,6 +123,80 @@ public class Coordinator
     }
 
     /**
+     * Getter for blockSize.
+     * @return the block size in bytes
+     */
+    public int getBlockSize()
+    {
+        return blockSize;
+    }
+
+    /**
+     * Getter for segmentSize.
+     * @return  the segment size in blocks
+     */
+    public int getSegmentSize()
+    {
+        return segmentSize;
+    }
+
+    /**
+     * Getter for segmentGroupSize.
+     * @return  the segment group size in number of nodes
+     */
+    public int getSegmentGroupSize()
+    {
+        return segmentGroupSize;
+    }
+
+    /**
+     * Getter for quorumSize.
+     * @return  the quorum size
+     */
+    public int getQuorumSize()
+    {
+        return quorumSize;
+    }
+
+    /**
+     * Getter for the server.
+     * @return  the network server this coordinator is configured to use
+     */
+    public NetworkServer getServer()
+    {
+        return server;
+    }
+
+    /**
+     * Sets the result of a request.
+     * @param   requestId   the id of the request
+     * @param   result      the result of the request
+     */
+    public void setRequestResult(int requestId, RequestResult result)
+    {
+        resultMap.put(requestId, result);
+        requestCompletionMap.put(requestId, true);
+    }
+
+    /**
+     * This method indicates whether a request has finished or not.
+     * @param   requestId   the id of the request
+     * @return  true if hte request has finished (or timed out, or errored out, etc.), false otherwise
+     */
+    public boolean requestFinished(int requestId)
+    {
+        Boolean finished = requestCompletionMap.get(requestId);
+        if (finished != null)
+        {
+            return finished;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
      * This method creates a new logical volume within the coordinator and tells the datanodes to do the same.
      * @param   volumeId    the id of the volume to create
      * @return  the request id, which is used to determine the success or failure of the attempt
@@ -142,28 +216,10 @@ public class Coordinator
     }
 
     /**
-     * This method indicates whether or not a certain request has finished.
-     * @param   requestId   the id of the request we want to check
-     * @return  true if the request is done (including time-outs or errors), false otherwise
-     */
-    public boolean createVolumeCompleted(int requestId)
-    {
-        Boolean finished = requestCompletionMap.get(requestId);
-        if (finished != null)
-        {
-            return finished;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    /**
      * This method returns the result of a create volume request.
      * Note: if it has not yet been set (for example, if the request is not finished), it will return null.
      * @param   requestId   the id of the request we want the result of
-     * 
+     * @return  the result of the request, or null if it has not been stored yet
      */
     public CreateVolumeRequestResult createVolumeResult(int requestId)
     {
@@ -178,8 +234,10 @@ public class Coordinator
         }
     }
 
-    /*
-     * This method deletes a logical volume within the coordinator.
+    /**
+     * This method deletes a logical volume within the coordinator and tells the datanodes to do the same.
+     * @param   volumeId    the id of the volume to delete
+     * @return  the request id, which is used to determine the success or failure of the attempt
      */
     public int deleteVolume(int volumeId)
     {
@@ -194,19 +252,12 @@ public class Coordinator
         return id;
     }
 
-    public boolean deleteVolumeCompleted(int requestId)
-    {
-        Boolean finished = requestCompletionMap.get(requestId);
-        if (finished != null)
-        {
-            return finished;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
+    /**
+     * This method returns the result of a delete volume request.
+     * Note: if it has not yet been set (for example, if the request is not finished), it will return null.
+     * @param   requestId   the id of the request we want the result of
+     * @return  the result of the request, or null if it has not been stored yet
+     */
     public DeleteVolumeRequestResult deleteVolumeResult(int requestId)
     {
         RequestResult result = resultMap.get(requestId);
@@ -220,8 +271,10 @@ public class Coordinator
         }
     }
 
-    /*
+    /**
      * A synchronized method to generate new unique request IDs.
+     * Note: this id may not be unique. After 2^32 requests, ids will repeat.
+     * @return  a new unique request id
      */
     private synchronized int generateNewRequestId()
     {
@@ -229,38 +282,30 @@ public class Coordinator
         return lastAssignedId;
     }
     
-    /*
-     * Initiates the write request and returns the request's ID.
+    /**
+     * Initiates the write request and returns the request's id.
+     * @param   volumeId        the volume the write is writing to
+     * @param   logicalOffset   the logical offset of the write
+     * @param   block           the data we are writing
+     * @return  the id of the request
      */
     public int write(int volumeId, long logicalOffset, byte[] block)
     {
         int id = generateNewRequestId();
 
-        WriteHandler handler = new WriteHandler(volumeId, logicalOffset, block, this);
+        SegmentGroup segmentGroup = getSegmentGroup(volumeId, logicalOffset);
+        WriteHandler handler = new WriteHandler(volumeId, logicalOffset, block, segmentGroup, this);
         handler.setRequestId(id);
         handler.start();
 
         return id;
     }
 
-    /*
-     * Returns the status of the write request (finished or not-finished).
-     */
-    public boolean writeCompleted(Integer requestId)
-    {
-        Boolean finished = requestCompletionMap.get(requestId);
-        if (finished != null)
-        {
-            return finished;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    /*
-     * This method fetches the result of the write request (success or failure).
+    /**
+     * This method returns the result of a write request.
+     * Note: if it has not yet been set (for example, if the request is not finished), it will return null.
+     * @param   requestId   the id of the request we want the result of
+     * @return  the result of the request, or null if it has not been stored yet
      */
     public WriteRequestResult writeResult(int requestId)
     {
@@ -275,38 +320,29 @@ public class Coordinator
         }
     }
 
-    /*
-     * This method initiates a read request for the given volume ID and logical offset and returns its request ID.
+    /**
+     * This method performs a read request.
+     * @param   volumeId        the volume id of the request
+     * @param   logicalOffset   the logical offset of the request
+`    * @return  the request id for this request
      */
     public int read(int volumeId, long logicalOffset)
     {
         int id = generateNewRequestId();
 
-        ReadHandler handler = new ReadHandler(volumeId, logicalOffset, this);
+        SegmentGroup segmentGroup = getSegmentGroup(volumeId, logicalOffset);
+        ReadHandler handler = new ReadHandler(volumeId, logicalOffset, segmentGroup, this);
         handler.setRequestId(id);
         handler.start();
 
         return id;
     }
 
-    /*
-     * This method returns whether or not the specified read request has completed.
-     */
-    public boolean readCompleted(Integer requestId)
-    {
-        Boolean finished = requestCompletionMap.get(requestId);
-        if (finished != null)
-        {
-            return finished;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    /*
-     * This method fetches the results of a read request; If the request is in progress, it returns null.
+    /**
+     * This method returns the result of a read request.
+     * Note: if it has not yet been set (for example, if the request is not finished), it will return null.
+     * @param   requestId   the id of the request we want the result of
+     * @return  the result of the request, or null if it has not been stored yet
      */
     public ReadRequestResult readResult(Integer requestId)
     {
@@ -333,9 +369,12 @@ public class Coordinator
         return false;
     }
 
-    /*
+    /**
      * This method returns the segment group for a volumeId and logical offset.
      * If the volumeId and logical offset pair do not have a segment group, it will be assigned.
+     * @param   volumeId        the volume id we want to use
+     * @param   logicalOffset   the logical offset of the request
+     * @return  the segment group for the given (volume, logicalOffset) pair
      */
     private SegmentGroup getSegmentGroup(int volumeId, long logicalOffset)
     {
@@ -349,9 +388,12 @@ public class Coordinator
         return segmentgroup;
     }
 
-    /*
+    /**
      * This method takes a volumeId and logical offset and assigns that pair a segment group.
      * It generates the segment group based off which nodes have the lightest load.
+     * @param   volumeId        the volume id we want to use
+     * @param   logicalOffset   the logical offset of the request
+     * @return  the segment group for the given (volume, logicalOffset) pair
      */
     private synchronized SegmentGroup assignSegmentGroup(int volumeId, long logicalOffset)
     {
@@ -393,7 +435,7 @@ public class Coordinator
      * This method generates a new timestamp for use in network requests.
      * @return  a new timestamp corresponding to the system time.
      */
-    private synchronized Date getNewTimestamp()
+    public Date getTimestamp()
     {
         return new Date();
     }

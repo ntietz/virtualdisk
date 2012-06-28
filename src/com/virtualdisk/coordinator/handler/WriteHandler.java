@@ -2,6 +2,7 @@ package com.virtualdisk.coordinator.handler;
 
 import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.request.base.*;
 
 import java.util.*;
 
@@ -12,16 +13,18 @@ public class WriteHandler
 extends Handler
 {
     private byte[] block;
+    private SegmentGroup targets;
 
     /*
      * This constructor sets up the write request with a volume ID, logical offset, and data to write.
      */
-    public WriteHandler(int vid, long lo, byte[] data, Coordinator c)
+    public WriteHandler(int vid, long lo, byte[] data, SegmentGroup targets, Coordinator c)
     {
         volumeId = vid;
         logicalOffset = lo;
         block = data;
         coordinator = c;
+        this.targets = targets;
     }
 
     /*
@@ -32,17 +35,15 @@ extends Handler
      */
     public void action()
     {
-        Date currentTime = coordinator.getNewTimestamp();
+        Date currentTime = coordinator.getTimestamp();
 
-        SegmentGroup targets = coordinator.getSegmentGroup(volumeId, logicalOffset);
-
-        int orderId = coordinator.server.issueOrderRequest(targets, volumeId, logicalOffset, currentTime);
+        int orderId = coordinator.getServer().issueOrderRequest(targets, volumeId, logicalOffset, currentTime);
 
         boolean waiting = true;
         boolean success = false;
         while (waiting)
         {
-            List<OrderRequestResult> results = coordinator.server.getOrderRequestResults(orderId);
+            List<OrderRequestResult> results = coordinator.getServer().getOrderRequestResults(orderId);
             int completed = 0;
             int successful = 0;
 
@@ -64,12 +65,12 @@ extends Handler
                 }
             }
 
-            if (successful >= coordinator.quorumSize)
+            if (successful >= coordinator.getQuorumSize())
             {
                 waiting = false;
                 success = true;
             }
-            else if (completed == coordinator.segmentGroupSize)
+            else if (completed == coordinator.getSegmentGroupSize())
             {
                 waiting = false;
                 success = false;
@@ -82,13 +83,13 @@ extends Handler
             return;
         }
 
-        int writeId = coordinator.server.issueWriteRequest(targets, volumeId, logicalOffset, block, currentTime);
+        int writeId = coordinator.getServer().issueWriteRequest(targets, volumeId, logicalOffset, block, currentTime);
 
         waiting = true;
         success = false;
         while (waiting)
         {
-            List<WriteRequestResult> results = coordinator.server.getWriteRequestResults(writeId);
+            List<WriteRequestResult> results = coordinator.getServer().getWriteRequestResults(writeId);
             int completed = 0;
             int successful = 0;
 
@@ -110,12 +111,12 @@ extends Handler
                 }
             }
 
-            if (successful >= coordinator.quorumSize)
+            if (successful >= coordinator.getQuorumSize())
             {
                 waiting = false;
                 success = true;
             }
-            else if (completed == coordinator.segmentGroupSize)
+            else if (completed == coordinator.getSegmentGroupSize())
             {
                 waiting = false;
                 success = false;
@@ -123,8 +124,7 @@ extends Handler
         }
 
         requestResult = new WriteRequestResult(requestId, true, success);
-        coordinator.writeResultMap.put(requestId, success);
-        coordinator.requestCompletionMap.put(requestId, true);
+        coordinator.setRequestResult(requestId, (RequestResult)requestResult);
         finished = true;
     }
 }

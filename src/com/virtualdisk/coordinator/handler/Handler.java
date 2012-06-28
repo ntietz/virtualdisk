@@ -2,6 +2,7 @@ package com.virtualdisk.coordinator.handler;
 
 import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.*;
 
 public abstract class Handler extends Thread
@@ -31,6 +32,8 @@ public abstract class Handler extends Thread
     public void run()
     {
         action();
+
+        // TODO : change this line... it's kind of gross.
         SingletonCoordinator.sendToClient(requestId, requestResult);
     }
 

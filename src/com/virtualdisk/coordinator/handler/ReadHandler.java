@@ -2,6 +2,7 @@ package com.virtualdisk.coordinator.handler;
 
 import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.request.base.*;
 
 import java.util.*;
 
@@ -12,15 +13,17 @@ public class ReadHandler
 extends Handler
 {
     private byte[] result = null;
+    private SegmentGroup targets;
 
     /*
      * Constructor takes in volume ID and logical offset to configure the read request.
      */
-    public ReadHandler(int vid, long lo, Coordinator c)
+    public ReadHandler(int vid, long lo, SegmentGroup targets, Coordinator c)
     {
         volumeId = vid;
         logicalOffset = lo;
         coordinator = c;
+        this.targets = targets;
     }
 
     /*
@@ -39,9 +42,7 @@ extends Handler
      */
     public void action()
     {
-        SegmentGroup targets = coordinator.getSegmentGroup(volumeId, logicalOffset);
-
-        int orderId = coordinator.server.issueReadRequest(targets, volumeId, logicalOffset);
+        int orderId = coordinator.getServer().issueReadRequest(targets, volumeId, logicalOffset);
 
         boolean waiting = true;
         boolean success = false;
@@ -51,7 +52,7 @@ extends Handler
 
         while (waiting)
         {
-            List<ReadRequestResult> results = coordinator.server.getReadRequestResults(orderId);
+            List<ReadRequestResult> results = coordinator.getServer().getReadRequestResults(orderId);
             int completed = 0;
 
             for (ReadRequestResult each : results)
@@ -79,7 +80,7 @@ extends Handler
                 }
             }
 
-            if (completed >= coordinator.quorumSize)
+            if (completed >= coordinator.getQuorumSize())
             {
                 waiting = false;
 
@@ -90,12 +91,13 @@ extends Handler
                 else
                 {
                     int id = coordinator.write(volumeId, logicalOffset, value);
-                    while (!coordinator.writeCompleted(id))
+                    while (!coordinator.requestFinished(id))
                     {
                         // spin!!!
                     }
                     
-                    boolean writeSuccess = coordinator.writeResult(id);
+                    WriteRequestResult writeResult = coordinator.writeResult(id);
+                    boolean writeSuccess = writeResult.wasSuccessful();
                     timestampsMatch = writeSuccess;
                     success = writeSuccess;
                 }
@@ -114,8 +116,7 @@ extends Handler
         }
 
         requestResult = new ReadRequestResult(requestId, true, success, timestamp, result);
-        coordinator.readResultMap.put(requestId, result);
-        coordinator.requestCompletionMap.put(requestId, true);
+        coordinator.setRequestResult(requestId, (RequestResult)requestResult);
         finished = true;
     }
 }
