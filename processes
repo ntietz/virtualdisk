@@ -1,0 +1,1 @@
+ps aux | head -1 && ps aux | grep -v vim | grep "sample\.jar" | grep "coordinator\|datanode\|client"
