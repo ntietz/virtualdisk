@@ -63,16 +63,6 @@ public class DataNodeTest
         
         assertEquals("Free space should match.", initialFreeSpace, dataNode.totalFreeSpace());
         
-        try
-        {
-            dataNode.order(0, 0L, new Date(0));
-            fail("Ordering should have thrown exception");
-        }
-        catch (NullPointerException e)
-        {
-            // do nothing, expected behavior
-        }
-        
         dataNode.createVolume(0);
         assertTrue("Volume should exist", dataNode.volumeExists(0));
 
@@ -130,7 +120,8 @@ public class DataNodeTest
             // do nothing, expected behavior
         }
         
-        assertTrue("Volume deletion should succeed", dataNode.deleteVolume(0));
+        dataNode.deleteVolume(0);
+        assertFalse("Volume deletion should succeed", dataNode.volumeExists(0));
         dataNode.createVolume(0);
         
         assertEquals("Drive should be empty", initialFreeSpace, dataNode.totalFreeSpace());

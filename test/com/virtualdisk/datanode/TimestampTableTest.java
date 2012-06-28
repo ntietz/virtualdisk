@@ -17,11 +17,11 @@ public class TimestampTableTest
         TimestampTable timestampTable = new TimestampTable();
         
         timestampTable.addVolume(0);
-        assertNull("Unassigned timestamps should be null.", timestampTable.getTimestamp(new DriveOffsetPair(0, 0)));
-        timestampTable.setTimestamp(new DriveOffsetPair(0, 0), new Date(10));
-        assertEquals("Timestamps should match", new Date(10), timestampTable.getTimestamp(new DriveOffsetPair(0, 0)));
-        timestampTable.removeTimestamp(new DriveOffsetPair(0, 0));
-        assertNull("Unassigned timestamps should be null.", timestampTable.getTimestamp(new DriveOffsetPair(0, 0)));
+        assertNull("Unassigned timestamps should be null.", timestampTable.getTimestamp(0, 0));
+        timestampTable.setTimestamp(0, 0, new Date(10));
+        assertEquals("Timestamps should match", new Date(10), timestampTable.getTimestamp(0, 0));
+        timestampTable.removeTimestamp(0, 0);
+        assertNull("Unassigned timestamps should be null.", timestampTable.getTimestamp(0, 0));
         timestampTable.removeVolume(0);
     }
 

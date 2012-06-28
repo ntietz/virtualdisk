@@ -1,7 +1,8 @@
 package com.virtualdisk.coordinator;
 
 import com.virtualdisk.network.*;
-import com.virtualdisk.network.util.DataNodeIdentifier;
+import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.util.*;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -54,36 +55,27 @@ public class CoordinatorTest
     public void testCreateVolume()
     {
         int firstCreateId = coordinator.createVolume(0);
-
         int firstDeleteId = coordinator.deleteVolume(0);
 
-        while (!coordinator.createVolumeCompleted(firstCreateId));
-        while (!coordinator.deleteVolumeCompleted(firstDeleteId));
+        while (!coordinator.requestFinished(firstCreateId));
+        while (!coordinator.requestFinished(firstDeleteId));
 
-        boolean firstTryCreate = coordinator.createVolumeResult(firstCreateId);
-        boolean firstTryDelete = coordinator.deleteVolumeResult(firstDeleteId);
+        boolean firstTryCreate = coordinator.createVolumeResult(firstCreateId).wasSuccessful();
+        boolean firstTryDelete = coordinator.deleteVolumeResult(firstDeleteId).wasSuccessful();
 
         assertEquals("First volume creation should succeed.", true, firstTryCreate);
         assertEquals("First volume deletion should succeed.", true, firstTryDelete);
     }
 
     @Test
-    public void testGenerateNewRequestId()
-    {
-        int firstId = coordinator.generateNewRequestId();
-        int secondId = coordinator.generateNewRequestId();
-        int thirdId = coordinator.generateNewRequestId();
-
-        assertFalse("ids should not match.", firstId == secondId);
-        assertFalse("ids should not match.", secondId == thirdId);
-    }
-
-    @Test
     public void testGetNewTimestamp()
+    throws Exception
     {
-        Date firstTs = coordinator.getNewTimestamp();
-        Date secondTs = coordinator.getNewTimestamp();
-        Date thirdTs = coordinator.getNewTimestamp();
+        Date firstTs = coordinator.getTimestamp();
+        Thread.sleep(10);
+        Date secondTs = coordinator.getTimestamp();
+        Thread.sleep(10);
+        Date thirdTs = coordinator.getTimestamp();
 
         assertTrue("Timestamps should be correctly ordered.", firstTs.before(secondTs));
         assertTrue("Timestamps should be correctly ordered.", secondTs.before(thirdTs));
@@ -97,8 +89,8 @@ public class CoordinatorTest
         Random testRandom = new Random(seed);
 
         int createId = coordinator.createVolume(0);
-        while (!coordinator.createVolumeCompleted(createId));
-        boolean created = coordinator.createVolumeResult(createId);
+        while (!coordinator.requestFinished(createId));
+        boolean created = coordinator.createVolumeResult(createId).wasSuccessful();
 
         assertEquals("Volume creation should succeed.", true, created);
         
@@ -119,14 +111,13 @@ public class CoordinatorTest
         {
             int id = writeIds.get(index);
             
-            while (!coordinator.writeCompleted(id))
+            while (!coordinator.requestFinished(id))
             {
                 // spin!!!
             }
 
-            assertTrue("Write id should be valid." + index, coordinator.writeResultMap.get(id) != null);
-            assertTrue("Write should complete.", coordinator.writeCompleted(id));
-            assertTrue("Write should succeed.", coordinator.writeResult(id));
+            assertTrue("Write should complete.", coordinator.requestFinished(id));
+            assertTrue("Write should succeed.", coordinator.writeResult(id).wasSuccessful());
         }
         
         List<Integer> readIds = new ArrayList<Integer>();
@@ -141,7 +132,7 @@ public class CoordinatorTest
         {
             int id = readIds.get(index);
             
-            while (!coordinator.readCompleted(id))
+            while (!coordinator.requestFinished(id))
             {
                 // spin!!!
             }
@@ -149,45 +140,8 @@ public class CoordinatorTest
             byte[] expected = new byte[blockSize];
             testRandom.nextBytes(expected);
 
-            assertTrue("Read id should be valid. " + index, coordinator.readResultMap.get(id) != null);
-            assertTrue("Read should complete.", coordinator.readCompleted(id));
-            assertArrayEquals("Read data should match.", expected, coordinator.readResult(id));
-        }
-    }
-
-    @Test
-    public void testSegmentGroupAssignment()
-    {
-        coordinator.createVolume(0);
-        
-        int numberOfWrites = 5113;
-        
-        for (int index = 0; index < numberOfWrites; ++index)
-        {
-            coordinator.assignSegmentGroup(0, index);
-        }
-        
-        List<Long> segmentsStored = new ArrayList<Long>();
-                
-        int size = coordinator.datanodeStatuses.size();
-        for (int index = 0; index < size; ++index)
-        {
-            segmentsStored.add(coordinator.datanodeStatuses.poll().getStatus().getSegmentsStored());
-        }
-        
-        long totalSegmentsStored = 0;
-        
-        for (long each : segmentsStored)
-        {
-            totalSegmentsStored += each;
-        }
-        
-        float average = ((float)totalSegmentsStored)/segmentsStored.size();
-        
-        for (long each : segmentsStored)
-        {
-            float error = Math.abs((each - average)/average);
-            assertTrue("Error should be low.", error < 0.05);
+            assertTrue("Read should complete.", coordinator.requestFinished(id));
+            assertArrayEquals("Read data should match.", expected, ((ReadRequestResult)coordinator.readResult(id)).getBlock());
         }
     }
 }

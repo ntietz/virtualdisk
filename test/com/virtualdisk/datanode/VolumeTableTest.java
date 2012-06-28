@@ -8,14 +8,6 @@ import org.junit.*;
 
 public class VolumeTableTest
 {
-
-    @Test(expected=NullPointerException.class)
-    public void testVolumeNotCreated()
-    {
-        VolumeTable volumeTable = new VolumeTable();
-        volumeTable.getAllPhysicalLocations(0);
-    }
-    
     @Test
     public void testVolumeUse()
     {
@@ -52,5 +44,5 @@ public class VolumeTableTest
         
         assertEquals("Volume should be empty", 0, volumeTable.getAllPhysicalLocations(0).size());
     }
-
 }
+
