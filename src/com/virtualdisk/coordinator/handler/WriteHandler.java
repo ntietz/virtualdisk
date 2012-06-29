@@ -6,8 +6,8 @@ import com.virtualdisk.network.request.base.*;
 
 import java.util.*;
 
-/*
- * This class handles write requests.
+/**
+ * The WriteHandler creates, issues, and manages write requests and their results.
  */
 public class WriteHandler
 extends Handler
@@ -15,23 +15,26 @@ extends Handler
     private byte[] block;
     private SegmentGroup targets;
 
-    /*
-     * This constructor sets up the write request with a volume ID, logical offset, and data to write.
+    /**
+    * Standard constructor.
+    * @
      */
-    public WriteHandler(int vid, long lo, byte[] data, SegmentGroup targets, Coordinator c)
+    public WriteHandler( int volumeId
+                       , long logicalOffset
+                       , byte[] block
+                       , SegmentGroup targets
+                       , Coordinator coordinator
+                       )
     {
-        volumeId = vid;
-        logicalOffset = lo;
-        block = data;
-        coordinator = c;
+        this.volumeId = volumeId;
+        this.logicalOffset = logicalOffset;
+        this.block = block;
+        this.coordinator = coordinator;
         this.targets = targets;
     }
 
-    /*
-     * This method performs a write request, as configured in the constructor.
-     * At any point where the request may block on IO, blocking will cause the handler
-     * to pause and execution will go to the next request handler in the queue.
-     * This uses the algorithm for writing described in the paper about "FAB".
+    /**
+     * This action issues the WriteRequest and waits to get a response.
      */
     public void action()
     {
@@ -79,7 +82,8 @@ extends Handler
 
         if (!success)
         {
-            // TODO TODO TODO TODO SET THE REQUEST RESULT!!!
+            requestResult = new WriteRequestResult(requestId, true, false);
+            coordinator.setRequestResult(requestId, (RequestResult)requestResult);
             return;
         }
 

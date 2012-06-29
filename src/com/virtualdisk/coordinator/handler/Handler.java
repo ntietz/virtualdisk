@@ -29,6 +29,12 @@ public abstract class Handler extends Thread
 
         // TODO : change this line... it's kind of gross.
         SingletonCoordinator.sendToClient(requestId, requestResult);
+        /*
+
+        change to something like this:
+            coordinator.getServer().set
+
+        */
     }
 
     public abstract void action();
