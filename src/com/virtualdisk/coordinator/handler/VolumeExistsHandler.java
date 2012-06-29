@@ -6,15 +6,26 @@ import com.virtualdisk.network.request.base.*;
 
 import java.util.*;
 
+/**
+ * The VolumeExistsHandler creates, issues, and manages queries about volume existence, and their results.
+ */
 public class VolumeExistsHandler
 extends Handler
 {
+    /**
+     * Standard constructor.
+     * @param   volumeId    the volume we want to check existnece of
+     * @param   coordinator the coordinator for the request
+     */
     public VolumeExistsHandler(int volumeId, Coordinator coordinator)
     {
         this.volumeId = volumeId;
         this.coordinator = coordinator;
     }
 
+    /**
+     * This action issues the VolumeExistsRequest and waits to get a response.
+     */
     public void action()
     {
         int existsId = coordinator.getServer().issueVolumeExistsRequest(volumeId);

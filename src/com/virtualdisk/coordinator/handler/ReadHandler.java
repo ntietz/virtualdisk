@@ -6,39 +6,35 @@ import com.virtualdisk.network.request.base.*;
 
 import java.util.*;
 
-/*
- * This class handles read requests.
+/**
+ * The ReadHandler creates, issues, and manages read requests and their results.
  */
 public class ReadHandler
 extends Handler
 {
-    private byte[] result = null;
     private SegmentGroup targets;
 
-    /*
-     * Constructor takes in volume ID and logical offset to configure the read request.
+    /**
+     * Standard constructor.
+     * @param   volumeId        the volume we are writing to
+     * @param   logicalOffset   the logical location of the write
+     * @param   targets         the nodes we are writing to
+     * @param   coordinator     the coordinator for the request
      */
-    public ReadHandler(int vid, long lo, SegmentGroup targets, Coordinator c)
+    public ReadHandler( int volumeId
+                      , long logicalOffset
+                      , SegmentGroup targets
+                      , Coordinator coordinator
+                      )
     {
-        volumeId = vid;
-        logicalOffset = lo;
-        coordinator = c;
+        this.volumeId = volumeId;
+        this.logicalOffset = logicalOffset;
+        this.coordinator = coordinator;
         this.targets = targets;
     }
 
-    /*
-     * This method returns the result of the read request.
-     */
-    public byte[] getResult()
-    {
-        return result;
-    }
-
-    /*
-     * This method performs a read request, as configured in the constructor.
-     * At any point where the request may block on IO, blocking will cause the handler
-     * to pause and execution will go to the next request handler in the queue.
-     * This uses the algorithm for reading described in the paper about "FAB".
+    /**
+     * This action issues the ReadRequest and waits to get a response.
      */
     public void action()
     {
@@ -104,18 +100,12 @@ extends Handler
             }
         }
 
-        // TODO TODO TODO TODO SET THE REQUEST RESULT!!!
-
-        if (!success)
+        if (value == null)
         {
-            result = new byte[0];
-        }
-        else
-        {
-            result = value;
+            value = new byte[0];
         }
 
-        requestResult = new ReadRequestResult(requestId, true, success, timestamp, result);
+        requestResult = new ReadRequestResult(requestId, true, success, timestamp, value);
         coordinator.setRequestResult(requestId, (RequestResult)requestResult);
     }
 }

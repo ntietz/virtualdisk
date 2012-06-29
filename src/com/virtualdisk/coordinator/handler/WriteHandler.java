@@ -16,8 +16,12 @@ extends Handler
     private SegmentGroup targets;
 
     /**
-    * Standard constructor.
-    * @
+     * Standard constructor.
+     * @param   volumeId        the volume we are writing to
+     * @param   logicalOffset   the logical location of the write
+     * @param   block           the block of data we want to write
+     * @param   targets         the nodes we are writing to
+     * @param   coordinator     the coordinator for the request
      */
     public WriteHandler( int volumeId
                        , long logicalOffset
