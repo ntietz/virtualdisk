@@ -26,6 +26,8 @@ public class ClientMain
 
         System.out.println("Created.");
 
+        Thread.sleep(1000);
+        /*
         // ...... issue some reads/writes........
         Thread.sleep(100);
 
@@ -57,6 +59,7 @@ public class ClientMain
         client.disconnect();
 
         System.out.println("Disconnected. Now exiting.");
+        */
     }
 }
 

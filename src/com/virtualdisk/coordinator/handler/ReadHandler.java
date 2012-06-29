@@ -104,7 +104,7 @@ extends Handler
             }
         }
 
-        finished = true;
+        // TODO TODO TODO TODO SET THE REQUEST RESULT!!!
 
         if (!success)
         {
@@ -117,7 +117,6 @@ extends Handler
 
         requestResult = new ReadRequestResult(requestId, true, success, timestamp, result);
         coordinator.setRequestResult(requestId, (RequestResult)requestResult);
-        finished = true;
     }
 }
 

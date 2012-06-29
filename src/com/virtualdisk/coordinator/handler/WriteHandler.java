@@ -79,7 +79,7 @@ extends Handler
 
         if (!success)
         {
-            finished = true;
+            // TODO TODO TODO TODO SET THE REQUEST RESULT!!!
             return;
         }
 
@@ -125,7 +125,6 @@ extends Handler
 
         requestResult = new WriteRequestResult(requestId, true, success);
         coordinator.setRequestResult(requestId, (RequestResult)requestResult);
-        finished = true;
     }
 }
 

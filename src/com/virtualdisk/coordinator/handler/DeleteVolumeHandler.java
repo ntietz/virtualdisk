@@ -6,15 +6,26 @@ import com.virtualdisk.network.request.base.*;
 
 import java.util.*;
 
+/**
+ * The DeleteVolumeHandler makes DeleteVolumeRequests, issues the requests to the server, handles receiving the results, and sets the results for return to the client.
+ */
 public class DeleteVolumeHandler
 extends Handler
 {
+    /**
+     * Standard constructor.
+     * @param   volumeId    the id of the volume we want to delete
+     * @param   coordinator the coordinator we use for requests
+     */
     public DeleteVolumeHandler(int volumeId, Coordinator coordinator)
     {
         this.volumeId = volumeId;
         this.coordinator = coordinator;
     }
 
+    /**
+     * Every handler must define an action; this action issues the DeleteVolumeRequest and waits to get a response.
+     */
     public void action()
     {
         int deleteId = coordinator.getServer().issueVolumeDeletionRequest(volumeId);
@@ -48,7 +59,6 @@ extends Handler
 
         requestResult = new DeleteVolumeRequestResult(requestId, true, success);
         coordinator.setRequestResult(requestId, (RequestResult)requestResult);
-        finished = true;
     }
 }
 

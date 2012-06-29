@@ -7,17 +7,11 @@ import com.virtualdisk.network.util.*;
 
 public abstract class Handler extends Thread
 {
-    protected boolean finished = false;
     protected int requestId;
     protected int volumeId;
     protected long logicalOffset;
     protected Coordinator coordinator;
     protected Sendable requestResult;
-
-    public boolean isFinished()
-    {
-        return finished;
-    }
 
     public void setRequestId(int id)
     {

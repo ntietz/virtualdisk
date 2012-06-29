@@ -48,7 +48,6 @@ extends Handler
 
         requestResult = new VolumeExistsRequestResult(requestId, true, true, exists);
         coordinator.setRequestResult(requestId, (RequestResult)requestResult);
-        finished = true;
     }
 }
 
