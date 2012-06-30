@@ -12,17 +12,46 @@ import org.jboss.netty.channel.socket.nio.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+/**
+ * The primary implementation of the NetworkServer api.
+ * This class is a singleton.
+ */
 public class CoordinatorServer
 extends NetworkServer
 {
+    /**
+     * An instance of this server.
+     */
     private static CoordinatorServer instance;
 
+    /**
+     * The last assigned request id, used to assign new unique request ids.
+     * All request ids are assigned sequentially and are not repeated (for almost 2^32 requests)
+     */
     private int lastAssignedId;
 
+    /**
+     * A list of identifiers for all the connected nodes.
+     */
     protected List<DataNodeIdentifier> allNodes;
+    
+    /**
+     * A map of datanode ids to their channels.
+     * protected (not private) so SingletonCordinator can access it.
+     */
     protected Map<Integer, Channel> channelMap;
+    
+    /**
+     * A map of request ids to their result-futures, which are used to handle waiting for results.
+     * protected (not private) so SingletonCordinator can access it.
+     */
     protected Map<Integer, List<RequestFuture>> resultMap;
 
+    /**
+     * Private constructor to preserve singleton property.
+     * @param   allNodes    the list of all nodes the coordinator is initially connected to
+     * @param   channelMap  the map of datanode id to channel for the initially connected nodes
+     */
     private CoordinatorServer( List<DataNodeIdentifier> allNodes
                              , Map<Integer, Channel> channelMap
                              )
@@ -36,6 +65,11 @@ extends NetworkServer
         instance = this;
     }
 
+    /**
+     * Gets an instances of the server, and constructs it if it does not yet exist.
+     * @param   allNodes    all the nodes which the coordinator is initially connected to
+     * @param   channelMap  a mapping of datanode id to the channel for the node
+     */
     public static CoordinatorServer getInstance( List<DataNodeIdentifier> allNodes
                                                , Map<Integer, Channel> channelMap
                                                )
@@ -47,6 +81,14 @@ extends NetworkServer
         return instance;
     }
 
+    /**
+     * This method creates and issues an order request, and sets up the handlers for the return of the result.
+     * @param   targets         the nodes to perform the order request on
+     * @param   volumeId        the volume to order on
+     * @param   logicalOffset   the logical location to order
+     * @param   timestamp       the timestamp of the request
+     * @return  the id of the request
+     */
     public int issueOrderRequest( SegmentGroup targets
                                 , int volumeId
                                 , long logicalOffset
@@ -76,6 +118,15 @@ extends NetworkServer
         return id;
     }
 
+    /**
+     * This method creates and issues a write request, and sets up the handlers for the return of the result.
+     * @param   targets         the nodes to perform the write request on
+     * @param   volumeId        the volume to write to
+     * @param   logicalOffset   the logical location to write to
+     * @param   block           the data to write
+     * @param   timestamp       the timestamp of the request
+     * @return  the id of the request
+     */
     public int issueWriteRequest( SegmentGroup targets
                                 , int volumeId
                                 , long logicalOffset
@@ -106,6 +157,14 @@ extends NetworkServer
         return id;
     }
 
+    /**
+     * This method creates and issues a read request, and sets up the handlers for the return of the result.
+     * @param   targets         the nodes to read from
+     * @param   volumeId        the volume to order on
+     * @param   logicalOffset   the logical location to order
+     * @param   timestamp       the timestamp of the request
+     * @return  the id of the request
+     */
     public int issueReadRequest( SegmentGroup targets
                                , int volumeId
                                , long logicalOffset
@@ -134,6 +193,11 @@ extends NetworkServer
         return id;
     }
 
+    /**
+     * This method creates and issues a volume creation request, and sets up the handlers for the return of the result.
+     * @param   volumeId        the volume to create
+     * @return  the id of the request
+     */
     public int issueVolumeCreationRequest(int volumeId)
     {
         List<DataNodeIdentifier> targets = allNodes;
@@ -160,6 +224,11 @@ extends NetworkServer
         return id;
     }
 
+    /**
+     * This method creates and issues a volume deleition request, and sets up the handlers for the return of the result.
+     * @param   volumeId        the volume to delete
+     * @return  the id of the request
+     */
     public int issueVolumeDeletionRequest(int volumeId)
     {
         List<DataNodeIdentifier> targets = allNodes;
@@ -187,6 +256,11 @@ extends NetworkServer
 
     }
 
+    /**
+     * This method creates and issues a volume existence request, and sets up the handlers for the return of the result.
+     * @param   volumeId        the volume to check for
+     * @return  the id of the request
+     */
     public int issueVolumeExistsRequest(int volumeId)
     {
         List<DataNodeIdentifier> targets = allNodes;
@@ -211,9 +285,14 @@ extends NetworkServer
         }
 
         return id;
-
     }
 
+    /**
+     * Returns all the order request results for the supplied request id.
+     * This method converts the request futures into request results.
+     * @param   requestId   the id for the request we want the results of
+     * @return  the list of all results of the request
+     */
     public List<OrderRequestResult> getOrderRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -235,6 +314,12 @@ extends NetworkServer
         }
     }
 
+    /**
+     * Returns all the write request results for the supplied request id.
+     * This method converts the request futures into request results.
+     * @param   requestId   the id for the request we want the results of
+     * @return  the list of all results of the request
+     */
     public List<WriteRequestResult> getWriteRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -256,6 +341,12 @@ extends NetworkServer
         }
     }
 
+    /**
+     * Returns all the read request results for the supplied request id.
+     * This method converts the request futures into request results.
+     * @param   requestId   the id for the request we want the results of
+     * @return  the list of all results of the request
+     */
     public List<ReadRequestResult> getReadRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -277,6 +368,12 @@ extends NetworkServer
         }
     }
 
+    /**
+     * Returns all the volume creation request results for the supplied request id.
+     * This method converts the request futures into request results.
+     * @param   requestId   the id for the request we want the results of
+     * @return  the list of all results of the request
+     */
     public List<CreateVolumeRequestResult> getVolumeCreationRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -298,6 +395,12 @@ extends NetworkServer
         }
     }
 
+    /**
+     * Returns all the volume deletion request results for the supplied request id.
+     * This method converts the request futures into request results.
+     * @param   requestId   the id for the request we want the results of
+     * @return  the list of all results of the request
+     */
     public List<DeleteVolumeRequestResult> getVolumeDeletionRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -319,6 +422,12 @@ extends NetworkServer
         }
     }
 
+    /**
+     * Returns all the volume exists request results for the supplied request id.
+     * This method converts the request futures into request results.
+     * @param   requestId   the id for the request we want the results of
+     * @return  the list of all results of the request
+     */
     public List<VolumeExistsRequestResult> getVolumeExistsRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -340,26 +449,41 @@ extends NetworkServer
         }
     }
 
+    /**
+     * Fetches a copy of the datanode-identifier list.
+     * @return  a copy of the list of connected datanodes
+     */
     public List<DataNodeIdentifier> getDataNodes()
     {
         return new ArrayList<DataNodeIdentifier>(allNodes);
     }
 
+    /**
+     * Attaches a new datanode to this coordinator.
+     * @return  whether or not the attachment succeeded
+     */
     public boolean attachDataNode(DataNodeIdentifier node)
     {
         return false;
     }
 
+    /**
+     * Detaches a datanode from this coordinator.
+     * @return  whether or not the deattachment succeeded
+     */
     public boolean detachDataNode(DataNodeIdentifier node)
     {
         return false;
     }
 
+    /**
+     * Generates a new unique id.
+     * @return  a new unique request id
+     */
     protected synchronized int generateNewRequestId()
     {
         ++lastAssignedId;
         return lastAssignedId;
     }
-
 }
 
