@@ -162,7 +162,6 @@ extends NetworkServer
      * @param   targets         the nodes to read from
      * @param   volumeId        the volume to order on
      * @param   logicalOffset   the logical location to order
-     * @param   timestamp       the timestamp of the request
      * @return  the id of the request
      */
     public int issueReadRequest( SegmentGroup targets
