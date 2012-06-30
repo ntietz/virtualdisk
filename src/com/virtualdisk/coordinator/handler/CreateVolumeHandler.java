@@ -32,6 +32,7 @@ extends Handler
         boolean waiting = true;
         boolean success = false;
 
+        System.out.println("Starting the wait.");
         while (waiting)
         {
             List<CreateVolumeRequestResult> results = coordinator.getServer().getVolumeCreationRequestResults(createId);
@@ -40,6 +41,7 @@ extends Handler
 
             for (CreateVolumeRequestResult each : results)
             {
+                //System.out.println("Result is: " + (each.isDone() ? "done" : "running"));
                 if (each.isDone())
                 {
                     ++completed;
@@ -50,12 +52,15 @@ extends Handler
                 }
             }
 
+            //System.out.println("Completed: " + completed);
+            //System.out.println("Num. results: " + results.size());
             if (completed == results.size())
             {
                 waiting = false;
                 success = (successful == results.size());
             }
         }
+        System.out.println("Finished the wait.");
 
         requestResult = new CreateVolumeRequestResult(requestId, true, success);
         coordinator.setRequestResult(requestId, (RequestResult)requestResult);

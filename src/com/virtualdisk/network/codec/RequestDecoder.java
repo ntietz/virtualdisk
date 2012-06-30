@@ -101,7 +101,7 @@ extends FrameDecoder
             case createVolumeRequestResult:
                 CreateVolumeRequestResult createVolumeRequestResult = new CreateVolumeRequestResult(0, false, false);
                 createVolumeRequestResult.decode(buffer);
-                System.out.println("CV request result");
+                System.out.println("CV request result : " + (createVolumeRequestResult.isDone() ? "done" : "undone"));
                 return createVolumeRequestResult;
 
             case deleteVolumeRequest:

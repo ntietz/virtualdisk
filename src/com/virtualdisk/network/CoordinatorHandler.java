@@ -80,6 +80,14 @@ extends SimpleChannelHandler
         }
     }
 
+    public void channelConnected( ChannelHandlerContext context
+                                , ChannelEvent event
+                                )
+    {
+        Channel clientChannel = event.getChannel();
+        SingletonCoordinator.registerNewClient(clientChannel);
+    }
+
     public void exceptionCaught( ChannelHandlerContext context
                                , ExceptionEvent event
                                )

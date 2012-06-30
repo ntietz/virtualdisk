@@ -178,13 +178,24 @@ public class SingletonCoordinator
     {
         List<RequestFuture> futures = server.resultMap.get(requestId);
 
+        int index = 0; // TODO this line here for debugging only
         for (RequestFuture each : futures)
         {
             if (!each.hasResultSet())
             {
                 each.setResult(result);
+                System.out.println("Setting result " + index);
                 break;
             }
+            else
+            {
+                CreateVolumeRequestResult cresult = (CreateVolumeRequestResult) each.getResult();
+                System.out.println(cresult.getRequestId() + ": " 
+                                    + (cresult.isDone() ? "done" : "not-done") + "\t"
+                                    + each.hasResultSet()
+                                    + each.isTimedOut());
+            }
+            ++index;
         }
 
         server.resultMap.put(requestId, futures);

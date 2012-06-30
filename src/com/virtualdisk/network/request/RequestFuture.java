@@ -19,6 +19,11 @@ public class RequestFuture
         this.result = null;
     }
 
+    public int getRequestId()
+    {
+        return requestId;
+    }
+
     public boolean isTimedOut()
     {
         if ((System.currentTimeMillis() - sentTime) > NetworkServer.timeoutLength())
@@ -55,7 +60,7 @@ public class RequestFuture
 
     public boolean hasResultSet()
     {
-        return result == null;
+        return result != null;
     }
 
     public RequestResult getResult()
