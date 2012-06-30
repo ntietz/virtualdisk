@@ -9,6 +9,9 @@ import com.virtualdisk.network.util.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+/**
+ * Coordinator handles coordinating read and write requests, etc.
+ */
 public class Coordinator
 {
     /**
