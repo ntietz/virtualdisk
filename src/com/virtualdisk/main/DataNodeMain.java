@@ -20,6 +20,8 @@ public class DataNodeMain
     private static List<String> driveHandles = new ArrayList<String>();
     private static List<Long> driveSizes = new ArrayList<Long>();
 
+    private static DataNode dataNode;
+
     public static void main(String... args)
     {
         /*
@@ -41,7 +43,7 @@ public class DataNodeMain
             driveSizes.add(driveSize);
         }
 
-        SingletonDataNode.setup(port, driveHandles, driveSizes);
+        dataNode = DataNodeFactory.setup(port, driveHandles, driveSizes);
 
         startDataNodeListener(port);
     }
@@ -55,7 +57,7 @@ public class DataNodeMain
             );
 
         ServerBootstrap bootstrap = new ServerBootstrap(channelFactory);
-        bootstrap.setPipelineFactory(new DataNodePipelineFactory());
+        bootstrap.setPipelineFactory(new DataNodePipelineFactory(dataNode));
 
         bootstrap.bind(new InetSocketAddress(port));
     }
