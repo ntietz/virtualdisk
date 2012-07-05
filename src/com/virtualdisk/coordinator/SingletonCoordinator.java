@@ -28,7 +28,7 @@ public class SingletonCoordinator
     /**
      * The server which is stored in this singleton, which the coordinator is configured to use.
      */
-    private static CoordinatorServer server;
+    private static NetworkServer server;
 
     /**
      * An instance of this singleton.
@@ -38,7 +38,10 @@ public class SingletonCoordinator
     /**
      * A bidirectional map used to connect client ids to their channels.
      */
-    private static BiMap<Channel, Integer> clientRegistry;
+    private static final BiMap<Channel, Integer> clientRegistry;
+    static {
+        clientRegistry = HashBiMap.create();
+    }
 
     /**
      * A map which connects request ids to the channel id the result should be returned on.
@@ -66,7 +69,6 @@ public class SingletonCoordinator
                                 , Map<Integer, Channel> channelMap
                                 )
     {
-        clientRegistry = HashBiMap.create();
         requestCallbacks = new HashMap<Integer, Integer>();
 
         server = CoordinatorServer.getInstance(nodes, channelMap);
@@ -86,7 +88,7 @@ public class SingletonCoordinator
      * Gets the coordinator's server.
      * @return  the server the coordinator uses
      */
-    public static CoordinatorServer getServer()
+    public static NetworkServer getServer()
     {
         return server;
     }
@@ -126,6 +128,10 @@ public class SingletonCoordinator
     public static void registerNewClient(Channel client)
     {
         ++lastClientId;
+        if (clientRegistry == null)
+        {
+            System.out.println("ruh-roh");
+        }
         clientRegistry.put(client, lastClientId);
     }
 
@@ -176,29 +182,18 @@ public class SingletonCoordinator
      */
     public synchronized static void setResult(int requestId, RequestResult result)
     {
-        List<RequestFuture> futures = server.resultMap.get(requestId);
+        List<RequestFuture> futures = server.getResultFutures(requestId);
 
-        int index = 0; // TODO this line here for debugging only
         for (RequestFuture each : futures)
         {
             if (!each.hasResultSet())
             {
                 each.setResult(result);
-                System.out.println("Setting result " + index);
                 break;
             }
-            else
-            {
-                CreateVolumeRequestResult cresult = (CreateVolumeRequestResult) each.getResult();
-                System.out.println(cresult.getRequestId() + ": " 
-                                    + (cresult.isDone() ? "done" : "not-done") + "\t"
-                                    + each.hasResultSet()
-                                    + each.isTimedOut());
-            }
-            ++index;
         }
 
-        server.resultMap.put(requestId, futures);
+        server.setResultFutures(requestId, futures);
     }
 }
 

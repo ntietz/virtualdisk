@@ -1,5 +1,7 @@
 package com.virtualdisk.network;
 
+import com.virtualdisk.datanode.*;
+
 import com.virtualdisk.network.*;
 import com.virtualdisk.network.codec.*;
 
@@ -14,7 +16,7 @@ implements ChannelPipelineFactory
 
         pipeline.addLast("decoder", new RequestDecoder());
         pipeline.addLast("encoder", new RequestEncoder());
-        pipeline.addLast("handler", new DataNodeHandler());
+        pipeline.addLast("handler", new DataNodeHandler(SingletonDataNode.getDataNode()));
 
         return pipeline;
     }

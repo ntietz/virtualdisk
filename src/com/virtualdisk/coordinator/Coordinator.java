@@ -238,6 +238,40 @@ public class Coordinator
     }
 
     /**
+     * This method issues a request to check whether a certain volume exists or not.
+     * @param   volumeId    the id of the volume to check for
+     * @return  the id for the request, to check for results later
+     */
+    public int volumeExists(int volumeId)
+    {
+        int id = generateNewRequestId();
+
+        VolumeExistsHandler handler = new VolumeExistsHandler(volumeId, this);
+        handler.setRequestId(id);
+        handler.start();
+
+        return id;
+    }
+
+    /**
+     * This method returns the result of a volume exists request.
+     * @param   requestId   the id of the request we want the result of
+     * @return  the result of the request, or null if it has not been stored yet
+     */
+    public VolumeExistsRequestResult volumeExistsResult(int requestId)
+    {
+        RequestResult result = resultMap.get(requestId);
+        if (result instanceof VolumeExistsRequestResult)
+        {
+            return (VolumeExistsRequestResult) result;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    /**
      * This method deletes a logical volume within the coordinator and tells the datanodes to do the same.
      * @param   volumeId    the id of the volume to delete
      * @return  the request id, which is used to determine the success or failure of the attempt

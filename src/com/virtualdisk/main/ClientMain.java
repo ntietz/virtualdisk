@@ -27,7 +27,7 @@ public class ClientMain
         System.out.println("Created.");
 
         Thread.sleep(1000);
-        /*
+
         // ...... issue some reads/writes........
         Thread.sleep(100);
 
@@ -49,6 +49,7 @@ public class ClientMain
 
         Thread.sleep(100);
 
+        /*
         System.out.println("Deleting volume 0...");
 
         client.deleteVolume(0);

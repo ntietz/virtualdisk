@@ -51,6 +51,14 @@ public class CoordinatorTest
 
     }
 
+    @Test
+    public void testGetters()
+    {
+        assertEquals("Block size should match", (int)blockSize, coordinator.getBlockSize());
+        assertEquals("Segment size should match", (int)segmentSize, coordinator.getSegmentSize());
+        assertEquals("Segment group size should match", (int)segmentGroupSize, coordinator.getSegmentGroupSize());
+    }
+
     @Test(timeout=10000)
     public void testCreateVolume()
     {
@@ -93,6 +101,18 @@ public class CoordinatorTest
         boolean created = coordinator.createVolumeResult(createId).wasSuccessful();
 
         assertEquals("Volume creation should succeed.", true, created);
+
+        int existsId = coordinator.volumeExists(0);
+        while (!coordinator.requestFinished(existsId));
+        boolean exists = coordinator.volumeExistsResult(existsId).volumeExists();
+
+        assertEquals("Volume should exist", true, exists);
+
+        existsId = coordinator.volumeExists(13);
+        while (!coordinator.requestFinished(existsId));
+        exists = coordinator.volumeExistsResult(existsId).volumeExists();
+
+        assertEquals("Volume should not exist", false, exists);
         
         int numberOfRounds = 100;
 

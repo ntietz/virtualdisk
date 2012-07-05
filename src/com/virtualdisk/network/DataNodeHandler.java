@@ -12,7 +12,13 @@ import java.util.*;
 public class DataNodeHandler
 extends SimpleChannelHandler
 {
-    DataNode dataNode = SingletonDataNode.getDataNode();
+    DataNode dataNode;
+
+    private DataNodeHandler() { }
+    public DataNodeHandler(DataNode dataNode)
+    {
+        this.dataNode = dataNode;
+    }
 
     public void messageReceived( ChannelHandlerContext context
                                , MessageEvent event

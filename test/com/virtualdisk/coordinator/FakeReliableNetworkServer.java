@@ -1,15 +1,15 @@
 package com.virtualdisk.coordinator;
 
 
-import com.virtualdisk.coordinator.NetworkServer;
-import com.virtualdisk.coordinator.SegmentGroup;
+import com.virtualdisk.coordinator.*;
 import com.virtualdisk.datanode.*;
 import com.virtualdisk.network.*;
 import com.virtualdisk.network.request.*;
-import com.virtualdisk.network.util.DataNodeIdentifier;
+import com.virtualdisk.network.util.*;
 
-import java.util.*;
 import java.io.*;
+import java.lang.*;
+import java.util.*;
 
 public class FakeReliableNetworkServer
 extends NetworkServer
@@ -280,6 +280,16 @@ extends NetworkServer
         dataNodeIdentifiers = ids;
 
         return ids;
+    }
+
+    public void setResultFutures(int requestId, List<RequestFuture> futures)
+    {
+        throw new UnsupportedOperationException("This operation not supported in this test fixture.");
+    }
+
+    public List<RequestFuture> getResultFutures(int requestId)
+    {
+        throw new UnsupportedOperationException("This operation not supported in this test fixture.");
     }
 
     /*

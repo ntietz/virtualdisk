@@ -1,13 +1,9 @@
 package com.virtualdisk.coordinator;
 
 import com.virtualdisk.network.*;
-import com.virtualdisk.network.request.CreateVolumeRequestResult;
-import com.virtualdisk.network.request.DeleteVolumeRequestResult;
-import com.virtualdisk.network.request.OrderRequestResult;
-import com.virtualdisk.network.request.ReadRequestResult;
-import com.virtualdisk.network.request.VolumeExistsRequestResult;
+import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.util.*;
 import com.virtualdisk.network.request.WriteRequestResult;
-import com.virtualdisk.network.util.DataNodeIdentifier;
 
 import java.util.*;
 
@@ -144,6 +140,20 @@ public abstract class NetworkServer
      * @return  the results of the request
      */
     public abstract List<VolumeExistsRequestResult> getVolumeExistsRequestResults(int requestId);
+
+    /**
+     * Sets the future results for a request.
+     * @param   requestId   the request's id
+     * @param   futures     the list of futures
+     */
+    public abstract void setResultFutures(int requestId, List<RequestFuture> futures);
+
+    /**
+     * Gets the future results from a request
+     * @param   requestId   the request's id
+     * @return  the futures of the request
+     */
+    public abstract List<RequestFuture> getResultFutures(int requestId);
 
     /**
      * This method should return a list of the datanodes the network server is configured to communicate with.

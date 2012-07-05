@@ -33,19 +33,19 @@ extends NetworkServer
     /**
      * A list of identifiers for all the connected nodes.
      */
-    protected List<DataNodeIdentifier> allNodes;
+    private List<DataNodeIdentifier> allNodes;
     
     /**
      * A map of datanode ids to their channels.
      * protected (not private) so SingletonCordinator can access it.
      */
-    protected Map<Integer, Channel> channelMap;
+    private Map<Integer, Channel> channelMap;
     
     /**
      * A map of request ids to their result-futures, which are used to handle waiting for results.
      * protected (not private) so SingletonCordinator can access it.
      */
-    protected Map<Integer, List<RequestFuture>> resultMap;
+    private Map<Integer, List<RequestFuture>> resultMap;
 
     /**
      * Private constructor to preserve singleton property.
@@ -446,6 +446,26 @@ extends NetworkServer
 
             return results;
         }
+    }
+
+    /**
+     * Sets the result futures.
+     * @param   requestId   the request's id
+     * @param   futures     the futures
+     */
+    public void setResultFutures(int requestId, List<RequestFuture> futures)
+    {
+        resultMap.put(requestId, futures);
+    }
+
+    /**
+     * Gets the result futures.
+     * @param   requestId   the request's id
+     * @return  the futures
+     */
+    public List<RequestFuture> getResultFutures(int requestId)
+    {
+        return resultMap.get(requestId);
     }
 
     /**

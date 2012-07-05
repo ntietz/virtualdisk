@@ -14,7 +14,7 @@ public class CoordinatorHandler
 extends SimpleChannelHandler
 {
     Coordinator coordinator = SingletonCoordinator.getCoordinator();
-    CoordinatorServer server = SingletonCoordinator.getServer();
+    NetworkServer server = SingletonCoordinator.getServer();
 
     public void messageReceived( ChannelHandlerContext context
                                , MessageEvent event
@@ -81,9 +81,10 @@ extends SimpleChannelHandler
     }
 
     public void channelConnected( ChannelHandlerContext context
-                                , ChannelEvent event
+                                , ChannelStateEvent event
                                 )
     {
+        System.out.println("Registering the client.");
         Channel clientChannel = event.getChannel();
         SingletonCoordinator.registerNewClient(clientChannel);
     }

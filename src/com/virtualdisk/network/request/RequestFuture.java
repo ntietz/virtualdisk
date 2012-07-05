@@ -85,33 +85,27 @@ public class RequestFuture
             {
                 case orderRequest:
                 case orderRequestResult:
-                    result = new OrderRequestResult(requestId, done, false);
-                    return result;
+                    return new OrderRequestResult(requestId, done, false);
 
                 case readRequest:
                 case readRequestResult:
-                    result = new ReadRequestResult(requestId, done, false, null, null);
-                    return result;
+                    return new ReadRequestResult(requestId, done, false, null, null);
 
                 case writeRequest:
                 case writeRequestResult:
-                    result = new WriteRequestResult(requestId, done, false);
-                    return result;
+                    return new WriteRequestResult(requestId, done, false);
 
                 case volumeExistsRequest:
                 case volumeExistsRequestResult:
-                    result = new VolumeExistsRequestResult(requestId, done, false, false);
-                    return result;
+                    return new VolumeExistsRequestResult(requestId, done, false, false);
 
                 case createVolumeRequest:
                 case createVolumeRequestResult:
-                    result = new CreateVolumeRequestResult(requestId, done, false);
-                    return result;
+                    return new CreateVolumeRequestResult(requestId, done, false);
 
                 case deleteVolumeRequest:
                 case deleteVolumeRequestResult:
-                    result = new DeleteVolumeRequestResult(requestId, done, false);
-                    return result;
+                    return new DeleteVolumeRequestResult(requestId, done, false);
 
                 default:
                     return null;
