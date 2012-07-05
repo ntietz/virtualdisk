@@ -109,7 +109,6 @@
         <delete dir="${build}" />
         <delete dir="${dist}" />
         <delete dir="${instrumented}" />
-        <delete dir="${reports}" />
         <delete dir="data" />
         <delete file="cobertura.ser" />
     </target>

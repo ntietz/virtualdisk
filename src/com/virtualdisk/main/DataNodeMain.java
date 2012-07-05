@@ -16,11 +16,11 @@ public class DataNodeMain
 {
     private static final int DEFAULT_BLOCK_SIZE = 1024;
 
-    private static int blockSize = DEFAULT_BLOCK_SIZE;
-    private static List<String> driveHandles = new ArrayList<String>();
-    private static List<Long> driveSizes = new ArrayList<Long>();
+    private int blockSize = DEFAULT_BLOCK_SIZE;
+    private List<String> driveHandles = new ArrayList<String>();
+    private List<Long> driveSizes = new ArrayList<Long>();
 
-    private static DataNode dataNode;
+    private DataNode dataNode;
 
     public static void main(String... args)
     {
@@ -43,13 +43,18 @@ public class DataNodeMain
             driveSizes.add(driveSize);
         }
 
-        dataNode = DataNodeFactory.setup(port, driveHandles, driveSizes);
+        DataNodeMain main = new DataNodeMain();
+        main.run(port, driveHandles, driveSizes);
+    }
 
+    public void run(int port, List<String> driveHandles, List<Long> driveSizes)
+    {
+        dataNode = DataNodeFactory.setup(port, driveHandles, driveSizes);
         startDataNodeListener(port);
     }
 
-    public static void startDataNodeListener( int port
-                                            )
+    public void startDataNodeListener( int port
+                                     )
     {
         ChannelFactory channelFactory = new NioServerSocketChannelFactory
             ( Executors.newCachedThreadPool()
