@@ -14,9 +14,9 @@ public class DataNodeFactory
      * @param   driveSizes      a list of the sizes of the drives for the node
      */
     public static DataNode setup( int blockSize
-                            , List<String> driveHandles
-                            , List<Long> driveSizes
-                            )
+                                , List<String> driveHandles
+                                , List<Long> driveSizes
+                                )
     {
         return new DataNode(blockSize, driveHandles, driveSizes);
     }
