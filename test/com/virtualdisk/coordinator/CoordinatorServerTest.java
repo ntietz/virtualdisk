@@ -147,6 +147,70 @@ public class CoordinatorServerTest
     }
 
     @Test(timeout=10000)
+    public void testDelete()
+    {
+        {
+            int deleteId = server.issueVolumeDeletionRequest(14);
+
+            List<DeleteVolumeRequestResult> results = server.getVolumeDeletionRequestResults(deleteId);
+            assertEquals("Result list should be right size.", clusterSize, results.size());
+
+            int finished = 0;
+            int successful = 0;
+            while (finished != clusterSize)
+            {
+                results = server.getVolumeDeletionRequestResults(deleteId);
+                finished = 0;
+                successful = 0;
+
+                for (DeleteVolumeRequestResult result : results)
+                {
+                    if (result.isDone())
+                    {
+                        ++finished;
+                        if (result.wasSuccessful())
+                        {
+                            ++successful;
+                        }
+                    }
+                }
+            }
+
+            assertEquals("All should finish.", clusterSize, finished);
+            assertEquals("All should be deleted.", clusterSize, successful);
+        } {
+            int existsId = server.issueVolumeExistsRequest(14);
+
+            List<VolumeExistsRequestResult> results = server.getVolumeExistsRequestResults(existsId);
+            assertEquals("Result list should be right size.", clusterSize, results.size());
+
+            int finished = 0;
+            int exists = 0;
+            while (finished != clusterSize)
+            {
+                results = server.getVolumeExistsRequestResults(existsId);
+                finished = 0;
+                exists = 0;
+
+                for (VolumeExistsRequestResult result : results)
+                {
+                    if (result.isDone())
+                    {
+                        ++finished;
+                        if (result.volumeExists())
+                        {
+                            ++exists;
+                        }
+                    }
+                }
+            }
+
+            assertEquals("All should finish.", clusterSize, finished);
+            assertEquals("None should exist.", 0, exists);
+        }
+    }
+
+    @Test(timeout=10000)
     public void testOrder()
     {
         SegmentGroup targets = segmentGroups.get(3);

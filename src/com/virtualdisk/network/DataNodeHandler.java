@@ -120,7 +120,7 @@ extends SimpleChannelHandler
                 int requestId = request.getRequestId();
                 boolean done = true;
                 dataNode.deleteVolume(volumeId);
-                boolean success = dataNode.volumeExists(volumeId);
+                boolean success = !dataNode.volumeExists(volumeId);
 
                 Channel coordinatorChannel = event.getChannel();
                 DeleteVolumeRequestResult result = new DeleteVolumeRequestResult(requestId, done, success);
