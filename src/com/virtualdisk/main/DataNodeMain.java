@@ -13,14 +13,24 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class DataNodeMain
+extends Thread
 {
-    private static final int DEFAULT_BLOCK_SIZE = 1024;
+    public static final int DEFAULT_BLOCK_SIZE = 1024;
+    public static final int DEFAULT_PORT = 10000;
 
     private int blockSize = DEFAULT_BLOCK_SIZE;
+    private int port = DEFAULT_PORT;
     private List<String> driveHandles = new ArrayList<String>();
     private List<Long> driveSizes = new ArrayList<Long>();
 
     private DataNode dataNode;
+
+    public DataNodeMain(int port, List<String> driveHandles, List<Long> driveSizes)
+    {
+        this.port = port;
+        this.driveHandles = driveHandles;
+        this.driveSizes = driveSizes;
+    }
 
     public static void main(String... args)
     {
@@ -43,11 +53,11 @@ public class DataNodeMain
             driveSizes.add(driveSize);
         }
 
-        DataNodeMain main = new DataNodeMain();
-        main.run(port, driveHandles, driveSizes);
+        DataNodeMain main = new DataNodeMain(port, driveHandles, driveSizes);
+        main.start();
     }
 
-    public void run(int port, List<String> driveHandles, List<Long> driveSizes)
+    public void run()
     {
         dataNode = DataNodeFactory.setup(port, driveHandles, driveSizes);
         startDataNodeListener(port);

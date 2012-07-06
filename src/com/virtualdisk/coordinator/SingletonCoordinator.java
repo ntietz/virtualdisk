@@ -11,7 +11,7 @@ import org.jboss.netty.channel.*;
 import java.util.*;
 
 /**
- * This class stores instances of the coordinator and its server so that the network layer can reference them.
+ * This class wraps coordinators with utilities.
  */
 public class SingletonCoordinator
 {

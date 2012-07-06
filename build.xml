@@ -78,8 +78,8 @@
         </cobertura-instrument>
     </target>
 
-    <target name="run-tests" depends="compile-tests,instrument" description="Runs the tests, fails if any test fails.">
-        <junit printsummary="yes" failureProperty="test.failure">
+    <target name="run-tests" depends="compile-tests" description="Runs the tests, fails if any test fails.">
+        <junit printsummary="yes" fork="yes" failureProperty="test.failure">
             <sysproperty key="net.sourceforge.cobertura.datafile" value="cobertura.ser" />
             <classpath refid="classpath.test" />
             <formatter type="plain" />

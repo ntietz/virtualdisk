@@ -25,7 +25,6 @@ extends OneToOneEncoder
                            , Object rawMessage
                            )
     {
-        System.out.println("Encoded!");
         Sendable message = (Sendable) rawMessage;
         ChannelBuffer buffer = message.encodeWithHeader();
         return buffer;

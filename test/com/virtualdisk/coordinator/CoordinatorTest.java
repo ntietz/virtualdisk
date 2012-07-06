@@ -12,11 +12,11 @@ import java.io.*;
 
 public class CoordinatorTest
 {
-    private static Integer clusterSize = 10;
-    private static Integer blockSize = 10;
-    private static Integer segmentSize = 10;
-    private static Integer segmentGroupSize = 5;
-    private static Integer quorumSize = 3;
+    private static int clusterSize = 10;
+    private static int blockSize = 10;
+    private static int segmentSize = 10;
+    private static int segmentGroupSize = 5;
+    private static int quorumSize = 3;
     private static List<DataNodeIdentifier> dataNodes;
     private static NetworkServer server;
     private static Coordinator coordinator;
