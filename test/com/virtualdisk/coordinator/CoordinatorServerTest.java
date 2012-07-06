@@ -109,6 +109,41 @@ public class CoordinatorServerTest
 
         server.issueVolumeCreationRequest(0);
         server.issueVolumeCreationRequest(1);
+        server.issueVolumeCreationRequest(13);
+        server.issueVolumeCreationRequest(14);
+    }
+
+    @Test(timeout=10000)
+    public void testExists()
+    {
+        int existsId = server.issueVolumeExistsRequest(13);
+
+        List<VolumeExistsRequestResult> results = server.getVolumeExistsRequestResults(existsId);
+        assertEquals("Result list should be right size.", clusterSize, results.size());
+
+        int finished = 0;
+        int exists = 0;
+        while (finished != clusterSize)
+        {
+            results = server.getVolumeExistsRequestResults(existsId);
+            finished = 0;
+            exists = 0;
+
+            for (VolumeExistsRequestResult result : results)
+            {
+                if (result.isDone())
+                {
+                    ++finished;
+                    if (result.volumeExists())
+                    {
+                        ++exists;
+                    }
+                }
+            }
+        }
+
+        assertEquals("All should finish.", clusterSize, finished);
+        assertEquals("All should exist.", clusterSize, exists);
     }
 
     @Test(timeout=10000)
@@ -125,7 +160,9 @@ public class CoordinatorServerTest
         int successful = 0;
         while (finished != segmentGroupSize)
         {
+            results = server.getOrderRequestResults(orderId);
             finished = 0;
+            successful = 0;
 
             for (OrderRequestResult result : results)
             {
