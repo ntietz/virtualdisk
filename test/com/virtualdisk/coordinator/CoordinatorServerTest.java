@@ -113,6 +113,76 @@ public class CoordinatorServerTest
         server.issueVolumeCreationRequest(14);
     }
 
+    @Test
+    public void testSingleton()
+    {
+        assertTrue("Pointers should be the same", CoordinatorServer.getInstance(null, null) == server);
+    }
+
+    @Test(timeout=10000)
+    public void testCreate()
+    {
+        {
+            int createId = server.issueVolumeCreationRequest(15);
+
+            List<CreateVolumeRequestResult> results=  server.getVolumeCreationRequestResults(createId);
+            assertEquals("Result list sholud be the right size.", clusterSize, results.size());
+
+            int finished = 0;
+            int successful = 0;
+            while (finished != clusterSize)
+            {
+                results = server.getVolumeCreationRequestResults(createId);
+                finished = 0;
+                successful = 0;
+
+                for (CreateVolumeRequestResult result : results)
+                {
+                    if (result.isDone())
+                    {
+                        ++finished;
+                        if (result.wasSuccessful())
+                        {
+                            ++successful;
+                        }
+                    }
+                }
+            }
+
+            assertEquals("All should finish.", clusterSize, finished);
+            assertEquals("All should succeed.", clusterSize, successful);
+        } {
+            int existsId = server.issueVolumeExistsRequest(15);
+
+            List<VolumeExistsRequestResult> results = server.getVolumeExistsRequestResults(existsId);
+            assertEquals("Result list should be right size.", clusterSize, results.size());
+
+            int finished = 0;
+            int exists = 0;
+            while (finished != clusterSize)
+            {
+                results = server.getVolumeExistsRequestResults(existsId);
+                finished = 0;
+                exists = 0;
+
+                for (VolumeExistsRequestResult result : results)
+                {
+                    if (result.isDone())
+                    {
+                        ++finished;
+                        if (result.volumeExists())
+                        {
+                            ++exists;
+                        }
+                    }
+                }
+            }
+
+            assertEquals("All should finish.", clusterSize, finished);
+            assertEquals("All should exist.", clusterSize, exists);
+        }
+    }
+
     @Test(timeout=10000)
     public void testExists()
     {
@@ -243,6 +313,50 @@ public class CoordinatorServerTest
 
         assertEquals("All should finish", segmentGroupSize, finished);
         assertEquals("All should succeed", segmentGroupSize, successful);
+    }
+
+    @Test(timeout=10000)
+    public void testWriteFinishes()
+    {
+        Random random = new Random(2012);
+        byte[] block = new byte[blockSize];
+        random.nextBytes(block);
+        SegmentGroup targets = segmentGroups.get(1);
+
+        int writeId = server.issueWriteRequest(targets, 0, 30, block, new Date());
+
+        List<WriteRequestResult> results = server.getWriteRequestResults(writeId);
+        assertEquals("Result list should be right size.", segmentGroupSize, results.size());
+
+        int finished = 0;
+        int successful = 0;
+        while (finished != segmentGroupSize)
+        {
+            results = server.getWriteRequestResults(writeId);
+            finished = 0;
+            successful = 0;
+
+            for (WriteRequestResult result : results)
+            {
+                if (result.isDone())
+                {
+                    ++finished;
+                    if (result.wasSuccessful())
+                    {
+                        ++successful;
+                    }
+                }
+            }
+        }
+
+        assertEquals("All should finish.", segmentGroupSize, finished);
+        assertEquals("None should succeed (order first).", 0, successful);
+    }
+
+    @Test(timeout=10000)
+    public void testReadWrite()
+    {
+        
     }
 }
 
