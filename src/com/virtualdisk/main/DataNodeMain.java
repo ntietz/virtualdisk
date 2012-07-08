@@ -25,9 +25,10 @@ extends Thread
 
     private DataNode dataNode;
 
-    public DataNodeMain(int port, List<String> driveHandles, List<Long> driveSizes)
+    public DataNodeMain(int port, int blockSize, List<String> driveHandles, List<Long> driveSizes)
     {
         this.port = port;
+        this.blockSize = blockSize;
         this.driveHandles = driveHandles;
         this.driveSizes = driveSizes;
     }
@@ -42,10 +43,11 @@ extends Thread
          */
         // TODO determine usage and implement it
         int port = Integer.valueOf(args[0]);
+        int blockSize = Integer.valueOf(args[1]);
 
         List<String> driveHandles = new ArrayList<String>();
         List<Long> driveSizes = new ArrayList<Long>();
-        for (int index = 1; index < args.length; index += 2)
+        for (int index = 2; index < args.length; index += 2)
         {
             String driveHandle = args[index];
             driveHandles.add(driveHandle);
@@ -53,13 +55,13 @@ extends Thread
             driveSizes.add(driveSize);
         }
 
-        DataNodeMain main = new DataNodeMain(port, driveHandles, driveSizes);
+        DataNodeMain main = new DataNodeMain(port, blockSize, driveHandles, driveSizes);
         main.start();
     }
 
     public void run()
     {
-        dataNode = DataNodeFactory.setup(port, driveHandles, driveSizes);
+        dataNode = DataNodeFactory.setup(blockSize, driveHandles, driveSizes);
         startDataNodeListener(port);
     }
 

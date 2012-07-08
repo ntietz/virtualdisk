@@ -60,7 +60,7 @@ public class CoordinatorServerTest
             nodes.add(nodeId);
             
             // construct and run the datanode
-            DataNodeMain main = new DataNodeMain(port, driveHandles, driveSizes);
+            DataNodeMain main = new DataNodeMain(port, blockSize, driveHandles, driveSizes);
             main.start();
         }
 
@@ -316,47 +316,140 @@ public class CoordinatorServerTest
     }
 
     @Test(timeout=10000)
-    public void testWriteFinishes()
+    public void testReadWrite()
     {
         Random random = new Random(2012);
         byte[] block = new byte[blockSize];
         random.nextBytes(block);
         SegmentGroup targets = segmentGroups.get(1);
 
-        int writeId = server.issueWriteRequest(targets, 0, 30, block, new Date());
-
-        List<WriteRequestResult> results = server.getWriteRequestResults(writeId);
-        assertEquals("Result list should be right size.", segmentGroupSize, results.size());
-
-        int finished = 0;
-        int successful = 0;
-        while (finished != segmentGroupSize)
         {
-            results = server.getWriteRequestResults(writeId);
-            finished = 0;
-            successful = 0;
+            int writeId = server.issueWriteRequest(targets, 0, 30, block, new Date());
 
-            for (WriteRequestResult result : results)
+            List<WriteRequestResult> results = server.getWriteRequestResults(writeId);
+            assertEquals("Result list should be right size.", segmentGroupSize, results.size());
+
+            int finished = 0;
+            int successful = 0;
+            while (finished != segmentGroupSize)
             {
-                if (result.isDone())
+                results = server.getWriteRequestResults(writeId);
+                finished = 0;
+                successful = 0;
+
+                for (WriteRequestResult result : results)
                 {
-                    ++finished;
-                    if (result.wasSuccessful())
+                    if (result.isDone())
                     {
-                        ++successful;
+                        ++finished;
+                        if (result.wasSuccessful())
+                        {
+                            ++successful;
+                        }
                     }
                 }
             }
+
+            assertEquals("All should finish.", segmentGroupSize, finished);
+            assertEquals("None should succeed (order first).", 0, successful);
         }
 
-        assertEquals("All should finish.", segmentGroupSize, finished);
-        assertEquals("None should succeed (order first).", 0, successful);
-    }
+        {
+            int orderId = server.issueOrderRequest(targets, 0, 30, new Date());
 
-    @Test(timeout=10000)
-    public void testReadWrite()
-    {
-        
+            List<OrderRequestResult> results = server.getOrderRequestResults(orderId);
+            assertEquals("Result list should be right size.", segmentGroupSize, results.size());
+            
+            int finished = 0;
+            int successful = 0;
+            while (finished != segmentGroupSize)
+            {
+                results = server.getOrderRequestResults(orderId);
+                finished = 0;
+                successful = 0;
+
+                for (OrderRequestResult result : results)
+                {
+                    if (result.isDone())
+                    {
+                        ++finished;
+                        if (result.wasSuccessful())
+                        {
+                            ++successful;
+                        }
+                    }
+                }
+            }
+
+            assertEquals("All should finish", segmentGroupSize, finished);
+            assertEquals("All should succeed", segmentGroupSize, successful);
+        }
+
+        {
+            int writeId = server.issueWriteRequest(targets, 0, 30, block, new Date());
+
+            List<WriteRequestResult> results = server.getWriteRequestResults(writeId);
+            assertEquals("Result list should be right size.", segmentGroupSize, results.size());
+
+            int finished = 0;
+            int successful = 0;
+            while (finished != segmentGroupSize)
+            {
+                results = server.getWriteRequestResults(writeId);
+                finished = 0;
+                successful = 0;
+
+                for (WriteRequestResult result : results)
+                {
+                    if (result.isDone())
+                    {
+                        ++finished;
+                        if (result.wasSuccessful())
+                        {
+                            ++successful;
+                        }
+                    }
+                }
+            }
+
+            assertEquals("All should finish.", segmentGroupSize, finished);
+            assertEquals("All should succeed.", segmentGroupSize, successful);
+        }
+
+        {
+            int readId = server.issueReadRequest(targets, 0, 30);
+
+            List<ReadRequestResult> results = server.getReadRequestResults(readId);
+            assertEquals("Result list should be right size.", segmentGroupSize, results.size());
+
+            int finished = 0;
+            int successful = 0;
+            byte[] data = null;
+            while (finished != segmentGroupSize)
+            {
+                results = server.getReadRequestResults(readId);
+                finished = 0;
+                successful = 0;
+
+                for (ReadRequestResult result : results)
+                {
+                    if (result.isDone())
+                    {
+                        ++finished;
+                        if (result.wasSuccessful())
+                        {
+                            ++successful;
+                        }
+                    }
+                }
+            }
+
+            data = results.get(0).getBlock();
+
+            assertEquals("All should finish.", segmentGroupSize, finished);
+            assertEquals("All should succeed.", segmentGroupSize, successful);
+            assertArrayEquals("Block should match", block, data);
+        }
     }
 }
 

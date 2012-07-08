@@ -61,6 +61,7 @@ extends BlockRequestResult
         super.decode(buffer);
         timestamp = new Date(buffer.readLong());
         int length = buffer.readInt();
+        System.out.println("Decoding length: " + length);
         block = new byte[length];
         buffer.readBytes(block);
     }
