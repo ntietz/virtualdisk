@@ -171,6 +171,7 @@ public class SingletonCoordinator
     {
         // TODO: remove the callback after we've completed it
         int clientId = requestCallbacks.get(requestId);
+        System.out.println("Writing to client " + clientId + ".");
         Channel channel = clientRegistry.inverse().get(clientId);
         channel.write(result);
     }
