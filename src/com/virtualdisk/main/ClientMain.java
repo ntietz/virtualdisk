@@ -23,6 +23,7 @@ public class ClientMain
         System.out.println("Creating volume 0...");
 
         client.createVolume(0);
+        client.createVolume(1);
 
         System.out.println("Created.");
 
@@ -34,13 +35,14 @@ public class ClientMain
         byte[] block = new byte[client.getBlockSize()];
 
 
-        for (int index = 0; index < 10; ++index)
+        for (int index = 0; index < 3; ++index)
         {
             System.out.println("Writing a block to volume 0, location " + index + "...");
             random.nextBytes(block);
             client.write(0, index, block);
         }
 
+        /*
         for (int index = 0; index < 10; ++index)
         {
             System.out.println("Reading a block from volume 0, location " + index + "...");

@@ -77,6 +77,7 @@ public class Client
         ++requestId;
         WriteRequest request = new WriteRequest(requestId, volumeId, logicalOffset, new Date(), block);
         channel.write(request);
+        System.out.println("Sent request " + requestId);
     }
 
     public void read(int volumeId, long logicalOffset)
