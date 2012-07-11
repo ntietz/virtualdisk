@@ -39,10 +39,8 @@ public abstract class Handler extends Thread
     {
         action();
 
-        System.out.println("Sending to client:");
         // TODO : change this line... it's kind of gross.
         SingletonCoordinator.sendToClient(requestId, requestResult);
-        System.out.println("Finished sending.");
         /*
 
         change to something like this:

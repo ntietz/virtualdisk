@@ -170,10 +170,20 @@ public class SingletonCoordinator
     public static void sendToClient(int requestId, Sendable result)
     {
         // TODO: remove the callback after we've completed it
-        int clientId = requestCallbacks.get(requestId);
-        System.out.println("Writing to client " + clientId + ".");
-        Channel channel = clientRegistry.inverse().get(clientId);
-        channel.write(result);
+        Integer clientId = requestCallbacks.get(requestId);
+        if (clientId != null)
+        {
+            System.out.println("Writing to client " + clientId + ".");
+            Channel channel = clientRegistry.inverse().get(clientId);
+            if (channel != null)
+            {
+                channel.write(result);
+            }
+        }
+        else
+        {
+            // TODO do we want to log that the client disconnected before getting the result back?
+        }
     }
 
     /**

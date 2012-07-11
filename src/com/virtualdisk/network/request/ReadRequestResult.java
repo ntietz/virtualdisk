@@ -43,15 +43,23 @@ extends BlockRequestResult
 
     public int messageSize()
     {
-        return 8 + 4 + block.length + super.messageSize();
+        int blockSize = (block != null) ? block.length : 0;
+        return 8 + 4 + blockSize + super.messageSize();
     }
 
     public ChannelBuffer encode()
     {
         ChannelBuffer buffer = super.encode();
         buffer.writeLong(timestamp.getTime());
-        buffer.writeInt(block.length);
-        buffer.writeBytes(block);
+        if (block != null && block.length > 0)
+        {
+            buffer.writeInt(block.length);
+            buffer.writeBytes(block);
+        }
+        else
+        {
+            buffer.writeInt(0);
+        }
 
         return buffer;
     }
@@ -61,9 +69,15 @@ extends BlockRequestResult
         super.decode(buffer);
         timestamp = new Date(buffer.readLong());
         int length = buffer.readInt();
-        System.out.println("Decoding length: " + length);
-        block = new byte[length];
-        buffer.readBytes(block);
+        if (length > 0)
+        {
+            block = new byte[length];
+            buffer.readBytes(block);
+        }
+        else
+        {
+            block = null;
+        }
     }
 
     public ChannelBuffer addHeader(ChannelBuffer buffer)

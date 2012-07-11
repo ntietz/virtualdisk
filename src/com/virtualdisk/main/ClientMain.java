@@ -35,7 +35,7 @@ public class ClientMain
         byte[] block = new byte[client.getBlockSize()];
 
 
-        for (int index = 0; index < 3; ++index)
+        for (int index = 0; index < 2; ++index)
         {
             System.out.println("Writing a block to volume 0, location " + index + "...");
             random.nextBytes(block);
@@ -43,7 +43,7 @@ public class ClientMain
         }
 
         /*
-        for (int index = 0; index < 10; ++index)
+        for (int index = 0; index < 2; ++index)
         {
             System.out.println("Reading a block from volume 0, location " + index + "...");
             client.read(0, index);

@@ -56,13 +56,18 @@ extends SimpleChannelHandler
                 if (block == null)
                 {
                     success = false;
-                    block = new byte[0];
+                    //block = new byte[0];
                 }
                 else
                 {
                     success = true;
                 }
                 Date timestamp = dataNode.getValueTimestamp(volumeId, logicalOffset);
+                // TODO FIXME proper null handling here!!!
+                if (timestamp == null)
+                {
+                    timestamp = new Date(0);
+                }
 
                 Channel coordinatorChannel = event.getChannel();
                 ReadRequestResult result = new ReadRequestResult(requestId, done, success, timestamp, block);
