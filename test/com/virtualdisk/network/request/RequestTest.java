@@ -1,5 +1,7 @@
 package com.virtualdisk.network.request;
 
+import nl.jqno.equalsverifier.*;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -8,6 +10,14 @@ import java.util.Random;
 
 public class RequestTest
 {
+    @Test
+    public void equalsTest()
+    {
+        EqualsVerifier.forClass(CreateVolumeRequest.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
+    }
 
     @Test
     public void testCVRCodec()

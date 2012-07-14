@@ -53,7 +53,7 @@ extends Sendable
         {
             Request other = (Request) obj;
 
-            return requestId == other.getRequestId();
+            return other.canEqual(this) && requestId == other.getRequestId();
         }
         else
         {
@@ -68,6 +68,11 @@ extends Sendable
         hash = prime*hash + requestId;
 
         return hash;
+    }
+
+    public boolean canEqual(Object other)
+    {
+        return (other instanceof Request);
     }
 }
 

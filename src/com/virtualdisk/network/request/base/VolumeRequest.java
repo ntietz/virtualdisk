@@ -50,7 +50,8 @@ extends Request
         {
             VolumeRequest other = (VolumeRequest) obj;
 
-            return super.equals(other)
+            return other.canEqual(this)
+                && super.equals(other)
                 && volumeId == other.getVolumeId();
         }
         else
@@ -66,6 +67,11 @@ extends Request
         hash = prime*hash + volumeId;
 
         return hash;
+    }
+
+    public boolean canEqual(Object other)
+    {
+        return (other instanceof VolumeRequest);
     }
 }
 
