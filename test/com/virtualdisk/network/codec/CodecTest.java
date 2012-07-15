@@ -14,17 +14,21 @@ public class CodecTest
     public final int seed = 2603;
 
     @Test
-    public void dummy() { }
-
-    /*
-    @Test
     public void testCodecGarbage()
+    throws Exception
     {
         RequestDecoder decoder = new RequestDecoder();
 
-        fail("Not yet implemented.");
+        Random random = new Random(seed);
+        byte[] block = new byte[1049];
+        random.nextBytes(block);
+
+        ChannelBuffer buffer = ChannelBuffers.dynamicBuffer();
+        buffer.writeByte(100);
+        buffer.writeBytes(block);
+
+        assertNull(decoder.decode(null, null, buffer));
     }
-    */
 
     @Test
     public void testCodecWrite()
