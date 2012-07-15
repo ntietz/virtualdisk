@@ -4,6 +4,7 @@ import com.virtualdisk.network.*;
 import com.virtualdisk.network.request.*;
 
 import org.jboss.netty.bootstrap.*;
+import org.jboss.netty.buffer.*;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.nio.*;
 
@@ -91,7 +92,7 @@ public class Client
     {
         try
         {
-            channel.close().awaitUninterruptibly();
+            channel.write(ChannelBuffers.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
             channelFactory.releaseExternalResources();
         }
         catch (Exception e)

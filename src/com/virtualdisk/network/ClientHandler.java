@@ -34,7 +34,10 @@ extends SimpleChannelHandler
             case readRequestResult: {
                 ReadRequestResult result = (ReadRequestResult) rawResult;
                 System.out.print(result.getTimestamp()); System.out.print(" ");
-                System.out.print(new String(result.getBlock()));
+                if (result.getBlock() != null)
+                    System.out.print(new String(result.getBlock()));
+                else
+                    System.out.print("(null)");
                 } break;
 
             case writeRequestResult: {

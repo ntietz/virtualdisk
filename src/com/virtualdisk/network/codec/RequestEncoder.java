@@ -25,9 +25,17 @@ extends OneToOneEncoder
                            , Object rawMessage
                            )
     {
-        Sendable message = (Sendable) rawMessage;
-        ChannelBuffer buffer = message.encodeWithHeader();
-        return buffer;
+        if (rawMessage instanceof Sendable)
+        {
+            Sendable message = (Sendable) rawMessage;
+            ChannelBuffer buffer = message.encodeWithHeader();
+            System.out.println("Encoded message");
+            return buffer;
+        }
+        else
+        {
+            return rawMessage;
+        }
     }
 }
 

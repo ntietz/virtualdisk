@@ -169,6 +169,7 @@ public class CoordinatorIntegrationTest
                 }
 
                 assertTrue("Write should succeed", result.wasSuccessful());
+                System.out.println(writeId);
             }
         }
     }
