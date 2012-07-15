@@ -52,7 +52,7 @@ extends VolumeRequestResult
         return addHeader(encode());
     }
 
-    public boolean equals(Object obj)
+    public final boolean equals(Object obj)
     {
         if (obj == null)
         {
@@ -62,7 +62,8 @@ extends VolumeRequestResult
         {
             CreateVolumeRequestResult other = (CreateVolumeRequestResult) obj;
 
-            return super.equals(other);
+            return other.canEqual(this)
+                && super.equals(other);
         }
         else
         {
@@ -70,9 +71,14 @@ extends VolumeRequestResult
         }
     }
 
-    public int hashCode()
+    public final int hashCode()
     {
         return super.hashCode();
+    }
+
+    public boolean canEqual(Object other)
+    {
+        return (other instanceof CreateVolumeRequestResult);
     }
 }
 

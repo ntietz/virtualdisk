@@ -82,7 +82,8 @@ extends Sendable
         {
             RequestResult other = (RequestResult) obj;
 
-            return requestId == other.getRequestId()
+            return other.canEqual(this)
+                && requestId == other.getRequestId()
                 && done == other.isDone()
                 && success == other.wasSuccessful();
         }
@@ -101,6 +102,11 @@ extends Sendable
         hash = prime*hash + (success ? 1 : 0);
 
         return hash;
+    }
+
+    public boolean canEqual(Object other)
+    {
+        return (other instanceof RequestResult);
     }
 }
 

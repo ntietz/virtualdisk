@@ -98,7 +98,7 @@ extends BlockRequestResult
         return addHeader(encode());
     }
 
-    public boolean equals(Object obj)
+    public final boolean equals(Object obj)
     {
         if (obj == null)
         {
@@ -108,7 +108,8 @@ extends BlockRequestResult
         {
             ReadRequestResult other = (ReadRequestResult) obj;
 
-            return super.equals(other)
+            return other.canEqual(this)
+                && super.equals(other)
                 && timestamp.equals(other.getTimestamp())
                 && Arrays.equals(block, other.getBlock());
         }
@@ -118,7 +119,7 @@ extends BlockRequestResult
         }
     }
 
-    public int hashCode()
+    public final int hashCode()
     {
         int hash = super.hashCode();
 
@@ -131,6 +132,11 @@ extends BlockRequestResult
         }
 
         return hash;
+    }
+
+    public boolean canEqual(Object other)
+    {
+        return (other instanceof ReadRequestResult);
     }
 }
 

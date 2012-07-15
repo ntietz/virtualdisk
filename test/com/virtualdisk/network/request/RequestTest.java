@@ -11,15 +11,6 @@ import java.util.Random;
 public class RequestTest
 {
     @Test
-    public void equalsTest()
-    {
-        EqualsVerifier.forClass(CreateVolumeRequest.class)
-                      .withRedefinedSuperclass()
-                      .suppress(Warning.NONFINAL_FIELDS)
-                      .verify();
-    }
-
-    @Test
     public void testCVRCodec()
     {
         CreateVolumeRequest request = new CreateVolumeRequest(10, 13);
@@ -27,6 +18,11 @@ public class RequestTest
         CreateVolumeRequest decodedRequest = new CreateVolumeRequest(0, 0);
         decodedRequest.decode(request.encode());
         assertEquals("Requests should be equal", request, decodedRequest);
+
+        EqualsVerifier.forClass(CreateVolumeRequest.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -37,6 +33,11 @@ public class RequestTest
         CreateVolumeRequestResult decodedResult = new CreateVolumeRequestResult(0, false, false);
         decodedResult.decode(result.encode());
         assertEquals("Results should be equal", result, decodedResult);
+
+        EqualsVerifier.forClass(CreateVolumeRequestResult.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -47,6 +48,11 @@ public class RequestTest
         DeleteVolumeRequest decodedRequest = new DeleteVolumeRequest(0, 0);
         decodedRequest.decode(request.encode());
         assertEquals("Requests should be equal", request, decodedRequest);
+
+        EqualsVerifier.forClass(DeleteVolumeRequest.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -57,6 +63,11 @@ public class RequestTest
         DeleteVolumeRequestResult decodedResult = new DeleteVolumeRequestResult(0, false, false);
         decodedResult.decode(result.encode());
         assertEquals("Results should be equal", result, decodedResult);
+
+        EqualsVerifier.forClass(DeleteVolumeRequestResult.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -67,6 +78,11 @@ public class RequestTest
         OrderRequest decodedRequest = new OrderRequest(0, 0, 0, null);
         decodedRequest.decode(request.encode());
         assertEquals("Requests should be equal", request, decodedRequest);
+
+        EqualsVerifier.forClass(OrderRequest.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS, Warning.NULL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -77,6 +93,11 @@ public class RequestTest
         OrderRequestResult decodedResult = new OrderRequestResult(0, false, false);
         decodedResult.decode(result.encode());
         assertEquals("Results should be equal", result, decodedResult);
+
+        EqualsVerifier.forClass(OrderRequestResult.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -87,6 +108,11 @@ public class RequestTest
         ReadRequest decodedRequest = new ReadRequest(0, 0, 0);
         decodedRequest.decode(request.encode());
         assertEquals("Requests should be equal", request, decodedRequest);
+
+        EqualsVerifier.forClass(ReadRequest.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -102,6 +128,11 @@ public class RequestTest
         ReadRequestResult decodedResult = new ReadRequestResult(0, false, false, null, null);
         decodedResult.decode(result.encode());
         assertEquals("Results should be equal", result, decodedResult);
+
+        EqualsVerifier.forClass(ReadRequestResult.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS, Warning.NULL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -112,6 +143,11 @@ public class RequestTest
         VolumeExistsRequest decodedRequest = new VolumeExistsRequest(0, 0);
         decodedRequest.decode(request.encode());
         assertEquals("Requests should be equal", request, decodedRequest);
+
+        EqualsVerifier.forClass(VolumeExistsRequest.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -122,6 +158,11 @@ public class RequestTest
         VolumeExistsRequestResult decodedResult = new VolumeExistsRequestResult(0, false, false, false);
         decodedResult.decode(result.encode());
         assertEquals("Results should be equal", result, decodedResult);
+
+        EqualsVerifier.forClass(VolumeExistsRequestResult.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -136,6 +177,11 @@ public class RequestTest
         WriteRequest decodedRequest = new WriteRequest(0, 0, 0, null, null);
         decodedRequest.decode(request.encode());
         assertEquals("Requests should be equal", request, decodedRequest);
+
+        EqualsVerifier.forClass(WriteRequest.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS, Warning.NULL_FIELDS)
+                      .verify();
     }
     
     @Test
@@ -146,5 +192,10 @@ public class RequestTest
         WriteRequestResult decodedResult = new WriteRequestResult(0, false, false);
         decodedResult.decode(result.encode());
         assertEquals("Results should be equal", result, decodedResult);
+
+        EqualsVerifier.forClass(WriteRequestResult.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
     }
 }

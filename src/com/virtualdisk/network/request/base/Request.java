@@ -53,7 +53,8 @@ extends Sendable
         {
             Request other = (Request) obj;
 
-            return other.canEqual(this) && requestId == other.getRequestId();
+            return other.canEqual(this)
+                && requestId == other.getRequestId();
         }
         else
         {

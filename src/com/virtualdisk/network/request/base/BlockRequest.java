@@ -62,7 +62,8 @@ extends Request
         {
             BlockRequest other = (BlockRequest) obj;
 
-            return super.equals(other)
+            return other.canEqual(this)
+                && super.equals(other)
                 && volumeId == other.getVolumeId()
                 && logicalOffset == other.getLogicalOffset();
         }
@@ -80,6 +81,11 @@ extends Request
         hash = hash*prime + (int) (logicalOffset ^ (logicalOffset >>> 32));
 
         return hash;
+    }
+
+    public boolean canEqual(Object other)
+    {
+        return (other instanceof BlockRequest);
     }
 }
 

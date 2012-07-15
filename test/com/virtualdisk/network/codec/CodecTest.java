@@ -2,11 +2,17 @@ package com.virtualdisk.network.codec;
 
 import com.virtualdisk.network.request.*;
 
+import org.jboss.netty.buffer.*;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 
+import java.util.*;
+
 public class CodecTest
 {
+    public final int seed = 2603;
+
     @Test
     public void dummy() { }
 
@@ -20,29 +26,108 @@ public class CodecTest
     }
     */
 
-    /*
     @Test
     public void testCodecWrite()
+    throws Exception
     {
         RequestEncoder encoder = new RequestEncoder();
         RequestDecoder decoder = new RequestDecoder();
 
-        /*
-            generate 10 write requests
-            generate 10 corresponding request results
+        Random writeRandom = new Random(seed);
+        int requestId = 53;
+        int volumeId = 94;
+        long logicalOffset = 1043L;
+        Date timestamp = new Date(5832);
+        byte[] block = new byte[14];
+        writeRandom.nextBytes(block);
 
-            encode all 10 write requests/results, and decode directly (1 request per channel)
+        List<WriteRequest> writeRequests = new ArrayList<WriteRequest>();
 
-            encode all 10 write requests/results, and decode all from the same channel
+        writeRequests.add(new WriteRequest(requestId, volumeId, logicalOffset, timestamp, block));
 
+        requestId += 942;
+        writeRequests.add(new WriteRequest(requestId, volumeId, logicalOffset, timestamp, block));
 
-        //Object writeRequest ...
-        //Object writeRequestResult = new 
+        volumeId += 18492;
+        writeRequests.add(new WriteRequest(requestId, volumeId, logicalOffset, timestamp, block));
 
+        logicalOffset -= 194L;
+        writeRequests.add(new WriteRequest(requestId, volumeId, logicalOffset, timestamp, block));
 
-        fail("Not yet implemented.");
+        timestamp = new Date(194948);
+        writeRequests.add(new WriteRequest(requestId, volumeId, logicalOffset, timestamp, block));
+
+        block = new byte[194];
+        writeRandom.nextBytes(block);
+        writeRequests.add(new WriteRequest(requestId, volumeId, logicalOffset, timestamp, block));
+
+        for (WriteRequest request : writeRequests)
+        {
+            ChannelBuffer buffer = (ChannelBuffer) encoder.encode(null, null, request);
+            WriteRequest decodedRequest = (WriteRequest) decoder.decode(null, null, buffer);
+
+            assertEquals("Decoded object should be equal.", request, decodedRequest);
+        }
+
+        ChannelBuffer resultBuffer = ChannelBuffers.dynamicBuffer();
+        for (int index = 0; index < writeRequests.size(); ++index)
+        {
+            WriteRequest request = writeRequests.get(index);
+            ChannelBuffer buffer = (ChannelBuffer) encoder.encode(null, null, request);
+            resultBuffer.writeBytes(buffer);
+        }
+
+        for (int index = 0; index < writeRequests.size(); ++index)
+        {
+            WriteRequest request = writeRequests.get(index);
+            WriteRequest decodedRequest = (WriteRequest) decoder.decode(null, null, resultBuffer);
+
+            assertEquals("Decoded object should be equal.", request, decodedRequest);
+        }
+
+        List<WriteRequestResult> writeResults = new ArrayList<WriteRequestResult>();
+
+        boolean done = false;
+        boolean success = false;
+
+        writeResults.add(new WriteRequestResult(requestId, done, success));
+
+        requestId += 8472;
+        writeResults.add(new WriteRequestResult(requestId, done, success));
+
+        done = !done;
+        writeResults.add(new WriteRequestResult(requestId, done, success));
+
+        success = !success;
+        writeResults.add(new WriteRequestResult(requestId, done, success));
+
+        for (WriteRequestResult result : writeResults)
+        {
+            ChannelBuffer buffer = (ChannelBuffer) encoder.encode(null, null, result);
+            WriteRequestResult decodedResult = (WriteRequestResult) decoder.decode(null, null, buffer);
+
+            assertEquals("Decoded object should be equal.", result, decodedResult);
+        }
+
+        resultBuffer = ChannelBuffers.dynamicBuffer();
+        for (int index = 0; index < writeResults.size(); ++index)
+        {
+            WriteRequestResult result = writeResults.get(index);
+            ChannelBuffer buffer = (ChannelBuffer) encoder.encode(null, null, result);
+            resultBuffer.writeBytes(buffer);
+        }
+
+        for (int index = 0; index < writeResults.size(); ++index)
+        {
+            WriteRequestResult result = writeResults.get(index);
+            WriteRequestResult decodedResult = (WriteRequestResult) decoder.decode(null, null, resultBuffer);
+
+            assertEquals("Decoded object should be equal.", result, decodedResult);
+        }
+
     }
 
+    /*
     @Test
     public void testCodecRead()
     {

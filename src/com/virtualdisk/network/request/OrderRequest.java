@@ -66,7 +66,7 @@ extends BlockRequest
         return addHeader(encode());
     }
 
-    public boolean equals(Object obj)
+    public final boolean equals(Object obj)
     {
         if (obj == null)
         {
@@ -76,7 +76,8 @@ extends BlockRequest
         {
             OrderRequest other = (OrderRequest) obj;
 
-            return super.equals(other)
+            return other.canEqual(this)
+                && super.equals(other)
                 && timestamp.equals(other.getTimestamp());
         }
         else
@@ -85,7 +86,7 @@ extends BlockRequest
         }
     }
 
-    public int hashCode()
+    public final int hashCode()
     {
         int hash = super.hashCode();
 
@@ -93,6 +94,11 @@ extends BlockRequest
         hash = prime*hash + ((int) (t ^ (t >>> 32)));
 
         return hash;
+    }
+
+    public boolean canEqual(Object other)
+    {
+        return (other instanceof OrderRequest);
     }
 }
 

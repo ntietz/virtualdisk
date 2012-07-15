@@ -62,7 +62,8 @@ extends VolumeRequest
         {
             CreateVolumeRequest other = (CreateVolumeRequest) obj;
 
-            return other.canEqual(this) && super.equals(other);
+            return other.canEqual(this)
+                && super.equals(other);
         }
         else
         {
