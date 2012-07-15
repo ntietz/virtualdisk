@@ -44,7 +44,7 @@ public class ClientMain
         }
         */
 
-        for (int index = 0; index < 2; ++index)
+        for (int index = 0; index < 20; ++index)
         {
             System.out.println("Reading a block from volume 0, location " + index + "...");
             client.read(0, index);
