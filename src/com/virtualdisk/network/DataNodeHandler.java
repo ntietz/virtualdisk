@@ -9,17 +9,43 @@ import org.jboss.netty.channel.*;
 
 import java.util.*;
 
+/**
+ * Handles received messages on the datanode side.
+ * When a request is received, the handler immediately performs this 
+ * request on the datanode and sends the result back on the channel
+ * the request was received on.
+ */
 public class DataNodeHandler
 extends SimpleChannelHandler
 {
+    /**
+     * The datanode which we perform requests on.
+     */
     DataNode dataNode;
 
+    /**
+     * The default constructor is private; we cannot use a handler without its datanode.
+     */
     private DataNodeHandler() { }
+
+    /**
+     * This constructor sets the datanode for requests to be performed on.
+     * 
+     * @param   dataNode    the node to perform all requests on
+     */
     public DataNodeHandler(DataNode dataNode)
     {
         this.dataNode = dataNode;
     }
 
+    /**
+     * This method handles requests by performing the appropriate request immediately
+     * on the datanode, then forwarding the result back from whence the request came.
+     *
+     * @param   context     not used
+     * @param   event       the message we're handling
+     */
+    @Override
     public void messageReceived( ChannelHandlerContext context
                                , MessageEvent event
                                )
@@ -137,6 +163,13 @@ extends SimpleChannelHandler
         }
     }
 
+    /**
+     * Handles caught exceptions by printing the stack trace and halting the program.
+     *
+     * @param   context     not used
+     * @param   event       the exception we're handling
+     */
+    @Override
     public void exceptionCaught( ChannelHandlerContext context
                                , ExceptionEvent event
                                )

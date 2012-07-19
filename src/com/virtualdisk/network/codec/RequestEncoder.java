@@ -6,20 +6,21 @@ import org.jboss.netty.channel.*;
 import org.jboss.netty.buffer.*;
 import org.jboss.netty.handler.codec.oneone.*;
 
+/**
+ * Encodes Sendable-type messages.
+ */
 public class RequestEncoder
 extends OneToOneEncoder
 {
-    /*
-    public void writeRequested(ChannelHandlerContext context, MessageEvent event)
-    {
-        Sendable message = (Sendable) event.getMessage();
-        
-        ChannelBuffer buffer = message.encode();
-
-        Channels.write(context, event.getFuture(), buffer);
-    }
-    */
-
+    /**
+     * Encodes the supplied message (passes through if not Sendable-type).
+     *
+     * @param   context     not used
+     * @param   channel     not used
+     * @param   rawMessage  the message to encode
+     * @return  a ChannelBuffer containing the encoded message
+     */
+    @Override
     protected Object encode( ChannelHandlerContext context
                            , Channel channel
                            , Object rawMessage

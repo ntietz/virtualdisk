@@ -7,9 +7,21 @@ import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.frame.*;
 import org.jboss.netty.buffer.*;
 
+/**
+ * Decodes Sendable-type messages.
+ */
 public class RequestDecoder
 extends FrameDecoder
 {
+    /**
+     * Decodes supplied messages (null if it is not fully received yet).
+     * 
+     * @param   context     not used
+     * @param   channel     not used
+     * @param   buffer      contains the message
+     * @return  null if the message is incomplete, and the decoded message otherwise
+     */
+    @Override
     protected Object decode( ChannelHandlerContext context
                            , Channel channel
                            , ChannelBuffer buffer

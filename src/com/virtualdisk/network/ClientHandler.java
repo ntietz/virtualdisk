@@ -7,9 +7,20 @@ import com.virtualdisk.network.util.Sendable.MessageType;
 
 import org.jboss.netty.channel.*;
 
+/**
+ * The ClientHandler takes care of receiving messages from the coordinator.
+ * Whenever a message is received, it logs any relevant information and stores or prints the message.
+ */
 public class ClientHandler
 extends SimpleChannelHandler
 {
+    /**
+     * This method handles received messages.
+     * 
+     * @param   context     the context arround teh channel; it is not used for this handler
+     * @param   event       the contents of the received message
+     */
+    @Override
     public void messageReceived( ChannelHandlerContext context
                                , MessageEvent event
                                )
@@ -62,6 +73,13 @@ extends SimpleChannelHandler
         System.out.println("");
     }
 
+    /**
+     * When an exception is caught, its stack trace is printed and the program halts execution.
+     *
+     * @param   context     not used here
+     * @param   event       the caught exception
+     */
+    @Override
     public void exceptionCaught( ChannelHandlerContext context
                                , ExceptionEvent event
                                )

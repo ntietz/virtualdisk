@@ -7,6 +7,9 @@ import com.virtualdisk.network.codec.*;
 
 import org.jboss.netty.channel.*;
 
+/**
+ * Constructs the pipeline for datanodes.
+ */
 public class DataNodePipelineFactory
 implements ChannelPipelineFactory
 {
@@ -18,6 +21,11 @@ implements ChannelPipelineFactory
         this.dataNode = dataNode;
     }
 
+    /**
+     * Creates a pipeline for a specific datanode, ensuring the handler is setup properly.
+     * @return  a pipeline with decoder, encoder, and handler.
+     */
+    @Override
     public ChannelPipeline getPipeline()
     {
         ChannelPipeline pipeline = Channels.pipeline();

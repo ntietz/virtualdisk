@@ -10,12 +10,33 @@ import org.jboss.netty.channel.*;
 
 import java.util.*;
 
+/**
+ * Handles received messages on the coordinator side.
+ * Any request result is sent directly back to the requesting client.
+ * Any request has a request object built which is then forwarded to the appropriate datanodes.
+ */
 public class CoordinatorHandler
 extends SimpleChannelHandler
 {
+    /**
+     * The coordinator for the requests.
+     */
     Coordinator coordinator = SingletonCoordinator.getCoordinator();
+    
+    /**
+     * The server used to send messages.
+     */
     NetworkServer server = SingletonCoordinator.getServer();
 
+    /**
+     * Handles requests: upon receipt of a request result, it gets sent
+     * back to the requester; upon receipt of a request, it gets sent
+     * to the appropriate datanodes.
+     *
+     * @param   context     not used
+     * @param   event       the message received
+     */
+    @Override
     public void messageReceived( ChannelHandlerContext context
                                , MessageEvent event
                                )
@@ -76,6 +97,13 @@ extends SimpleChannelHandler
         }
     }
 
+    /**
+     * Registers the connecting client channel so that callbacks can be performed.
+     *
+     * @param   context     not used
+     * @param   event       the channel connection event, where we get the channel from
+     */
+    @Override
     public void channelConnected( ChannelHandlerContext context
                                 , ChannelStateEvent event
                                 )
@@ -84,6 +112,13 @@ extends SimpleChannelHandler
         SingletonCoordinator.registerNewClient(clientChannel);
     }
 
+    /**
+     * Handles caught exceptions by printing the stack trace and halting the program.
+     *
+     * @param   context     not used
+     * @param   event       the exception we're handling
+     */
+    @Override
     public void exceptionCaught( ChannelHandlerContext context
                                , ExceptionEvent event
                                )

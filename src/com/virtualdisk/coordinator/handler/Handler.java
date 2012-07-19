@@ -10,10 +10,29 @@ import com.virtualdisk.network.util.*;
  */
 public abstract class Handler extends Thread
 {
+    /**
+     * The id assigned by the coordinator for this request.
+     */
     protected int requestId;
+
+    /**
+     * The logical volume id the request is hitting.
+     */
     protected int volumeId;
+
+    /**
+     * The logical offset the request is hitting. This is not used for all requests, such as create volume requests.
+     */
     protected long logicalOffset;
+
+    /**
+     * The coordinator for the requests.
+     */
     protected Coordinator coordinator;
+
+    /**
+     * The result of the request. This is set when the request finishes.
+     */
     protected Sendable requestResult;
 
     /**
