@@ -35,7 +35,7 @@ public abstract class Handler extends Thread
     /**
      * Sets off the action, then passes along the result to the client.
      */
-    public void run()
+    public final void run()
     {
         action();
 
