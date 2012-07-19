@@ -227,6 +227,44 @@ public class CoordinatorIntegrationTest
     }
 
     @Test(timeout=10000)
+    public void testMixedReadWrite()
+    {
+        final int numberOfWrites = 100;
+        final int numberOfReads = 100;
+        Random random = new Random(seed);
+        List<Integer> writeIds = new ArrayList<Integer>();
+        List<Integer> readIds = new ArrayList<Integer>();
+
+        for (int index = 0; index < numberOfWrites; ++index)
+        {
+            byte[] block = new byte[blockSize];
+            random.nextBytes(block);
+            writeIds.add(coordinator.write(0, index, block));
+            readIds.add(coordinator.read(0, index));
+        }
+
+        for (int writeId : writeIds)
+        {
+            WriteRequestResult result = null;
+            while (result == null || !result.isDone())
+            {
+                result = coordinator.writeResult(writeId);
+            }
+
+            assertTrue("Write should succeed", result.wasSuccessful());
+        }
+
+        for (int readId : readIds)
+        {
+            ReadRequestResult result = null;
+            while (result == null || !result.isDone())
+            {
+                result = coordinator.readResult(readId);
+            }
+        }
+    }
+
+    @Test(timeout=10000)
     public void testReadUnwritten()
     {
         final int numberOfReads = 500;

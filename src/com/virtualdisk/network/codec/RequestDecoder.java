@@ -73,7 +73,6 @@ extends FrameDecoder
             case writeRequest:
                 WriteRequest writeRequest = new WriteRequest(0, 0, 0, null, null);
                 writeRequest.decode(buffer);
-                System.out.println("Decoded " + writeRequest.getRequestId());
                 return writeRequest;
 
             case writeRequestResult:

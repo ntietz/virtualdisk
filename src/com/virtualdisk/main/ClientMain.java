@@ -34,11 +34,20 @@ public class ClientMain
 
         byte[] block = new byte[client.getBlockSize()];
 
-        for (int index = 0; index < 1; ++index)
+        /*
+        random.nextBytes(block);
+        client.write(0, 0, block);
+
+        random.nextBytes(block);
+        client.write(0, 1, block);
+        */
+
+        for (int index = 0; index < 4; ++index)
         {
             System.out.println("Writing a block to volume 0, location " + index + "...");
             random.nextBytes(block);
             client.write(0, index, block);
+            Thread.sleep(50);
         }
 
         Thread.sleep(500);
@@ -53,14 +62,14 @@ public class ClientMain
 
         System.out.println("Deleting volume 0...");
 
-        client.deleteVolume(0);
+        //client.deleteVolume(0);
 
         Thread.sleep(100);
 
         System.out.println("Deleted.");
         System.out.println("Disconnecting from the coordinator...");
 
-        client.disconnect();
+        //client.disconnect();
 
         //System.out.println("Disconnected. Now exiting.");
     }
