@@ -46,7 +46,7 @@ extends SimpleChannelHandler
                 ReadRequestResult result = (ReadRequestResult) rawResult;
                 System.out.print(result.getTimestamp()); System.out.print(" ");
                 if (result.getBlock() != null)
-                    System.out.print(new String(result.getBlock()));
+                    System.out.print(result.getBlock().length);
                 else
                     System.out.print("(null)");
                 } break;

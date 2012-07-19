@@ -12,32 +12,77 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+/**
+ * The Client class provides an easy API for accessing the Virtualdisk system, handling all the network requests for you.
+ */
 public class Client
 {
+    /**
+     * The default block size for the system.
+     */
     private static final int DEFAULT_BLOCK_SIZE = 1024;
+
+    /**
+     * The block size the client is configured to use.
+     */
     private static int blockSize = DEFAULT_BLOCK_SIZE;
+
+    /**
+     * The last used request id; this is used to generate uique ids for each request.
+     * Note: these do not have to be synchronized between clients, as they're only used for
+     * pairing requests with results on the client side; the coordinator registers callbacks
+     * when the channel is connected, independent of request ids.
+     */
     private static int requestId = 0;
 
+    /**
+     * The hostname of the coordinator.
+     */
     private String host;
+
+    /**
+     * The port of the coordinator.
+     */
     private int port;
 
+    /**
+     * The channel the coordinator is connected on.
+     */
     private Channel channel;
+
+    /**
+     * The channel factory. This is only a member so that its resources can be released later.
+     */
     private ChannelFactory channelFactory;
 
+    /**
+     * Clients must be constructed with a hostname and port for the client.
+     *
+     * @param   host    the coordinator's hostname
+     * @param   port    the coordinator's port
+     */
     public Client(String host, int port)
     {
         this.host = host;
         this.port = port;
     }
 
+    /**
+     * Getter for the block size.
+     *
+     * @return  the block size
+     */
     public int getBlockSize()
     {
         return blockSize;
     }
 
-    public void connect()
+    /**
+     * Connects to the coordinator we are 
+     */
+    public boolean connect()
     {
-        ChannelFactory channelFactory = new NioClientSocketChannelFactory
+        channelFactory = new NioClientSocketChannelFactory
             ( Executors.newCachedThreadPool()
             , Executors.newCachedThreadPool()
             );
@@ -51,14 +96,18 @@ public class Client
         {
             channel = future.getChannel();
             System.out.println("Connected to the coordinator.");
+            return true;
         }
         else
         {
             System.out.println("Error connecting to the coordinator.");
-            System.exit(1);
+            return false;
         }
     }
 
+    /**
+     * Sends a create-volume request.
+     */
     public void createVolume(int volumeId)
     {
         ++requestId;
@@ -66,6 +115,9 @@ public class Client
         channel.write(request);
     }
 
+    /**
+     * Sends a delete-volume request.
+     */
     public void deleteVolume(int volumeId)
     {
         ++requestId;
@@ -73,6 +125,9 @@ public class Client
         channel.write(request);
     }
 
+    /**
+     * Sends a write request with the supplied arguments.
+     */
     public void write(int volumeId, long logicalOffset, byte[] block)
     {
         ++requestId;
@@ -81,6 +136,9 @@ public class Client
         System.out.println("Sent request " + requestId);
     }
 
+    /**
+     * Sends a read request with the supplied arguments.
+     */
     public void read(int volumeId, long logicalOffset)
     {
         ++requestId;
@@ -88,6 +146,9 @@ public class Client
         channel.write(request);
     }
 
+    /**
+     * Disconnects from the coordinator.
+     */
     public void disconnect()
     {
         try
