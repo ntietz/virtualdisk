@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * The Client class provides an easy API for accessing the Virtualdisk system, handling all the network requests for you.
+ * An asychronous client for the Virtualdisk project.
  */
 public class Client
 {
@@ -28,12 +28,27 @@ public class Client
     private static int blockSize = DEFAULT_BLOCK_SIZE;
 
     /**
+     * Maps a request id onto true if it has finished, false or null otherwise.
+     */
+    private Map<Integer, Boolean> finishedMap = new HashMap();
+
+    /**
+     * Maps a request id onto true if the result has finished and succeeded, false if it has finished and failed.
+     */
+    private Map<Integer, Boolean> successMap = new HashMap();
+
+    /**
+     * The result map for reading.
+     */
+    private Map<Integer, byte[]> readResults = new HashMap();
+
+    /**
      * The last used request id; this is used to generate uique ids for each request.
      * Note: these do not have to be synchronized between clients, as they're only used for
      * pairing requests with results on the client side; the coordinator registers callbacks
      * when the channel is connected, independent of request ids.
      */
-    private static int requestId = 0;
+    private static int lastAssignedId = 0;
 
     /**
      * The hostname of the coordinator.
@@ -88,7 +103,7 @@ public class Client
             );
 
         ClientBootstrap bootstrap = new ClientBootstrap(channelFactory);
-        bootstrap.setPipelineFactory(new ClientPipelineFactory());
+        bootstrap.setPipelineFactory(new ClientPipelineFactory(this));
 
         ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
         future.awaitUninterruptibly();
@@ -108,42 +123,53 @@ public class Client
     /**
      * Sends a create-volume request.
      */
-    public void createVolume(int volumeId)
+    public int createVolume(int volumeId)
     {
-        ++requestId;
+        int requestId = generateNewRequestId();
+
         CreateVolumeRequest request = new CreateVolumeRequest(requestId, volumeId);
         channel.write(request);
+
+        return requestId;
     }
 
     /**
      * Sends a delete-volume request.
      */
-    public void deleteVolume(int volumeId)
+    public int deleteVolume(int volumeId)
     {
-        ++requestId;
+        int requestId = generateNewRequestId();
+
         DeleteVolumeRequest request = new DeleteVolumeRequest(requestId, volumeId);
         channel.write(request);
+
+        return requestId;
     }
 
     /**
      * Sends a write request with the supplied arguments.
      */
-    public void write(int volumeId, long logicalOffset, byte[] block)
+    public int write(int volumeId, long logicalOffset, byte[] block)
     {
-        ++requestId;
+        int requestId = generateNewRequestId();
+
         WriteRequest request = new WriteRequest(requestId, volumeId, logicalOffset, new Date(), block);
         channel.write(request);
-        System.out.println("Sent request " + requestId);
+
+        return requestId;
     }
 
     /**
      * Sends a read request with the supplied arguments.
      */
-    public void read(int volumeId, long logicalOffset)
+    public int read(int volumeId, long logicalOffset)
     {
-        ++requestId;
+        int requestId = generateNewRequestId();
+
         ReadRequest request = new ReadRequest(requestId, volumeId, logicalOffset);
         channel.write(request);
+
+        return requestId;
     }
 
     /**
@@ -160,6 +186,56 @@ public class Client
         {
             System.exit(0);
         }
+    }
+
+    public void setSuccess(int requestId, boolean success)
+    {
+        successMap.put(requestId, success);
+    }
+
+    public void setFinished(int requestId, boolean success)
+    {
+        finishedMap.put(requestId, success);
+    }
+
+    public void setReadResult(int requestId, byte[] block)
+    {
+        readResults.put(requestId, block);
+    }
+
+    public boolean wasSuccessful(int requestId)
+    {
+        Boolean success = successMap.get(requestId);
+
+        if (success == null)
+        {
+            success = false;
+        }
+
+        return success;
+    }
+
+    public boolean hasFinished(int requestId)
+    {
+        Boolean finished = finishedMap.get(requestId);
+
+        if (finished == null)
+        {
+            finished = false;
+        }
+
+        return finished;
+    }
+
+    public byte[] getReadResult(int requestId)
+    {
+        return readResults.get(requestId);
+    }
+
+    private synchronized int generateNewRequestId()
+    {
+        ++lastAssignedId;
+        return lastAssignedId;
     }
 }
 

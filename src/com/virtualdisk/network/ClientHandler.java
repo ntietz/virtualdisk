@@ -1,5 +1,6 @@
 package com.virtualdisk.network;
 
+import com.virtualdisk.client.*;
 import com.virtualdisk.network.request.*;
 import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.*;
@@ -14,6 +15,13 @@ import org.jboss.netty.channel.*;
 public class ClientHandler
 extends SimpleChannelHandler
 {
+    Client client;
+
+    public ClientHandler(Client client)
+    {
+        this.client = client;
+    }
+
     /**
      * This method handles received messages.
      * 
@@ -29,14 +37,6 @@ extends SimpleChannelHandler
 
         MessageType type = rawResult.messageType();
 
-        System.out.print("Received: ");
-        if (rawResult instanceof RequestResult)
-        {
-            RequestResult result = (RequestResult) rawResult;
-            System.out.print(result.isDone() ? "done" : "not-done"); System.out.print(" ");
-            System.out.print(result.wasSuccessful() ? "success" : "failed"); System.out.print(" ");
-        }
-
         switch (type)
         {
             case orderRequestResult: {
@@ -44,19 +44,13 @@ extends SimpleChannelHandler
 
             case readRequestResult: {
                 ReadRequestResult result = (ReadRequestResult) rawResult;
-                System.out.print(result.getTimestamp()); System.out.print(" ");
-                if (result.getBlock() != null)
-                    System.out.print(result.getBlock().length);
-                else
-                    System.out.print("(null)");
+                client.setReadResult(result.getRequestId(), result.getBlock());
                 } break;
 
             case writeRequestResult: {
                 } break;
 
             case volumeExistsRequestResult: {
-                VolumeExistsRequestResult result = (VolumeExistsRequestResult) rawResult;
-                System.out.print(result.volumeExists() ? "exists" : "missing"); System.out.print(" ");
                 } break;
 
             case createVolumeRequestResult: {
@@ -66,11 +60,17 @@ extends SimpleChannelHandler
                 } break;
 
             default: {
-                System.out.print("error.");
                 } break;
         }
 
-        System.out.println("");
+        if (rawResult instanceof RequestResult)
+        {
+            RequestResult result = (RequestResult) rawResult;
+            int requestId = result.getRequestId();
+            
+            client.setSuccess(requestId, result.isDone());
+            client.setFinished(requestId, result.wasSuccessful());
+        }
     }
 
     /**
