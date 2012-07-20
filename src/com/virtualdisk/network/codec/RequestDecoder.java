@@ -33,6 +33,8 @@ extends FrameDecoder
             return null;
         }
 
+        buffer.markReaderIndex();
+
         MessageType type = MessageType.fromByte(buffer.readByte());
         int length = buffer.readInt();
 

@@ -18,6 +18,7 @@ implements ChannelPipelineFactory
     public ChannelPipeline getPipeline()
     {
         ChannelPipeline pipeline = Channels.pipeline();
+
         pipeline.addLast("decoder", new RequestDecoder());
         pipeline.addLast("encoder", new RequestEncoder());
         pipeline.addLast("handler", new ClientHandler());

@@ -63,7 +63,8 @@ extends SimpleChannelHandler
                 int requestId = coordinator.write(volumeId, logicalOffset, block);
 
                 SingletonCoordinator.registerCallback(requestId, event.getChannel());
-                System.out.println("Registered callback for write request " + request.getRequestId());
+                System.out.println("Registered callback for write request " + request.getRequestId()
+                                 + " internal request id " + requestId);
                 } break;
 
             case readRequest: {
@@ -73,6 +74,7 @@ extends SimpleChannelHandler
                 int requestId = coordinator.read(volumeId, logicalOffset);
 
                 SingletonCoordinator.registerCallback(requestId, event.getChannel());
+                System.out.println("Registered callback for read request " + request.getRequestId());
                 } break;
 
             case createVolumeRequest: {

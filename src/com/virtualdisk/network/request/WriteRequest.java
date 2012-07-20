@@ -57,7 +57,15 @@ extends BlockRequest
         timestamp = new Date(buffer.readLong());
         int length = buffer.readInt();
         block = new byte[length];
-        buffer.readBytes(block);
+        try
+        {
+            buffer.readBytes(block);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     public ChannelBuffer addHeader(ChannelBuffer buffer)

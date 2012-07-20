@@ -1,6 +1,5 @@
 package com.virtualdisk.network;
 
-import com.virtualdisk.network.*;
 import com.virtualdisk.network.codec.*;
 
 import org.jboss.netty.channel.*;

@@ -173,7 +173,7 @@ public class SingletonCoordinator
         Integer clientId = requestCallbacks.get(requestId);
         if (clientId != null)
         {
-            System.out.println("Writing to client " + clientId + ".");
+            System.out.println("Writing to client " + clientId + ", request " + ((RequestResult)result).getRequestId());
             Channel channel = clientRegistry.inverse().get(clientId);
             if (channel != null)
             {

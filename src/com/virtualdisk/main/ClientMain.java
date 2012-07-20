@@ -42,36 +42,41 @@ public class ClientMain
         client.write(0, 1, block);
         */
 
-        for (int index = 0; index < 4; ++index)
+        for (int index = 0; index < 50; ++index)
         {
             System.out.println("Writing a block to volume 0, location " + index + "...");
             random.nextBytes(block);
             client.write(0, index, block);
-            Thread.sleep(50);
         }
 
-        Thread.sleep(500);
-
-        for (int index = 0; index < 20; ++index)
+        for (int index = 0; index < 100; ++index)
         {
             System.out.println("Reading a block from volume 0, location " + index + "...");
             client.read(0, index);
         }
 
+        for (int index = 50; index < 100; ++index)
+        {
+            System.out.println("Writing a block to volume 0, location " + index + "...");
+            random.nextBytes(block);
+            client.write(0, index, block);
+        }
+
+
         Thread.sleep(500);
 
         System.out.println("Deleting volume 0...");
 
-        //client.deleteVolume(0);
+        client.deleteVolume(0);
 
         Thread.sleep(100);
 
         System.out.println("Deleted.");
         System.out.println("Disconnecting from the coordinator...");
 
-        //client.disconnect();
+        client.disconnect();
 
-        //System.out.println("Disconnected. Now exiting.");
+        System.out.println("Disconnected. Now exiting.");
     }
 }
 
