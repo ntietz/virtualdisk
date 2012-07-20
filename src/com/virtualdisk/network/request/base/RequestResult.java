@@ -19,6 +19,11 @@ extends Sendable
         this.success = success;
     }
 
+    public void setRequestId(int requestId)
+    {
+        this.requestId = requestId;
+    }
+
     public int getRequestId()
     {
         return requestId;

@@ -62,7 +62,7 @@ extends SimpleChannelHandler
                 byte[] block = request.getBlock();
                 int requestId = coordinator.write(volumeId, logicalOffset, block);
 
-                SingletonCoordinator.registerCallback(requestId, event.getChannel());
+                SingletonCoordinator.registerCallback(requestId, request.getRequestId(), event.getChannel());
                 System.out.println("Registered callback for write request " + request.getRequestId()
                                  + " internal request id " + requestId);
                 } break;
@@ -73,7 +73,7 @@ extends SimpleChannelHandler
                 long logicalOffset = request.getLogicalOffset();
                 int requestId = coordinator.read(volumeId, logicalOffset);
 
-                SingletonCoordinator.registerCallback(requestId, event.getChannel());
+                SingletonCoordinator.registerCallback(requestId, request.getRequestId(), event.getChannel());
                 System.out.println("Registered callback for read request " + request.getRequestId());
                 } break;
 
@@ -82,7 +82,7 @@ extends SimpleChannelHandler
                 int volumeId = request.getVolumeId();
                 int requestId = coordinator.createVolume(volumeId);
 
-                SingletonCoordinator.registerCallback(requestId, event.getChannel());
+                SingletonCoordinator.registerCallback(requestId, request.getRequestId(), event.getChannel());
                 System.out.println("Registered callback for create request " + request.getRequestId());
                 } break;
 
@@ -91,7 +91,7 @@ extends SimpleChannelHandler
                 int volumeId = request.getVolumeId();
                 int requestId = coordinator.deleteVolume(volumeId);
 
-                SingletonCoordinator.registerCallback(requestId, event.getChannel());
+                SingletonCoordinator.registerCallback(requestId, request.getRequestId(), event.getChannel());
                 } break;
 
             default:

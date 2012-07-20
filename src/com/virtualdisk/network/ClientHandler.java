@@ -68,8 +68,8 @@ extends SimpleChannelHandler
             RequestResult result = (RequestResult) rawResult;
             int requestId = result.getRequestId();
             
-            client.setSuccess(requestId, result.isDone());
-            client.setFinished(requestId, result.wasSuccessful());
+            client.setSuccess(requestId, result.wasSuccessful());
+            client.setFinished(requestId, true);
         }
     }
 

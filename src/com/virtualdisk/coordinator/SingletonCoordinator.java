@@ -3,6 +3,7 @@ package com.virtualdisk.coordinator;
 import com.virtualdisk.network.request.*;
 import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.*;
+import com.virtualdisk.util.*;
 
 import com.google.common.collect.*;
 
@@ -46,7 +47,7 @@ public class SingletonCoordinator
     /**
      * A map which connects request ids to the channel id the result should be returned on.
      */
-    private static Map<Integer, Integer> requestCallbacks;
+    private static Map<Integer, IntegerPair> requestCallbacks;
 
     /**
      * The last client id which was assigned. This is used to allow unique client ids to be given when new channels are registered.
@@ -69,7 +70,7 @@ public class SingletonCoordinator
                                 , Map<Integer, Channel> channelMap
                                 )
     {
-        requestCallbacks = new HashMap<Integer, Integer>();
+        requestCallbacks = new HashMap();
 
         server = CoordinatorServer.getInstance(nodes, channelMap);
         coordinator = new Coordinator(blockSize, segmentSize, segmentGroupSize, quorumSize, nodes, server);
@@ -157,9 +158,9 @@ public class SingletonCoordinator
      * @param   requestId   the id of the request we are registering a callback for
      * @param   channel     the channel we want the result to be forwarded to
      */
-    public static void registerCallback(int requestId, Channel channel)
+    public static void registerCallback(int requestId, int clientRequestId, Channel channel)
     {
-        requestCallbacks.put(requestId, getClientId(channel));
+        requestCallbacks.put(requestId, new IntegerPair(clientRequestId, getClientId(channel)));
     }
 
     /**
@@ -170,7 +171,10 @@ public class SingletonCoordinator
     public static void sendToClient(int requestId, Sendable result)
     {
         // TODO: remove the callback after we've completed it
-        Integer clientId = requestCallbacks.get(requestId);
+        IntegerPair callbackPair = requestCallbacks.get(requestId);
+        Integer clientRequestId = callbackPair.first();
+        Integer clientId = callbackPair.second();
+        ((RequestResult)result).setRequestId(clientRequestId);
         if (clientId != null)
         {
             System.out.println("Writing to client " + clientId + ", request " + ((RequestResult)result).getRequestId());
