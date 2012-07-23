@@ -442,8 +442,8 @@ public class Coordinator
         }
         else
         {
-            List<DataNodeStatusPair> segmentGroupMemberPairs = Collections.synchronizedList(new ArrayList<DataNodeStatusPair>(segmentGroupSize));
-            List<DataNodeIdentifier> segmentGroupMembers = Collections.synchronizedList(new ArrayList<DataNodeIdentifier>(segmentGroupSize));
+            List<DataNodeStatusPair> segmentGroupMemberPairs = Collections.synchronizedList(new ArrayList<DataNodeStatusPair>());
+            List<DataNodeIdentifier> segmentGroupMembers = Collections.synchronizedList(new ArrayList<DataNodeIdentifier>());
 
             for (int index = 0; index < segmentGroupSize; ++index)
             {
