@@ -27,7 +27,7 @@ public class SegmentGroupAssignment
                 }
 
                 System.out.println("Generated " + numberOfNodes + " nodes.");
-                List<SegmentGroup> segmentGroups = generateSegmentGroups(segmentGroupSize, nodes);
+                List<SegmentGroup> segmentGroups = generateInitialSegmentGroups(segmentGroupSize, nodes);
                 System.out.println("Assigned " + segmentGroups.size() + " segment groups.");
                 printSegmentGroupAverageCount(nodes);
                 System.out.println();
@@ -35,7 +35,7 @@ public class SegmentGroupAssignment
         }
     }
 
-    public List<SegmentGroup> generateSegmentGroups(int segmentGroupSize, List<Node> nodes)
+    public List<SegmentGroup> generateInitialSegmentGroups(int segmentGroupSize, List<Node> nodes)
     {
         List<SegmentGroup> segmentGroups = new ArrayList();
 
@@ -111,6 +111,8 @@ public class SegmentGroupAssignment
         double average = numberOfGroups / nodes.size();
         System.out.println("Nodes have " + average + " groups (avg)");
     }
+
+
 
     public class SegmentGroup
     implements Comparable
