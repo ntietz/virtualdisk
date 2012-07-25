@@ -34,6 +34,11 @@ public class VolumeTable
         }
     }
 
+    public List<SegmentGroup> getAllSegmentGroups()
+    {
+        return new ArrayList(resolutionMap.values());
+    }
+
     public long getStartingSegment(long logicalOffset)
     {
         long segmentNumber = (logicalOffset / blocksPerSegment);

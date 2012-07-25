@@ -20,6 +20,18 @@ public class SegmentGroup
         return (start <= offset && offset <= stop);
     }
 
+    public boolean contains(DataNodeId node)
+    {
+        return nodes.contains(node);
+    }
+
+    public void replace(DataNodeId original, DataNodeId replacement)
+    {
+        int index = nodes.indexOf(original);
+        nodes.set(index, replacement);
+        // FIXME in real life, we would retain both nodes until the values are all copied over
+    }
+
     public List<DataNodeId> getNodes()
     {
         return nodes;

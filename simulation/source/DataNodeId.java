@@ -31,5 +31,11 @@ implements Comparable
         DataNodeId other = (DataNodeId) obj;
         return (getSegmentGroupMemberships() - other.getSegmentGroupMemberships());
     }
+
+    public boolean equals(Object obj)
+    {
+        DataNodeId other = (DataNodeId) obj;
+        return this.numericId == other.numericId;
+    }
 }
 
