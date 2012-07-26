@@ -22,6 +22,7 @@ public class Coordinator
             coordinator.write(index);
         }
 
+        System.out.println();
         for (DataNodeId each : nodes)
         {
             System.out.println(each.getNumericId() + ": " + each.getSegmentGroupMemberships() + " segment groups");
@@ -29,6 +30,7 @@ public class Coordinator
 
         coordinator.removeDataNode(nodes.get(2));
 
+        System.out.println();
         for (DataNodeId each : nodes)
         {
             System.out.println(each.getNumericId() + ": " + each.getSegmentGroupMemberships() + " segment groups");
@@ -36,6 +38,7 @@ public class Coordinator
 
         coordinator.removeDataNode(nodes.get(6));
 
+        System.out.println();
         for (DataNodeId each : nodes)
         {
             System.out.println(each.getNumericId() + ": " + each.getSegmentGroupMemberships() + " segment groups");
@@ -43,10 +46,42 @@ public class Coordinator
 
         coordinator.removeDataNode(nodes.get(5));
 
+        System.out.println();
         for (DataNodeId each : nodes)
         {
             System.out.println(each.getNumericId() + ": " + each.getSegmentGroupMemberships() + " segment groups");
         }
+
+        DataNodeId revivedNode = new DataNodeId(numberOfNodes + 1);
+        nodes.add(revivedNode);
+        coordinator.addDataNode(revivedNode);
+
+        System.out.println();
+        for (DataNodeId each : nodes)
+        {
+            System.out.println(each.getNumericId() + ": " + each.getSegmentGroupMemberships() + " segment groups");
+        }
+
+        revivedNode = new DataNodeId(numberOfNodes + 10);
+        nodes.add(revivedNode);
+        coordinator.addDataNode(revivedNode);
+
+        System.out.println();
+        for (DataNodeId each : nodes)
+        {
+            System.out.println(each.getNumericId() + ": " + each.getSegmentGroupMemberships() + " segment groups");
+        }
+
+        revivedNode = new DataNodeId(numberOfNodes + 13);
+        nodes.add(revivedNode);
+        coordinator.addDataNode(revivedNode);
+
+        System.out.println();
+        for (DataNodeId each : nodes)
+        {
+            System.out.println(each.getNumericId() + ": " + each.getSegmentGroupMemberships() + " segment groups");
+        }
+
 
     }
 
@@ -126,12 +161,60 @@ public class Coordinator
 
             DataNodeId lightest = nodeHeap.poll();
             each.replace(original, lightest);
-            lightest.updateSegmentGroupMemberships(1);
-            original.updateSegmentGroupMemberships(-1);
             nodeHeap.add(lightest);
         }
 
         nodes.remove(original);
+    }
+
+    public void addDataNode(DataNodeId newcomer)
+    {
+        int numberOfNodes = nodes.size() + 1;
+        int totalSegments = 0;
+
+        for (DataNodeId each : nodes)
+        {
+            totalSegments += each.getSegmentGroupMemberships();
+        }
+
+        int averageSegments = totalSegments / numberOfNodes;
+
+        while (!closeTo(newcomer.getSegmentGroupMemberships(), averageSegments))
+        {
+            PriorityQueue<DataNodeId> nodeHeap = new PriorityQueue(nodes.size(), new Comparator() {
+                public int compare(Object leftObj, Object rightObj) {
+                    DataNodeId left = (DataNodeId) leftObj;
+                    DataNodeId right = (DataNodeId) rightObj;
+                    return -1 * left.compareTo(right);
+                }
+            });
+
+            for (DataNodeId each : nodes)
+            {
+                nodeHeap.add(each);
+            }
+
+            DataNodeId loser = nodeHeap.poll();
+            SegmentGroup group = null;
+
+            for (SegmentGroup each : volumeTable.getAllSegmentGroups())
+            {
+                if (each.contains(loser) && !each.contains(newcomer))
+                {
+                    group = each;
+                    break;
+                }
+            }
+
+            group.replace(loser, newcomer);
+        }
+
+        nodes.add(newcomer);
+    }
+
+    private boolean closeTo(int value, int bound)
+    {
+        return (bound <= value) && (value <= bound+1);
     }
 
     public SegmentGroup generateSegmentGroup(long startingSegment)

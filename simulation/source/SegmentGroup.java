@@ -29,6 +29,8 @@ public class SegmentGroup
     {
         int index = nodes.indexOf(original);
         nodes.set(index, replacement);
+        original.updateSegmentGroupMemberships(-1);
+        replacement.updateSegmentGroupMemberships(1);
         // FIXME in real life, we would retain both nodes until the values are all copied over
     }
 
