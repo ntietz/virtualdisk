@@ -28,6 +28,7 @@ public class SegmentGroup
     public SegmentGroup(List<DataNodeIdentifier> members, long startingBlock, long stoppingBlock)
     {
         this.members = new ArrayList<DataNodeIdentifier>(members);
+
         this.startingBlock = startingBlock;
         this.stoppingBlock = stoppingBlock;
     }

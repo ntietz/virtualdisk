@@ -443,14 +443,14 @@ public class Coordinator
         }
         else
         {
-            List<DataNodeStatusPair> segmentGroupMemberPairs = Collections.synchronizedList(new ArrayList<DataNodeStatusPair>());
-            List<DataNodeIdentifier> segmentGroupMembers = Collections.synchronizedList(new ArrayList<DataNodeIdentifier>());
+            List<DataNodeStatusPair> segmentGroupMemberPairs = new ArrayList<DataNodeStatusPair>();
+            List<DataNodeIdentifier> segmentGroupMembers = new ArrayList<DataNodeIdentifier>();
 
             for (int index = 0; index < segmentGroupSize; ++index)
             {
                 DataNodeStatusPair current = datanodeStatuses.poll();
                 DataNodeStatus status = current.getStatus();
-                status.addStoredSegments(1);
+                status.addStoredSegments(1); // TODO FIXME Segment-group-size should be changed here, not just by 1.
 
                 segmentGroupMemberPairs.add(current);
                 segmentGroupMembers.add(current.getIdentifier());
@@ -458,7 +458,7 @@ public class Coordinator
 
             segmentgroup = volumeTable.makeSegmentGroup(segmentGroupMembers, logicalOffset);
 
-            for (int index = 0; index < segmentGroupSize; ++index)
+            for (DataNodeStatusPair each : segmentGroupMemberPairs)
             {
                 datanodeStatuses.add(segmentGroupMemberPairs.get(index));
             }

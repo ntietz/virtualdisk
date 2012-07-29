@@ -59,7 +59,7 @@ public class VolumeTable
     public long startOf(long logicalOffset)
     {
         long startingBlock = logicalOffset - (logicalOffset % (blocksPerSegment*segmentsPerSegmentGroup));
-        return startingBlock; // TODO actually set this
+        return startingBlock;
     }
 
     // the last included block
