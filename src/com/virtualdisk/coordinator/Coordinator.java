@@ -58,7 +58,8 @@ public class Coordinator
      * This will likely be converted to a custom class in the future; probably a segment group manager
      * along with an address resolver.
      */
-    private Map<Integer,Map<Long,SegmentGroup>> volumeTable;
+    private VolumeTable volumeTable;
+    //private Map<Integer,Map<Long,SegmentGroup>> volumeTable;
 
     /**
      * The completion map maps request ids onto booleans; true means the request finished, false means it did not.
@@ -95,7 +96,7 @@ public class Coordinator
      */
     public Coordinator( int blockSize
                       , int segmentSize
-                      , int segmentGroupSize
+                      , int segmentGroupSize // TODO FIXME FIXME CHANGE THIS!!!!
                       , int quorumSize
                       , List<DataNodeIdentifier> initialNodes
                       , NetworkServer server
@@ -119,7 +120,8 @@ public class Coordinator
         segmentGroupList = Collections.synchronizedList(new ArrayList<SegmentGroup>());
         // TODO initialize segment groups here.
 
-        volumeTable = new ConcurrentHashMap<Integer,Map<Long,SegmentGroup>>();
+        // TODO FIXME FIXME FIXME remove the magic number
+        volumeTable = new VolumeTable(blockSize, segmentSize, 1024, segmentGroupSize);
 
         requestCompletionMap = new ConcurrentHashMap<Integer, Boolean>();
         resultMap = new ConcurrentHashMap<Integer, RequestResult>();
@@ -212,8 +214,7 @@ public class Coordinator
         handler.setRequestId(id);
         handler.start();
 
-        Map<Long, SegmentGroup> volumeMap = new ConcurrentHashMap<Long, SegmentGroup>();
-        volumeTable.put(volumeId, volumeMap);
+        volumeTable.addVolume(volumeId);
 
         return id;
     }
@@ -284,7 +285,7 @@ public class Coordinator
         handler.setRequestId(id);
         handler.start();
 
-        volumeTable.remove(volumeId);
+        volumeTable.deleteVolume(volumeId);
 
         return id;
     }
@@ -415,7 +416,7 @@ public class Coordinator
      */
     private SegmentGroup getSegmentGroup(int volumeId, long logicalOffset)
     {
-        SegmentGroup segmentgroup = volumeTable.get(volumeId).get(logicalOffset);
+        SegmentGroup segmentgroup = volumeTable.getSegmentGroup(volumeId, logicalOffset);
 
         if (segmentgroup == null)
         {
@@ -434,7 +435,7 @@ public class Coordinator
      */
     private synchronized SegmentGroup assignSegmentGroup(int volumeId, long logicalOffset)
     {
-        SegmentGroup segmentgroup = volumeTable.get(volumeId).get(logicalOffset);
+        SegmentGroup segmentgroup = volumeTable.getSegmentGroup(volumeId, logicalOffset);
 
         if (segmentgroup != null)
         {
@@ -455,14 +456,14 @@ public class Coordinator
                 segmentGroupMembers.add(current.getIdentifier());
             }
 
-            segmentgroup = new SegmentGroup(segmentGroupMembers);
+            segmentgroup = volumeTable.makeSegmentGroup(segmentGroupMembers, logicalOffset);
 
             for (int index = 0; index < segmentGroupSize; ++index)
             {
                 datanodeStatuses.add(segmentGroupMemberPairs.get(index));
             }
 
-            volumeTable.get(volumeId).put(logicalOffset, segmentgroup);
+            volumeTable.setSegmentGroup(volumeId, logicalOffset, segmentgroup);
 
             return segmentgroup;
         }

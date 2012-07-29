@@ -16,13 +16,20 @@ public class SegmentGroup
      */
     private List<DataNodeIdentifier> members;
 
+    //TODO new line
+    private long startingBlock;
+    private long stoppingBlock;
+
     /**
      * Standard constructor.
      * @param   members the members of the segment group
+     * TODO update this
      */
-    public SegmentGroup(List<DataNodeIdentifier> members)
+    public SegmentGroup(List<DataNodeIdentifier> members, long startingBlock, long stoppingBlock)
     {
         this.members = new ArrayList<DataNodeIdentifier>(members);
+        this.startingBlock = startingBlock;
+        this.stoppingBlock = stoppingBlock;
     }
 
     /**
@@ -33,6 +40,21 @@ public class SegmentGroup
     public List<DataNodeIdentifier> getMembers()
     {
         return members;
+    }
+
+    public long getStartingBlock()
+    {
+        return startingBlock;
+    }
+
+    public long getStoppingBlock()
+    {
+        return stoppingBlock;
+    }
+
+    public boolean contains(long logicalOffset)
+    {
+        return (startingBlock <= logicalOffset) && (logicalOffset <= stoppingBlock);
     }
 
     /**
