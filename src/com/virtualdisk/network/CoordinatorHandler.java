@@ -105,6 +105,22 @@ extends SimpleChannelHandler
                 channel.write(identity);
                 } break;
 
+            case identifyRequestResult: {
+                IdentifyRequestResult identifyResult = (IdentifyRequestResult) result;
+
+                if (identifyResult.getType() == IdentifyRequestResult.CLIENT)
+                {
+                    Channel clientChannel = event.getChannel();
+                    SingletonCoordinator.registerNewClient(clientChannel);
+                }
+                else if (identifyResult.getType() == IdentifyRequestResult.DATANODE)
+                {
+                    Channel datanodeChannel = event.getChannel();
+                    SingletonCoordinator.registerNewDataNode(datanodeChannel);
+                }
+
+                } break;
+
 
             default:
                 break;
@@ -123,7 +139,8 @@ extends SimpleChannelHandler
                                 )
     {
         Channel clientChannel = event.getChannel();
-        SingletonCoordinator.registerNewClient(clientChannel);
+        IdentifyRequest request = new IdentifyRequest(0);
+        clientChannel.write(request);
     }
 
     /**

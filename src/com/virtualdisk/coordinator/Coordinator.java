@@ -402,13 +402,39 @@ public class Coordinator
     // TODO: IMPLEMENT LATER
     public boolean addDataNode(DataNodeIdentifier node)
     {
+        //attachDataNode(node);
+        // reconfiguration... 
         return false;
     }
 
     // TODO: IMPLEMENT LATER
     public boolean removeDataNode(DataNodeIdentifier node)
     {
+        //detachDataNode(node);
+        // reconfiguration... 
         return false;
+    }
+
+    private void attachDataNode(DataNodeIdentifier node)
+    {
+        datanodes.add(node);
+
+        DataNodeStatus status = new DataNodeStatus(blockSize, segmentSize);
+        datanodeStatuses.put(new DataNodeStatusPair(node, status));
+    }
+
+    private void detachDataNode(DataNodeIdentifier node)
+    {
+        datanodes.remove(node);
+
+        for (DataNodeStatusPair each : datanodeStatuses)
+        {
+            if (each.getIdentifier().equals(node))
+            {
+                datanodeStatuses.remove(each);
+                break;
+            }
+        }
     }
 
     /**

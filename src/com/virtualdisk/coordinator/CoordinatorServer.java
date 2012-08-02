@@ -517,9 +517,14 @@ extends NetworkServer
      * Attaches a new datanode to this coordinator.
      * @return  whether or not the attachment succeeded
      */
-    public boolean attachDataNode(DataNodeIdentifier node)
+    public boolean attachDataNode(DataNodeIdentifier node, Channel channel)
     {
-        return false;
+        int datanodeId = node.getNodeId();
+
+        allNodes.add(node);
+        channelMap.put(datanodeId, channel);
+
+        return true;
     }
 
     /**
@@ -528,7 +533,12 @@ extends NetworkServer
      */
     public boolean detachDataNode(DataNodeIdentifier node)
     {
-        return false;
+        int datanodeId = node.getNodeId();
+
+        allNodes.remove(node);
+        channelMap.remove(datanodeId);
+
+        return true;
     }
 
     /**

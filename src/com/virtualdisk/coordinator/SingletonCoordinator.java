@@ -131,6 +131,17 @@ public class SingletonCoordinator
         clientRegistry.put(client, lastClientId);
     }
 
+    public static void registerNewDataNode(Channel channel)
+    {
+        ++lastClientId;
+
+        DataNodeIdentifier identifier = new DataNodeIdentifier(lastClientId, "", 0); // TODO FIXME find this info
+
+        server.attachDataNode(identifier, channel);
+
+        // TODO what else do we do here...?
+    }
+
     /**
      * Gets the client id associated with a given channel.
      * @param   client  the channel we wish to resolve to an id

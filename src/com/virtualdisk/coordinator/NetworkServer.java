@@ -5,6 +5,8 @@ import com.virtualdisk.network.request.*;
 import com.virtualdisk.network.util.*;
 import com.virtualdisk.network.request.WriteRequestResult;
 
+import org.jboss.netty.channel.*;
+
 import java.util.*;
 
 /**
@@ -172,7 +174,7 @@ public abstract class NetworkServer
      * @param   node    the datanode to try to attach
      * @return  true if attaching succeeds, false otherwise
      */
-    public abstract boolean attachDataNode(DataNodeIdentifier node);
+    public abstract boolean attachDataNode(DataNodeIdentifier node, Channel channel);
 
     /**
      * This method detaches a datanode from the server.
