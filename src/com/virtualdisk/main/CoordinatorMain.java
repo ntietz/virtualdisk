@@ -63,13 +63,15 @@ public class CoordinatorMain
                                          )
     {
 
-        ChannelFactory channelFactory = new NioClientSocketChannelFactory
+        ChannelFactory channelFactory = new NioClientSocketChannelFactory // TODO FIXME This needs to be set in the server so that it can be reused later
             ( Executors.newCachedThreadPool()
             , Executors.newCachedThreadPool()
             );
 
-        ClientBootstrap bootstrap = new ClientBootstrap(channelFactory);
+        ClientBootstrap bootstrap = new ClientBootstrap(channelFactory); // TODO FIXME This needs to be stored in the server so it can be reused later
         bootstrap.setPipelineFactory(new CoordinatorPipelineFactory());
+
+        // TODO FIXME we also need to set the last-used node id in the server so it can be reused later
 
         List<DataNodeIdentifier> connectedNodes = new ArrayList<DataNodeIdentifier>();
         Map<Integer, Channel> channelMap = new HashMap<Integer, Channel>();
@@ -99,6 +101,7 @@ public class CoordinatorMain
                                   , quorumSize
                                   , connectedNodes
                                   , channelMap
+                                  , bootstrap
                                   );
     }
 

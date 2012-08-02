@@ -9,6 +9,7 @@ import org.jboss.netty.bootstrap.*;
 import org.jboss.netty.channel.*;
 import org.jboss.netty.channel.socket.nio.*;
 
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -47,6 +48,8 @@ extends NetworkServer
      */
     private Map<Integer, List<RequestFuture>> resultMap;
 
+    private ClientBootstrap bootstrap;
+
     /**
      * Private constructor to preserve singleton property.
      * @param   allNodes    the list of all nodes the coordinator is initially connected to
@@ -54,12 +57,14 @@ extends NetworkServer
      */
     private CoordinatorServer( List<DataNodeIdentifier> allNodes
                              , Map<Integer, Channel> channelMap
+                             , ClientBootstrap bootstrap
                              )
     {
         lastAssignedId = 0;
 
         this.allNodes = allNodes;
         this.channelMap = channelMap;
+        this.bootstrap = bootstrap;
         resultMap = new ConcurrentHashMap<Integer, List<RequestFuture>>();
 
         instance = this;
@@ -72,11 +77,12 @@ extends NetworkServer
      */
     public static CoordinatorServer getInstance( List<DataNodeIdentifier> allNodes
                                                , Map<Integer, Channel> channelMap
+                                               , ClientBootstrap bootstrap
                                                )
     {
         if (instance == null)
         {
-            instance = new CoordinatorServer(allNodes, channelMap);
+            instance = new CoordinatorServer(allNodes, channelMap, bootstrap);
         }
         return instance;
     }
@@ -517,9 +523,15 @@ extends NetworkServer
      * Attaches a new datanode to this coordinator.
      * @return  whether or not the attachment succeeded
      */
-    public boolean attachDataNode(DataNodeIdentifier node, Channel channel)
+    public boolean attachDataNode(DataNodeIdentifier node)
     {
         int datanodeId = node.getNodeId();
+        String host = node.getNodeAddress();
+        int port = node.getPort();
+
+        ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
+        future.awaitUninterruptibly();
+        Channel channel = future.getChannel();
 
         allNodes.add(node);
         channelMap.put(datanodeId, channel);

@@ -113,11 +113,6 @@ extends SimpleChannelHandler
                     Channel clientChannel = event.getChannel();
                     SingletonCoordinator.registerNewClient(clientChannel);
                 }
-                else if (identifyResult.getType() == IdentifyRequestResult.DATANODE)
-                {
-                    Channel datanodeChannel = event.getChannel();
-                    SingletonCoordinator.registerNewDataNode(datanodeChannel);
-                }
 
                 } break;
 

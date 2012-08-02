@@ -1,0 +1,13 @@
+package com.virtualdisk.network.request;
+
+import com.virtualdisk.network.request.base.*;
+import com.virtualdisk.network.util.Sendable.*;
+
+public abstract class AttachDataNodeRequest
+extends Request
+{
+    public AttachDataNodeRequest(int requestId)
+    {
+        super(requestId);
+    }
+}

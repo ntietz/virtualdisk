@@ -7,6 +7,7 @@ import com.virtualdisk.util.*;
 
 import com.google.common.collect.*;
 
+import org.jboss.netty.bootstrap.*;
 import org.jboss.netty.channel.*;
 
 import java.util.*;
@@ -61,11 +62,12 @@ public class SingletonCoordinator
                                 , int quorumSize
                                 , List<DataNodeIdentifier> nodes
                                 , Map<Integer, Channel> channelMap
+                                , ClientBootstrap bootstrap
                                 )
     {
         requestCallbacks = new HashMap();
 
-        server = CoordinatorServer.getInstance(nodes, channelMap);
+        server = CoordinatorServer.getInstance(nodes, channelMap, bootstrap); // TODO FIXME this needs to also contain the last-used-nodeid
         coordinator = new Coordinator(blockSize, segmentSize, segmentsPerSegmentGroup, nodesPerSegmentGroup, quorumSize, nodes, server);
     }
 
@@ -102,6 +104,7 @@ public class SingletonCoordinator
                             , int quorumSize
                             , List<DataNodeIdentifier> nodes
                             , Map<Integer, Channel> channelMap
+                            , ClientBootstrap bootstrap
                             )
     {
         if (singleton == null)
@@ -113,6 +116,7 @@ public class SingletonCoordinator
                                                 , quorumSize
                                                 , nodes
                                                 , channelMap
+                                                , bootstrap
                                                 );
         }
     }
@@ -129,17 +133,6 @@ public class SingletonCoordinator
             System.out.println("ruh-roh");
         }
         clientRegistry.put(client, lastClientId);
-    }
-
-    public static void registerNewDataNode(Channel channel)
-    {
-        ++lastClientId;
-
-        DataNodeIdentifier identifier = new DataNodeIdentifier(lastClientId, "", 0); // TODO FIXME find this info
-
-        server.attachDataNode(identifier, channel);
-
-        // TODO what else do we do here...?
     }
 
     /**

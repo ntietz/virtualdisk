@@ -402,16 +402,40 @@ public class Coordinator
     // TODO: IMPLEMENT LATER
     public boolean addDataNode(DataNodeIdentifier node)
     {
-        //attachDataNode(node);
-        // reconfiguration... 
+        /*
+            wait until no other reconfiguration attempts are in progress
+
+            server.attachdatanode(node)
+
+            while not balanced:
+                pick a segment group to put the node in / node to kick out
+                construct the reconfiguration handler and run it
+
+            wait until all reconfiguration has finished
+            attachDataNode(node)
+
+            signal that the reconfiguration attempt is no longer in progress
+        */
         return false;
     }
 
     // TODO: IMPLEMENT LATER
     public boolean removeDataNode(DataNodeIdentifier node)
     {
-        //detachDataNode(node);
-        // reconfiguration... 
+        /*
+            wait until no other reconfiguration attempts are in progress
+
+            server.detachnode(node)
+
+            for each affected segment group:
+                pick a new node to put into the group
+                construct the reconfiguration handler and run it
+
+            wait until all reconfiguration has finished
+            detachDataNode(node)
+
+            signal that the reconfiguration attempt is no longer in progress
+        */
         return false;
     }
 

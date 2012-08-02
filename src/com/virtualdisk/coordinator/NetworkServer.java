@@ -169,12 +169,12 @@ public abstract class NetworkServer
     public abstract List<DataNodeIdentifier> getDataNodes();
 
     /**
-     * This method attaches a new datanode to the server.
+     * This method attaches (and connects to) a new datanode to the server.
      * This method must be implemented.
      * @param   node    the datanode to try to attach
      * @return  true if attaching succeeds, false otherwise
      */
-    public abstract boolean attachDataNode(DataNodeIdentifier node, Channel channel);
+    public abstract boolean attachDataNode(DataNodeIdentifier node);
 
     /**
      * This method detaches a datanode from the server.
