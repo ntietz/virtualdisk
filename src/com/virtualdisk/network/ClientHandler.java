@@ -39,6 +39,16 @@ extends SimpleChannelHandler
 
         switch (type)
         {
+            case identifyRequest: {
+                IdentifyRequest request = (IdentifyRequest) rawResult;
+
+                int requestId = request.getRequestId();
+                
+                Channel coordinatorChannel = event.getChannel();
+                IdentifyRequestResult result = new IdentifyRequestResult(requestId, IdentifyRequestResult.CLIENT);
+                coordinatorChannel.write(result);
+                } break;
+
             case orderRequestResult: {
                 } break;
 

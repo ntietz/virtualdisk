@@ -95,6 +95,17 @@ extends SimpleChannelHandler
                 SingletonCoordinator.registerCallback(requestId, request.getRequestId(), event.getChannel());
                 } break;
 
+            case identifyRequest: {
+                IdentifyRequest request = (IdentifyRequest) result;
+
+                int requestId = request.getRequestId();
+                
+                Channel channel = event.getChannel();
+                IdentifyRequestResult identity = new IdentifyRequestResult(requestId, IdentifyRequestResult.COORDINATOR);
+                channel.write(identity);
+                } break;
+
+
             default:
                 break;
         }

@@ -60,6 +60,8 @@ public abstract class Sendable
       , deleteVolumeRequestResult(13)
       , unsetSegmentRequest(14)
       , unsetSegmentRequestResult(15)
+      , identifyRequest(16)
+      , identifyRequestResult(17)
       ;
           
         private byte type;

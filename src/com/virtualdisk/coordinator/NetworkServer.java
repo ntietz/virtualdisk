@@ -92,6 +92,8 @@ public abstract class NetworkServer
      * @return  the identifier of the request
      */
     public abstract int issueVolumeExistsRequest(int volumeId);
+
+    public abstract int issueUnsetSegmentRequest(List<DataNodeIdentifier> targets, int volumeId, long startingOffset, long stoppingOffset);
     
     /**
      * This method should return a list of all the results (in progress or complete) from the order request.
@@ -140,6 +142,8 @@ public abstract class NetworkServer
      * @return  the results of the request
      */
     public abstract List<VolumeExistsRequestResult> getVolumeExistsRequestResults(int requestId);
+
+    public abstract List<UnsetSegmentRequestResult> getUnsetSegmentRequestResults(int requestId);
 
     /**
      * Sets the future results for a request.

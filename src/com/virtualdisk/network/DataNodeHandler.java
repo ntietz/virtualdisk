@@ -175,6 +175,16 @@ extends SimpleChannelHandler
                 coordinatorChannel.write(result);
                 } break;
 
+            case identifyRequest: {
+                IdentifyRequest request = (IdentifyRequest) rawRequest;
+
+                int requestId = request.getRequestId();
+                
+                Channel coordinatorChannel = event.getChannel();
+                IdentifyRequestResult result = new IdentifyRequestResult(requestId, IdentifyRequestResult.DATANODE);
+                coordinatorChannel.write(result);
+                } break;
+
             default:
                 break;
         }

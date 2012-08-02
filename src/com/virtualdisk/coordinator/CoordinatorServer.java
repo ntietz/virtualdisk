@@ -286,6 +286,22 @@ extends NetworkServer
         return id;
     }
 
+    public int issueUnsetSegmentRequest(List<DataNodeIdentifier> targets, int volumeId, long startingOffset, long stoppingOffset)
+    {
+        int id = generateNewRequestId();
+
+        UnsetSegmentRequest request = new UnsetSegmentRequest(id, volumeId, startingOffset, stoppingOffset);
+
+        for (DataNodeIdentifier eachTarget : targets)
+        {
+            int targetId = eachTarget.getNodeId();
+            Channel channel = channelMap.get(targetId);
+            channel.write(request);
+        }
+
+        return id;
+    }
+
     /**
      * Returns all the order request results for the supplied request id.
      * This method converts the request futures into request results.
@@ -448,6 +464,26 @@ extends NetworkServer
         }
     }
 
+    public List<UnsetSegmentRequestResult> getUnsetSegmentRequestResults(int requestId)
+    {
+        List<RequestFuture> futures = resultMap.get(requestId);
+        List<UnsetSegmentRequestResult> results = new ArrayList<UnsetSegmentRequestResult>();
+
+        if (futures == null)
+        {
+            return results;
+        }
+        else
+        {
+            for (RequestFuture each : futures)
+            {
+                results.add((UnsetSegmentRequestResult)each.getResult());
+            }
+
+            return results;
+        }
+    }
+
     /**
      * Sets the result futures.
      * @param   requestId   the request's id
@@ -505,4 +541,3 @@ extends NetworkServer
         return lastAssignedId;
     }
 }
-
