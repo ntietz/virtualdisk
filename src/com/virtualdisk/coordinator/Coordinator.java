@@ -333,10 +333,15 @@ public class Coordinator
      */
     public int write(int volumeId, long logicalOffset, byte[] block)
     {
+        SegmentGroup segmentGroup = getSegmentGroup(volumeId, logicalOffset);
+        return writeWithTarget(segmentGroup, volumeId, logicalOffset, block);
+    }
+
+    public int writeWithTarget(SegmentGroup targetGroup, int volumeId, long logicalOffset, byte[] block)
+    {
         int id = generateNewRequestId();
 
-        SegmentGroup segmentGroup = getSegmentGroup(volumeId, logicalOffset);
-        WriteHandler handler = new WriteHandler(volumeId, logicalOffset, block, segmentGroup, this);
+        WriteHandler handler = new WriteHandler(volumeId, logicalOffset, block, targetGroup, this);
         handler.setRequestId(id);
         handler.start();
 

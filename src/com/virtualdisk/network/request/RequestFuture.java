@@ -107,6 +107,10 @@ public class RequestFuture
                 case deleteVolumeRequestResult:
                     return new DeleteVolumeRequestResult(requestId, done, false);
 
+                case unsetSegmentRequest:
+                case unsetSegmentRequestResult:
+                    return new UnsetSegmentRequestResult(requestId, done, false);
+
                 default:
                     return null;
             }
