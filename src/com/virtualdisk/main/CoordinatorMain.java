@@ -16,12 +16,14 @@ public class CoordinatorMain
 {
     private static final int DEFAULT_BLOCK_SIZE = 1024;
     private static final int DEFAULT_SEGMENT_SIZE = 64;
-    private static final int DEFAULT_SEGMENT_GROUP_SIZE = 3;
+    private static final int DEFAULT_SEGMENTS_PER_SEGMENTGROUP = 10;
+    private static final int DEFAULT_NODES_PER_SEGMENTGROUP = 3;
     private static final int DEFAULT_QUORUM_SIZE = 2;
 
     private static int blockSize = DEFAULT_BLOCK_SIZE;
     private static int segmentSize = DEFAULT_SEGMENT_SIZE;
-    private static int segmentGroupSize = DEFAULT_SEGMENT_GROUP_SIZE;
+    private static int segmentsPerSegmentGroup = DEFAULT_SEGMENTS_PER_SEGMENTGROUP;
+    private static int nodesPerSegmentGroup = DEFAULT_NODES_PER_SEGMENTGROUP;
     private static int quorumSize = DEFAULT_QUORUM_SIZE;
 
     public static void main(String... args)
@@ -92,7 +94,8 @@ public class CoordinatorMain
 
         SingletonCoordinator.setup( blockSize
                                   , segmentSize
-                                  , segmentGroupSize
+                                  , segmentsPerSegmentGroup
+                                  , nodesPerSegmentGroup
                                   , quorumSize
                                   , connectedNodes
                                   , channelMap

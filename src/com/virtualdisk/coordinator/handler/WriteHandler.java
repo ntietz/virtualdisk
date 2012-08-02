@@ -77,7 +77,7 @@ extends Handler
                 waiting = false;
                 success = true;
             }
-            else if (completed == coordinator.getSegmentGroupSize())
+            else if (completed == coordinator.getNodesPerSegmentGroup())
             {
                 waiting = false;
                 success = false;
@@ -124,7 +124,7 @@ extends Handler
                 waiting = false;
                 success = true;
             }
-            else if (completed == coordinator.getSegmentGroupSize())
+            else if (completed == coordinator.getNodesPerSegmentGroup())
             {
                 waiting = false;
                 success = false;

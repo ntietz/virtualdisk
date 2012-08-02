@@ -16,7 +16,6 @@ public class SegmentGroup
      */
     private List<DataNodeIdentifier> members;
 
-    //TODO new line
     private long startingBlock;
     private long stoppingBlock;
 

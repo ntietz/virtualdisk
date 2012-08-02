@@ -54,17 +54,10 @@ public class SingletonCoordinator
      */
     private static int lastClientId = 0;
 
-    /**
-     * Standard constructor.
-     * @param   blockSize           the block size in bytes for the system
-     * @param   segmentSize         the segment size in blocks for the system
-     * @param   segmentGroupSize    the segment group size in nodes
-     * @param   quorumSize          the number of nodes needed for a quorum
-     * @param   nodes               the initial nodes in the cluster
-     */
     private SingletonCoordinator( int blockSize
                                 , int segmentSize
-                                , int segmentGroupSize
+                                , int segmentsPerSegmentGroup
+                                , int nodesPerSegmentGroup
                                 , int quorumSize
                                 , List<DataNodeIdentifier> nodes
                                 , Map<Integer, Channel> channelMap
@@ -73,7 +66,7 @@ public class SingletonCoordinator
         requestCallbacks = new HashMap();
 
         server = CoordinatorServer.getInstance(nodes, channelMap);
-        coordinator = new Coordinator(blockSize, segmentSize, segmentGroupSize, quorumSize, nodes, server);
+        coordinator = new Coordinator(blockSize, segmentSize, segmentsPerSegmentGroup, nodesPerSegmentGroup, quorumSize, nodes, server);
     }
 
     /**
@@ -104,7 +97,8 @@ public class SingletonCoordinator
      */
     public static void setup( int blockSize
                             , int segmentSize
-                            , int segmentGroupSize
+                            , int segmentsPerSegmentGroup
+                            , int nodesPerSegmentGroup
                             , int quorumSize
                             , List<DataNodeIdentifier> nodes
                             , Map<Integer, Channel> channelMap
@@ -114,7 +108,8 @@ public class SingletonCoordinator
         {
             singleton = new SingletonCoordinator( blockSize
                                                 , segmentSize
-                                                , segmentGroupSize
+                                                , segmentsPerSegmentGroup
+                                                , nodesPerSegmentGroup
                                                 , quorumSize
                                                 , nodes
                                                 , channelMap

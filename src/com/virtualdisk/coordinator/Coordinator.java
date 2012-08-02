@@ -27,7 +27,8 @@ public class Coordinator
     /**
      * The segment group size (in datanodes) for the system.
      */
-    private int segmentGroupSize;
+    private int nodesPerSegmentGroup;
+    private int segmentsPerSegmentGroup;
 
     /**
      * The quorum size for the system; a quorum is the minimum number of nodes you need to reach a consensus.
@@ -93,10 +94,12 @@ public class Coordinator
      * @param   quorumSize          the quorum size for the system
      * @param   initialNodes        the first nodes to add to the system and connect to
      * @param   server              the server to be used for network requests
+     * TODO FIXME fix the javadoc
      */
     public Coordinator( int blockSize
                       , int segmentSize
-                      , int segmentGroupSize // TODO FIXME FIXME CHANGE THIS!!!!
+                      , int segmentsPerSegmentGroup
+                      , int nodesPerSegmentGroup
                       , int quorumSize
                       , List<DataNodeIdentifier> initialNodes
                       , NetworkServer server
@@ -104,7 +107,8 @@ public class Coordinator
     {
         this.blockSize = blockSize;
         this.segmentSize = segmentSize;
-        this.segmentGroupSize = segmentGroupSize;
+        this.segmentsPerSegmentGroup = segmentsPerSegmentGroup;
+        this.nodesPerSegmentGroup = nodesPerSegmentGroup;
         this.quorumSize = quorumSize;
         this.server = server;
         datanodes = Collections.synchronizedList(new ArrayList<DataNodeIdentifier>(initialNodes));
@@ -120,8 +124,7 @@ public class Coordinator
         segmentGroupList = Collections.synchronizedList(new ArrayList<SegmentGroup>());
         // TODO initialize segment groups here.
 
-        // TODO FIXME FIXME FIXME remove the magic number
-        volumeTable = new VolumeTable(blockSize, segmentSize, 1024, segmentGroupSize);
+        volumeTable = new VolumeTable(blockSize, segmentSize, segmentsPerSegmentGroup, nodesPerSegmentGroup);
 
         requestCompletionMap = new ConcurrentHashMap<Integer, Boolean>();
         resultMap = new ConcurrentHashMap<Integer, RequestResult>();
@@ -145,13 +148,14 @@ public class Coordinator
         return segmentSize;
     }
 
-    /**
-     * Getter for segmentGroupSize.
-     * @return  the segment group size in number of nodes
-     */
-    public int getSegmentGroupSize()
+    public int getNodesPerSegmentGroup()
     {
-        return segmentGroupSize;
+        return nodesPerSegmentGroup;
+    }
+
+    public int getSegmentsPerSegmentGroup()
+    {
+        return segmentsPerSegmentGroup;
     }
 
     /**
@@ -446,11 +450,11 @@ public class Coordinator
             List<DataNodeStatusPair> segmentGroupMemberPairs = new ArrayList<DataNodeStatusPair>();
             List<DataNodeIdentifier> segmentGroupMembers = new ArrayList<DataNodeIdentifier>();
 
-            for (int index = 0; index < segmentGroupSize; ++index)
+            for (int index = 0; index < nodesPerSegmentGroup; ++index)
             {
                 DataNodeStatusPair current = datanodeStatuses.poll();
                 DataNodeStatus status = current.getStatus();
-                status.addStoredSegments(1); // TODO FIXME Segment-group-size should be changed here, not just by 1.
+                status.addStoredSegments(segmentsPerSegmentGroup);
 
                 segmentGroupMemberPairs.add(current);
                 segmentGroupMembers.add(current.getIdentifier());
@@ -458,7 +462,7 @@ public class Coordinator
 
             segmentgroup = volumeTable.makeSegmentGroup(segmentGroupMembers, logicalOffset);
 
-            for (DataNodeStatusPair each : segmentGroupMemberPairs)
+            for (int index = 0; index < nodesPerSegmentGroup; ++index)
             {
                 datanodeStatuses.add(segmentGroupMemberPairs.get(index));
             }
