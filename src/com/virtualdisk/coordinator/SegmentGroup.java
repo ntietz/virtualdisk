@@ -67,5 +67,10 @@ public class SegmentGroup
         return members.contains(node);
     }
 
+    public void replace(DataNodeIdentifier oldNode, DataNodeIdentifier replacementNode)
+    {
+        int index = members.indexOf(oldNode);
+        members.set(index, replacementNode);
+    }
 }
 

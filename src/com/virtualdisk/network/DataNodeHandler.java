@@ -158,6 +158,23 @@ extends SimpleChannelHandler
                 coordinatorChannel.write(result);
                 } break;
 
+            case unsetSegmentRequest: {
+                UnsetSegmentRequest request = (UnsetSegmentRequest) rawRequest;
+                int volumeId = request.getVolumeId();
+
+                int requestId = request.getRequestId();
+                boolean done = true;
+                boolean success = true;
+                for (long logicalOffset = request.getStartingOffset(); logicalOffset <= request.getStoppingOffset(); ++logicalOffset)
+                {
+                    dataNode.unset(volumeId, logicalOffset);
+                }
+
+                Channel coordinatorChannel = event.getChannel();
+                UnsetSegmentRequestResult result = new UnsetSegmentRequestResult(requestId, done, success);
+                coordinatorChannel.write(result);
+                } break;
+
             default:
                 break;
         }

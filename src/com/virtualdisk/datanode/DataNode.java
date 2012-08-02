@@ -296,6 +296,16 @@ public class DataNode
         volumeTable.setPhysicalLocation(volumeId, logicalOffset, location);
     }
 
+    public void unset(int volumeId, long logicalOffset)
+    {
+        orderTimestampTable.removeTimestamp(volumeId, logicalOffset);
+        valueTimestampTable.removeTimestamp(volumeId, logicalOffset);
+
+        DriveOffsetPair physicalPair = volumeTable.getPhysicalLocation(volumeId, logicalOffset);
+        freeSpaceTable.release(physicalPair);
+        volumeTable.unsetPhysicalLocation(volumeId, logicalOffset);
+    }
+
     /**
      * Returns the total free space for this data node.
      * @return  the total free space for this node

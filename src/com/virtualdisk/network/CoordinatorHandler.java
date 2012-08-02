@@ -52,6 +52,7 @@ extends SimpleChannelHandler
             case volumeExistsRequestResult:
             case createVolumeRequestResult:
             case deleteVolumeRequestResult:
+            case unsetSegmentRequestResult:
                 SingletonCoordinator.setResult(((RequestResult)result).getRequestId(), (RequestResult)result);
                 break;
 
