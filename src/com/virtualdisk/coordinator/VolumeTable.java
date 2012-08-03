@@ -56,6 +56,41 @@ public class VolumeTable
         table.get(volumeId).remove(startingSegment);
     }
 
+    public List<SegmentGroup> getAllSegmentGroups()
+    {
+        List<SegmentGroup> segmentGroups = new ArrayList<SegmentGroup>();
+
+        for (Integer eachKey : table.keySet())
+        {
+            Map<Long, SegmentGroup> segmentGroupMap = table.get(eachKey);
+            for (SegmentGroup eachGroup : segmentGroupMap.values())
+            {
+                segmentGroups.add(eachGroup);
+            }
+        }
+
+        return segmentGroups;
+    }
+
+    public List<SegmentGroup> getAllSegmentGroupsContaining(DataNodeIdentifier node)
+    {
+        List<SegmentGroup> segmentGroups = new ArrayList<SegmentGroup>();
+
+        for (Integer eachKey : table.keySet())
+        {
+            Map<Long, SegmentGroup> segmentGroupMap = table.get(eachKey);
+            for (SegmentGroup eachGroup : segmentGroupMap.values())
+            {
+                if (eachGroup.isMember(node))
+                {
+                    segmentGroups.add(eachGroup);
+                }
+            }
+        }
+
+        return segmentGroups;
+    }
+
     public long startOf(long logicalOffset)
     {
         long startingBlock = logicalOffset - (logicalOffset % (blocksPerSegment*segmentsPerSegmentGroup));
@@ -68,9 +103,9 @@ public class VolumeTable
         return startOf(logicalOffset) + blocksPerSegment*segmentsPerSegmentGroup - 1;
     }
 
-    public SegmentGroup makeSegmentGroup(List<DataNodeIdentifier> members, long logicalOffset)
+    public SegmentGroup makeSegmentGroup(List<DataNodeIdentifier> members, int volumeId, long logicalOffset)
     {
-        return new SegmentGroup(members, startOf(logicalOffset), endOf(logicalOffset));
+        return new SegmentGroup(members, volumeId, startOf(logicalOffset), endOf(logicalOffset));
     }
 
 }

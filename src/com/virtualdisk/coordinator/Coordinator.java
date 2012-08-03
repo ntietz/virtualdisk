@@ -86,6 +86,8 @@ public class Coordinator
      */
     private NetworkServer server;
 
+    private boolean reconfigurationInProgress = false;
+
     /**
      * Standard constructor which makes sure all the data structures are safe to use concurrently.
      * @param   blockSize           the size of the blocks, in bytes
@@ -412,14 +414,15 @@ public class Coordinator
 
             server.attachdatanode(node)
 
-            while not balanced:
-                pick a segment group to put the node in / node to kick out
-                construct the reconfiguration handler and run it
+            call the reconfiguration handler:
+                while not balanced:
+                    pick a segment group to put the node in / node to kick out
+                    construct the reconfiguration handler and run it
 
-            wait until all reconfiguration has finished
-            attachDataNode(node)
+                wait until all reconfiguration has finished
+                attachDataNode(node)
 
-            signal that the reconfiguration attempt is no longer in progress
+                signal that the reconfiguration attempt is no longer in progress
         */
         return false;
     }
@@ -432,19 +435,21 @@ public class Coordinator
 
             server.detachnode(node)
 
-            for each affected segment group:
-                pick a new node to put into the group
-                construct the reconfiguration handler and run it
+            call the reconfiguration handler:
+                for each affected segment group:
+                    pick a new node to put into the group
+                    construct the reconfiguration handler and run it
 
-            wait until all reconfiguration has finished
-            detachDataNode(node)
+                wait until all reconfiguration has finished
+                detachDataNode(node)
 
-            signal that the reconfiguration attempt is no longer in progress
+                signal that the reconfiguration attempt is no longer in progress
         */
         return false;
     }
 
-    private void attachDataNode(DataNodeIdentifier node)
+    // note: should only be called when reconfiguration is done
+    public void attachDataNode(DataNodeIdentifier node)
     {
         datanodes.add(node);
 
@@ -452,7 +457,8 @@ public class Coordinator
         datanodeStatuses.put(new DataNodeStatusPair(node, status));
     }
 
-    private void detachDataNode(DataNodeIdentifier node)
+    // note: should only be called when reconfiguration is done
+    public void detachDataNode(DataNodeIdentifier node)
     {
         datanodes.remove(node);
 
@@ -464,6 +470,22 @@ public class Coordinator
                 break;
             }
         }
+    }
+
+    /**
+     * Triest to start a reconfiguration attempt; it is an atomic test-and-set.
+     * @return  true if we got the lock; false if someone else is already reconfiguring
+     */
+    public synchronized boolean startReconfiguration()
+    {
+        boolean oldValue = reconfigurationInProgress;
+        reconfigurationInProgress = true;
+        return !oldValue;
+    }
+
+    public synchronized void finishReconfiguration()
+    {
+        reconfigurationInProgress = false;
     }
 
     /**
@@ -515,7 +537,7 @@ public class Coordinator
                 segmentGroupMembers.add(current.getIdentifier());
             }
 
-            segmentgroup = volumeTable.makeSegmentGroup(segmentGroupMembers, logicalOffset);
+            segmentgroup = volumeTable.makeSegmentGroup(segmentGroupMembers, volumeId, logicalOffset);
 
             for (int index = 0; index < nodesPerSegmentGroup; ++index)
             {

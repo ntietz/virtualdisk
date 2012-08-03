@@ -16,6 +16,7 @@ public class SegmentGroup
      */
     private List<DataNodeIdentifier> members;
 
+    private int volumeId;
     private long startingBlock;
     private long stoppingBlock;
 
@@ -24,10 +25,10 @@ public class SegmentGroup
      * @param   members the members of the segment group
      * TODO update this
      */
-    public SegmentGroup(List<DataNodeIdentifier> members, long startingBlock, long stoppingBlock)
+    public SegmentGroup(List<DataNodeIdentifier> members, int volumeId, long startingBlock, long stoppingBlock)
     {
         this.members = new ArrayList<DataNodeIdentifier>(members);
-
+        this.volumeId = volumeId;
         this.startingBlock = startingBlock;
         this.stoppingBlock = stoppingBlock;
     }
@@ -40,6 +41,11 @@ public class SegmentGroup
     public List<DataNodeIdentifier> getMembers()
     {
         return members;
+    }
+
+    public int getVolumeId()
+    {
+        return volumeId;
     }
 
     public long getStartingBlock()
