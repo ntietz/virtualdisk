@@ -62,6 +62,8 @@ public abstract class Sendable
       , unsetSegmentRequestResult(15)
       , identifyRequest(16)
       , identifyRequestResult(17)
+      , reconfigurationRequest(18)
+      , reconfigurationRequestResult(19)
       ;
           
         private byte type;

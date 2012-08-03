@@ -406,46 +406,38 @@ public class Coordinator
         }
     }
 
-    // TODO: IMPLEMENT LATER
-    public boolean addDataNode(DataNodeIdentifier node)
+    public int addDataNode(DataNodeIdentifier node)
     {
-        /*
-            wait until no other reconfiguration attempts are in progress
+        int id = generateNewRequestId();
 
-            server.attachdatanode(node)
+        DataNodeReconfigurationHandler handler = new DataNodeReconfigurationHandler( volumeTable
+                                                                                   , datanodes
+                                                                                   , datanodeStatuses
+                                                                                   , node
+                                                                                   , true
+                                                                                   , this
+                                                                                   );
+        handler.setRequestId(id);
+        handler.start();
 
-            call the reconfiguration handler:
-                while not balanced:
-                    pick a segment group to put the node in / node to kick out
-                    construct the reconfiguration handler and run it
-
-                wait until all reconfiguration has finished
-                attachDataNode(node)
-
-                signal that the reconfiguration attempt is no longer in progress
-        */
-        return false;
+        return id;
     }
 
-    // TODO: IMPLEMENT LATER
-    public boolean removeDataNode(DataNodeIdentifier node)
+    public int removeDataNode(DataNodeIdentifier node)
     {
-        /*
-            wait until no other reconfiguration attempts are in progress
+        int id = generateNewRequestId();
 
-            server.detachnode(node)
+        DataNodeReconfigurationHandler handler = new DataNodeReconfigurationHandler( volumeTable
+                                                                                   , datanodes
+                                                                                   , datanodeStatuses
+                                                                                   , node
+                                                                                   , false
+                                                                                   , this
+                                                                                   );
+        handler.setRequestId(id);
+        handler.start();
 
-            call the reconfiguration handler:
-                for each affected segment group:
-                    pick a new node to put into the group
-                    construct the reconfiguration handler and run it
-
-                wait until all reconfiguration has finished
-                detachDataNode(node)
-
-                signal that the reconfiguration attempt is no longer in progress
-        */
-        return false;
+        return id;
     }
 
     // note: should only be called when reconfiguration is done

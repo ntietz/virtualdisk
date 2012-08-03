@@ -2,6 +2,7 @@ package com.virtualdisk.coordinator.handler;
 
 import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.request.*;
+import com.virtualdisk.network.request.base.*;
 import com.virtualdisk.network.util.*;
 
 import java.util.*;
@@ -160,6 +161,9 @@ extends Handler
         }
 
         coordinator.finishReconfiguration();
+
+        requestResult = new ReconfigurationRequestResult(requestId, true, true);
+        coordinator.setRequestResult(requestId, (RequestResult) requestResult);
     }
 
     private void updateStatus(DataNodeIdentifier oldNode, DataNodeIdentifier replacementNode)
