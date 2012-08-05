@@ -289,5 +289,24 @@ public class CoordinatorIntegrationTest
             assertTrue("Read should succeed", result.wasSuccessful());
         }
     }
+
+    @Test(timeout=10000)
+    public void testAddRemoveDataNode()
+    {
+        int id = 15;
+        String host = "localhost";
+        int port = DataNodeMain.DEFAULT_PORT + id;
+        DataNodeIdentifier nodeId = new DataNodeIdentifier(id, host, port);
+
+        List<String> driveHandles = new ArrayList<String>();
+        driveHandles.add("data/drive." + id);
+        List<Long> driveSizes = new ArrayList<Long>();
+        driveSizes.add(1024L);
+        
+        DataNodeMain main = new DataNodeMain(port, blockSize, driveHandles, driveSizes);
+        main.start();
+
+        int requestId = coordinator.addDataNode(nodeId);
+    }
 }
 

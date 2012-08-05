@@ -413,6 +413,7 @@ public class Coordinator
         DataNodeReconfigurationHandler handler = new DataNodeReconfigurationHandler( volumeTable
                                                                                    , datanodes
                                                                                    , datanodeStatuses
+                                                                                   , server
                                                                                    , node
                                                                                    , true
                                                                                    , this
@@ -430,6 +431,7 @@ public class Coordinator
         DataNodeReconfigurationHandler handler = new DataNodeReconfigurationHandler( volumeTable
                                                                                    , datanodes
                                                                                    , datanodeStatuses
+                                                                                   , server
                                                                                    , node
                                                                                    , false
                                                                                    , this

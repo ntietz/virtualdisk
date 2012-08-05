@@ -298,6 +298,15 @@ extends NetworkServer
 
         UnsetSegmentRequest request = new UnsetSegmentRequest(id, volumeId, startingOffset, stoppingOffset);
 
+        List<RequestFuture> futures = new ArrayList<RequestFuture>();
+        for (int index = 0; index < targets.size(); ++index)
+        {
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            futures.add(future);
+        }
+
+        resultMap.put(id, futures);
+
         for (DataNodeIdentifier eachTarget : targets)
         {
             int targetId = eachTarget.getNodeId();

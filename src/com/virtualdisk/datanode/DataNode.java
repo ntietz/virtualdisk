@@ -302,8 +302,11 @@ public class DataNode
         valueTimestampTable.removeTimestamp(volumeId, logicalOffset);
 
         DriveOffsetPair physicalPair = volumeTable.getPhysicalLocation(volumeId, logicalOffset);
-        freeSpaceTable.release(physicalPair);
-        volumeTable.unsetPhysicalLocation(volumeId, logicalOffset);
+        if (physicalPair != null)
+        {
+            freeSpaceTable.release(physicalPair);
+            volumeTable.unsetPhysicalLocation(volumeId, logicalOffset);
+        }
     }
 
     /**

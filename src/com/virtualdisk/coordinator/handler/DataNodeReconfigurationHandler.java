@@ -14,12 +14,14 @@ extends Handler
     private VolumeTable volumeTable;
     private List<DataNodeIdentifier> datanodes;
     private PriorityBlockingQueue<DataNodeStatusPair> datanodeStatuses;
-    DataNodeIdentifier affectedNode;
+    private NetworkServer server;
+    private DataNodeIdentifier affectedNode;
     private boolean affectedNodeIsUp;
 
     public DataNodeReconfigurationHandler( VolumeTable volumeTable
                                          , List<DataNodeIdentifier> datanodes
                                          , PriorityBlockingQueue<DataNodeStatusPair> datanodeStatuses
+                                         , NetworkServer server
                                          , DataNodeIdentifier affectedNode // the one to remove or add...
                                          , boolean affectedNodeIsUp
                                          , Coordinator coordinator
@@ -28,6 +30,7 @@ extends Handler
         this.volumeTable = volumeTable;
         this.datanodes = datanodes;
         this.datanodeStatuses = datanodeStatuses;
+        this.server = server;
         this.affectedNode = affectedNode;
         this.affectedNodeIsUp = affectedNodeIsUp;
         this.coordinator = coordinator;
@@ -49,6 +52,11 @@ extends Handler
                 
                 signal that all reconfiguration is done (set the result and let the handler terminate)
         */
+
+        if (affectedNodeIsUp)
+        {
+            server.attachDataNode(affectedNode);
+        }
 
         while(!coordinator.startReconfiguration())
         {
