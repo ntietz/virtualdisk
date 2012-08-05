@@ -1,0 +1,7 @@
+#!/bin/bash
+
+MULTILINE=`find . | grep "src\|test" | grep -v swp | grep java | grep $1`
+FILES=${MULTILINE/$'\n'/ }
+shift
+vim -O $FILES $@
+

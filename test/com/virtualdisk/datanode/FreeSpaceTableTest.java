@@ -28,7 +28,7 @@ public class FreeSpaceTableTest
         
         List<DriveOffsetPair> claimedLocations = new ArrayList<DriveOffsetPair>();
         
-        for (int index = 0; index < 15; ++index)
+        for (int index = 10; index < 25; ++index)
         {
             DriveOffsetPair location = freeSpaceTable.next();
             freeSpaceTable.claim(location);

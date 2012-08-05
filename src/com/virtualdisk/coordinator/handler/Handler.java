@@ -59,8 +59,8 @@ public abstract class Handler extends Thread
         action();
 
         // TODO : change these lines... they're gross!!!! we should have a queue or something.
-        if (requestResult != null)
-            SingletonCoordinator.sendToClient(requestId, requestResult);
+        //if (requestResult != null)
+        //    SingletonCoordinator.sendToClient(requestId, requestResult);
         /*
 
         change to something like this:

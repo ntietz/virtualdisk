@@ -20,6 +20,8 @@ extends NetworkServer
     // This list stores the datanodes, populated by the node generator method, since we are communicating directly with them.
     List<DataNode> dataNodes;
 
+    Map<DataNodeIdentifier, DataNode> idMap;
+
     // These maps cache the request results for later fetching by the coordinator.
     Map<Integer, List<OrderRequestResult>> orderRequestResults;
     Map<Integer, List<ReadRequestResult>> readRequestResults;
@@ -27,6 +29,7 @@ extends NetworkServer
     Map<Integer, List<CreateVolumeRequestResult>> createVolumeRequestResults;
     Map<Integer, List<DeleteVolumeRequestResult>> deleteVolumeRequestResults;
     Map<Integer, List<VolumeExistsRequestResult>> volumeExistsReqestResults;
+    Map<Integer, List<UnsetSegmentRequestResult>> unsetSegmentRequestResults;
 
     /*
      * This constructor initializes the datanode with empty node identifier and node lists, and empty result maps.
@@ -35,6 +38,7 @@ extends NetworkServer
     {
         dataNodeIdentifiers = new ArrayList<DataNodeIdentifier>();
         dataNodes = new ArrayList<DataNode>();
+        idMap = new HashMap<DataNodeIdentifier, DataNode>();
 
         orderRequestResults = new HashMap<Integer, List<OrderRequestResult>>();
         readRequestResults = new HashMap<Integer, List<ReadRequestResult>>();
@@ -42,6 +46,7 @@ extends NetworkServer
         createVolumeRequestResults = new HashMap<Integer, List<CreateVolumeRequestResult>>();
         deleteVolumeRequestResults = new HashMap<Integer, List<DeleteVolumeRequestResult>>();
         volumeExistsReqestResults = new HashMap<Integer, List<VolumeExistsRequestResult>>();
+        unsetSegmentRequestResults = new HashMap<Integer, List<UnsetSegmentRequestResult>>();
     }
 
     /*
@@ -169,6 +174,27 @@ extends NetworkServer
         
         return id;
     }
+
+    public synchronized int issueUnsetSegmentRequest(List<DataNodeIdentifier> targets, int volumeId, long startingOffset, long stoppingOffset)
+    {
+        int id = generateNewRequestId();
+
+        List<UnsetSegmentRequestResult> results = new ArrayList<UnsetSegmentRequestResult>();
+
+        for (DataNodeIdentifier eachId : targets)
+        {
+            DataNode node = idMap.get(eachId);
+
+            for (long index = startingOffset; index <= stoppingOffset; ++index)
+            {
+                node.unset(volumeId, index);
+            }
+
+            results.add(new UnsetSegmentRequestResult(id, true, true));
+        }
+
+        return id;
+    }
     
     /*
      * This method fetches the results of a given order request.
@@ -210,6 +236,11 @@ extends NetworkServer
     public List<VolumeExistsRequestResult> getVolumeExistsRequestResults(int requestId)
     {
         return volumeExistsReqestResults.get(requestId);
+    }
+
+    public List<UnsetSegmentRequestResult> getUnsetSegmentRequestResults(int requestId)
+    {
+        return unsetSegmentRequestResults.get(requestId);
     }
     
     /*
@@ -274,6 +305,7 @@ extends NetworkServer
 
             ids.add(index, currentId);
             nodes.add(index, current);
+            idMap.put(currentId, current);
         }
 
         dataNodes = nodes;

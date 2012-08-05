@@ -23,6 +23,8 @@ public class TimestampTableTest
         timestampTable.removeTimestamp(0, 0);
         assertNull("Unassigned timestamps should be null.", timestampTable.getTimestamp(0, 0));
         timestampTable.removeVolume(0);
+
+        assertNull("Uncreated volume should give null.", timestampTable.getTimestamp(13, 10));
     }
 
 }

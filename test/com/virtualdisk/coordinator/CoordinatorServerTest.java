@@ -22,7 +22,8 @@ public class CoordinatorServerTest
     private static final int clusterSize = 10;
     private static final int blockSize = 10;
     private static final int segmentSize = 10;
-    private static final int segmentGroupSize = 5;
+    private static final int segmentsPerSegmentGroup = 3;
+    private static final int nodesPerSegmentGroup = 5;
     private static final int quorumSize = 3;
     private static final int port = 8000;
     private static List<DataNodeIdentifier> nodes = new ArrayList<DataNodeIdentifier>();
@@ -87,10 +88,12 @@ public class CoordinatorServerTest
 
         SingletonCoordinator.setup( blockSize
                                   , segmentSize
-                                  , segmentGroupSize
+                                  , segmentsPerSegmentGroup
+                                  , nodesPerSegmentGroup
                                   , quorumSize
                                   , nodes
                                   , channelMap
+                                  , bootstrap
                                   );
 
         server = (CoordinatorServer) SingletonCoordinator.getServer();
@@ -99,12 +102,12 @@ public class CoordinatorServerTest
         for (int index = 0; index < 5; ++index)
         {
             List<DataNodeIdentifier> members = new ArrayList<DataNodeIdentifier>();
-            for (int num = index; num < (index + segmentGroupSize)%nodes.size(); ++num)
+            for (int num = index; num < (index + nodesPerSegmentGroup)%nodes.size(); ++num)
             {
                 members.add(nodes.get(num));
             }
 
-            segmentGroups.add(new SegmentGroup(members));
+            segmentGroups.add(new SegmentGroup(members, 0, 0, 0));
         }
 
         server.issueVolumeCreationRequest(0);
@@ -116,7 +119,7 @@ public class CoordinatorServerTest
     @Test
     public void testSingleton()
     {
-        assertTrue("Pointers should be the same", CoordinatorServer.getInstance(null, null) == server);
+        assertTrue("Pointers should be the same", CoordinatorServer.getInstance(null, null, null) == server);
     }
 
     @Test(timeout=10000)
@@ -125,7 +128,7 @@ public class CoordinatorServerTest
         {
             int createId = server.issueVolumeCreationRequest(15);
 
-            List<CreateVolumeRequestResult> results=  server.getVolumeCreationRequestResults(createId);
+            List<CreateVolumeRequestResult> results = server.getVolumeCreationRequestResults(createId);
             assertEquals("Result list sholud be the right size.", clusterSize, results.size());
 
             int finished = 0;
@@ -288,11 +291,11 @@ public class CoordinatorServerTest
         int orderId = server.issueOrderRequest(targets, 0, 0, new Date());
 
         List<OrderRequestResult> results = server.getOrderRequestResults(orderId);
-        assertEquals("Result list should be right size.", segmentGroupSize, results.size());
+        assertEquals("Result list should be right size.", nodesPerSegmentGroup, results.size());
         
         int finished = 0;
         int successful = 0;
-        while (finished != segmentGroupSize)
+        while (finished != nodesPerSegmentGroup)
         {
             results = server.getOrderRequestResults(orderId);
             finished = 0;
@@ -311,8 +314,8 @@ public class CoordinatorServerTest
             }
         }
 
-        assertEquals("All should finish", segmentGroupSize, finished);
-        assertEquals("All should succeed", segmentGroupSize, successful);
+        assertEquals("All should finish", nodesPerSegmentGroup, finished);
+        assertEquals("All should succeed", nodesPerSegmentGroup, successful);
     }
 
     @Test(timeout=10000)
@@ -327,11 +330,11 @@ public class CoordinatorServerTest
             int writeId = server.issueWriteRequest(targets, 0, 30, block, new Date());
 
             List<WriteRequestResult> results = server.getWriteRequestResults(writeId);
-            assertEquals("Result list should be right size.", segmentGroupSize, results.size());
+            assertEquals("Result list should be right size.", nodesPerSegmentGroup, results.size());
 
             int finished = 0;
             int successful = 0;
-            while (finished != segmentGroupSize)
+            while (finished != nodesPerSegmentGroup)
             {
                 results = server.getWriteRequestResults(writeId);
                 finished = 0;
@@ -350,7 +353,7 @@ public class CoordinatorServerTest
                 }
             }
 
-            assertEquals("All should finish.", segmentGroupSize, finished);
+            assertEquals("All should finish.", nodesPerSegmentGroup, finished);
             assertEquals("None should succeed (order first).", 0, successful);
         }
 
@@ -358,11 +361,11 @@ public class CoordinatorServerTest
             int orderId = server.issueOrderRequest(targets, 0, 30, new Date());
 
             List<OrderRequestResult> results = server.getOrderRequestResults(orderId);
-            assertEquals("Result list should be right size.", segmentGroupSize, results.size());
+            assertEquals("Result list should be right size.", nodesPerSegmentGroup, results.size());
             
             int finished = 0;
             int successful = 0;
-            while (finished != segmentGroupSize)
+            while (finished != nodesPerSegmentGroup)
             {
                 results = server.getOrderRequestResults(orderId);
                 finished = 0;
@@ -381,19 +384,19 @@ public class CoordinatorServerTest
                 }
             }
 
-            assertEquals("All should finish", segmentGroupSize, finished);
-            assertEquals("All should succeed", segmentGroupSize, successful);
+            assertEquals("All should finish", nodesPerSegmentGroup, finished);
+            assertEquals("All should succeed", nodesPerSegmentGroup, successful);
         }
 
         {
             int writeId = server.issueWriteRequest(targets, 0, 30, block, new Date());
 
             List<WriteRequestResult> results = server.getWriteRequestResults(writeId);
-            assertEquals("Result list should be right size.", segmentGroupSize, results.size());
+            assertEquals("Result list should be right size.", nodesPerSegmentGroup, results.size());
 
             int finished = 0;
             int successful = 0;
-            while (finished != segmentGroupSize)
+            while (finished != nodesPerSegmentGroup)
             {
                 results = server.getWriteRequestResults(writeId);
                 finished = 0;
@@ -412,20 +415,20 @@ public class CoordinatorServerTest
                 }
             }
 
-            assertEquals("All should finish.", segmentGroupSize, finished);
-            assertEquals("All should succeed.", segmentGroupSize, successful);
+            assertEquals("All should finish.", nodesPerSegmentGroup, finished);
+            assertEquals("All should succeed.", nodesPerSegmentGroup, successful);
         }
 
         {
             int readId = server.issueReadRequest(targets, 0, 30);
 
             List<ReadRequestResult> results = server.getReadRequestResults(readId);
-            assertEquals("Result list should be right size.", segmentGroupSize, results.size());
+            assertEquals("Result list should be right size.", nodesPerSegmentGroup, results.size());
 
             int finished = 0;
             int successful = 0;
             byte[] data = null;
-            while (finished != segmentGroupSize)
+            while (finished != nodesPerSegmentGroup)
             {
                 results = server.getReadRequestResults(readId);
                 finished = 0;
@@ -446,8 +449,8 @@ public class CoordinatorServerTest
 
             data = results.get(0).getBlock();
 
-            assertEquals("All should finish.", segmentGroupSize, finished);
-            assertEquals("All should succeed.", segmentGroupSize, successful);
+            assertEquals("All should finish.", nodesPerSegmentGroup, finished);
+            assertEquals("All should succeed.", nodesPerSegmentGroup, successful);
             assertArrayEquals("Block should match", block, data);
         }
     }

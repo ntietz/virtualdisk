@@ -112,6 +112,31 @@ extends FrameDecoder
                 deleteVolumeRequestResult.decode(buffer);
                 return deleteVolumeRequestResult;
 
+            case identifyRequest:
+                IdentifyRequest identifyRequest = new IdentifyRequest(0);
+                identifyRequest.decode(buffer);
+                return identifyRequest;
+
+            case identifyRequestResult:
+                IdentifyRequestResult identifyRequestResult = new IdentifyRequestResult(0, (byte)-1);
+                identifyRequestResult.decode(buffer);
+                return identifyRequestResult;
+
+            case reconfigurationRequestResult:
+                ReconfigurationRequestResult reconfigurationRequestResult = new ReconfigurationRequestResult(0, false, false);
+                reconfigurationRequestResult.decode(buffer);
+                return reconfigurationRequestResult;
+
+            case unsetSegmentRequest:
+                UnsetSegmentRequest unsetSegmentRequest = new UnsetSegmentRequest(0, 0, 0, 0);
+                unsetSegmentRequest.decode(buffer);
+                return unsetSegmentRequest;
+
+            case unsetSegmentRequestResult:
+                UnsetSegmentRequestResult unsetSegmentRequestResult = new UnsetSegmentRequestResult(0, false, false);
+                unsetSegmentRequestResult.decode(buffer);
+                return unsetSegmentRequestResult;
+
             default:
                 return null;
         }

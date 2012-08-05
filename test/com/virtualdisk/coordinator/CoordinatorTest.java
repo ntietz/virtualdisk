@@ -15,7 +15,8 @@ public class CoordinatorTest
     private static int clusterSize = 10;
     private static int blockSize = 10;
     private static int segmentSize = 10;
-    private static int segmentGroupSize = 5;
+    private static int segmentsPerSegmentGroup = 3;
+    private static int nodesPerSegmentGroup = 5;
     private static int quorumSize = 3;
     private static List<DataNodeIdentifier> dataNodes;
     private static NetworkServer server;
@@ -43,7 +44,8 @@ public class CoordinatorTest
 
         coordinator = new Coordinator( blockSize
                                      , segmentSize
-                                     , segmentGroupSize
+                                     , segmentsPerSegmentGroup
+                                     , nodesPerSegmentGroup
                                      , quorumSize
                                      , dataNodes
                                      , server
@@ -56,7 +58,7 @@ public class CoordinatorTest
     {
         assertEquals("Block size should match", (int)blockSize, coordinator.getBlockSize());
         assertEquals("Segment size should match", (int)segmentSize, coordinator.getSegmentSize());
-        assertEquals("Segment group size should match", (int)segmentGroupSize, coordinator.getSegmentGroupSize());
+        assertEquals("Segment group size should match", (int)nodesPerSegmentGroup, coordinator.getNodesPerSegmentGroup());
     }
 
     @Test(timeout=10000)

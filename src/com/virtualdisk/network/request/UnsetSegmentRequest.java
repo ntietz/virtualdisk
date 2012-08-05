@@ -84,6 +84,7 @@ extends VolumeRequest
             UnsetSegmentRequest other = (UnsetSegmentRequest) obj;
 
             return other.canEqual(this)
+                && super.equals(other)
                 && other.startingOffset == startingOffset
                 && other.stoppingOffset == stoppingOffset;
         }

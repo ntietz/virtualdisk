@@ -61,7 +61,7 @@ extends Thread
 
     public void run()
     {
-        dataNode = DataNodeFactory.setup(blockSize, driveHandles, driveSizes);
+        dataNode = new DataNode(blockSize, driveHandles, driveSizes);
         startDataNodeListener(port);
     }
 

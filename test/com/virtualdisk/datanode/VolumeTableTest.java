@@ -43,6 +43,9 @@ public class VolumeTableTest
         volumeTable.addVolume(0);
         
         assertEquals("Volume should be empty", 0, volumeTable.getAllPhysicalLocations(0).size());
+
+        assertNull("Unset location should be null.", volumeTable.getPhysicalLocation(13, 0));
+        assertEquals("Non-existent volume should be empty", 0, volumeTable.getAllPhysicalLocations(13).size());
     }
 }
 

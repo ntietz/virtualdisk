@@ -198,4 +198,79 @@ public class RequestTest
                       .suppress(Warning.NONFINAL_FIELDS)
                       .verify();
     }
+
+    @Test
+    public void testUSRCodec()
+    {
+        UnsetSegmentRequest request = new UnsetSegmentRequest(132, 13, 193, 194);
+
+        UnsetSegmentRequest decodedRequest = new UnsetSegmentRequest(0, 0, 0, 0);
+        decodedRequest.decode(request.encode());
+        assertEquals("Requests should be equal", request, decodedRequest);
+
+        EqualsVerifier.forClass(UnsetSegmentRequest.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
+    }
+
+    @Test
+    public void testUSRRCodec()
+    {
+        UnsetSegmentRequestResult result = new UnsetSegmentRequestResult(19, true, true);
+
+        UnsetSegmentRequestResult decodedResult = new UnsetSegmentRequestResult(0, false, false);
+        decodedResult.decode(result.encode());
+        assertEquals("Results should be equal", result, decodedResult);
+
+        EqualsVerifier.forClass(UnsetSegmentRequestResult.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
+    }
+
+    @Test
+    public void testIRCodec()
+    {
+        IdentifyRequest request = new IdentifyRequest(39);
+
+        IdentifyRequest decodedRequest = new IdentifyRequest(0);
+        decodedRequest.decode(request.encode());
+        assertEquals("Requests should be equal", request, decodedRequest);
+
+        EqualsVerifier.forClass(IdentifyRequest.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
+    }
+
+    @Test
+    public void testIRRCodec()
+    {
+        IdentifyRequestResult result = new IdentifyRequestResult(39, (byte)2);
+
+        IdentifyRequestResult decodedResult = new IdentifyRequestResult(0, (byte)-1);
+        decodedResult.decode(result.encode());
+        assertEquals("Results should be equal", result, decodedResult);
+
+        EqualsVerifier.forClass(IdentifyRequestResult.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
+    }
+
+    @Test
+    public void testReconfigurationRRCodec()
+    {
+        ReconfigurationRequestResult result = new ReconfigurationRequestResult(17, true, true);
+
+        ReconfigurationRequestResult decodedResult = new ReconfigurationRequestResult(0, false, false);
+        decodedResult.decode(result.encode());
+        assertEquals("Results should be equal", result, decodedResult);
+
+        EqualsVerifier.forClass(IdentifyRequestResult.class)
+                      .withRedefinedSuperclass()
+                      .suppress(Warning.NONFINAL_FIELDS)
+                      .verify();
+    }
 }

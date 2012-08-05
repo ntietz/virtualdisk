@@ -106,6 +106,15 @@ public class DataNodeTest
             assertTrue("Order should succeed", dataNode.order(0, (long)index, new Date(10)));
             assertTrue("Write should succeed", dataNode.write(0, (long)index, block, new Date(15)));
         }
+
+        for (int index = 10; index < initialFreeSpace; ++index)
+        {
+            byte[] block = new byte[blockSize];
+            random.nextBytes(block);
+
+            assertTrue("Order should succeed", dataNode.order(0, (long)index, new Date(16)));
+            assertTrue("Write should succeed", dataNode.write(0, (long)index, block, new Date(16)));
+        }
         
         assertEquals("Node should be full", 0, dataNode.totalFreeSpace());
         
@@ -119,6 +128,9 @@ public class DataNodeTest
         {
             // do nothing, expected behavior
         }
+
+        dataNode.unset(0, 10);
+        assertNull("Should be unset", dataNode.read(0, 10));
         
         dataNode.deleteVolume(0);
         assertFalse("Volume deletion should succeed", dataNode.volumeExists(0));

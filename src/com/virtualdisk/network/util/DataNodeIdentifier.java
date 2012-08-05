@@ -28,7 +28,7 @@ public class DataNodeIdentifier
         return nodePort;
     }
 
-    public boolean equals(Object pThat)
+    public final boolean equals(Object pThat)
     {
         if (this == pThat)
         {
@@ -43,7 +43,7 @@ public class DataNodeIdentifier
                && (nodeAddress.equals(that.getNodeAddress())));
     }
 
-    public int hashCode()
+    public final int hashCode()
     {
         return nodeId + nodeAddress.hashCode();
     }

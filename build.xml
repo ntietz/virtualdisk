@@ -72,7 +72,7 @@
             <fileset dir="${build}">
                 <include name="**/*.class" />
                 <exclude name="**/*Test.class" />
-                <exclude name="TestFile.class" />
+                <exclude name="**/TestFile.class" />
                 <exclude name="**/Fake*NetworkServer.class" />
             </fileset>
         </cobertura-instrument>

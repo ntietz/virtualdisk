@@ -21,7 +21,8 @@ public class CoordinatorIntegrationTest
     private static int clusterSize = 10;
     private static int blockSize = 20;
     private static int segmentSize = 15;
-    private static int segmentGroupSize = 5;
+    private static int segmentsPerSegmentGroup = 3;
+    private static int nodesPerSegmentGroup = 5;
     private static int quorumSize = 3;
     private static List<DataNodeIdentifier> nodes = new ArrayList<DataNodeIdentifier>();
     private static Map<Integer, Channel> channelMap = new HashMap<Integer, Channel>();
@@ -87,10 +88,12 @@ public class CoordinatorIntegrationTest
 
         SingletonCoordinator.setup( blockSize
                                   , segmentSize
-                                  , segmentGroupSize
+                                  , segmentsPerSegmentGroup
+                                  , nodesPerSegmentGroup
                                   , quorumSize
                                   , nodes
                                   , channelMap
+                                  , bootstrap
                                   );
 
         coordinator = SingletonCoordinator.getCoordinator();
@@ -117,7 +120,7 @@ public class CoordinatorIntegrationTest
         assertEquals("Block size should match", blockSize, coordinator.getBlockSize());
         assertEquals("Should have right number of datanodes", clusterSize, nodes.size());
         assertEquals("Segment size should match", segmentSize, coordinator.getSegmentSize());
-        assertEquals("Segment group size sholud match", segmentGroupSize, coordinator.getSegmentGroupSize());
+        assertEquals("Segment group size sholud match", nodesPerSegmentGroup, coordinator.getNodesPerSegmentGroup());
         assertEquals("Quorum size should match", quorumSize, coordinator.getQuorumSize());
     }
 
