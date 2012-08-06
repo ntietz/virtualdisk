@@ -291,8 +291,11 @@ public class CoordinatorIntegrationTest
     }
 
     @Test(timeout=10000)
-    public void testAddRemoveDataNode()
+    public void testAddDataNode()
     {
+        System.out.println("\nStatuses before adding a node:");
+        reportStatuses();
+
         int id = 15;
         String host = "localhost";
         int port = DataNodeMain.DEFAULT_PORT + id;
@@ -307,6 +310,46 @@ public class CoordinatorIntegrationTest
         main.start();
 
         int requestId = coordinator.addDataNode(nodeId);
+
+        while (!coordinator.requestFinished(requestId))
+        {
+            // spin!!!
+        }
+
+        System.out.println("\nStatuses after adding a node:");
+        reportStatuses();
+
+        float totalSegments = 0.0f;
+        for (DataNodeStatusPair eachPair : coordinator.getDataNodeStatusPairs())
+        {
+            totalSegments += eachPair.getStatus().getSegmentsStored();
+        }
+
+        float averageSegments = totalSegments / coordinator.getDataNodeStatusPairs().size();
+        float lowerBound = 0.99f * averageSegments - coordinator.getSegmentsPerSegmentGroup();
+        float upperBound = 1.01f * averageSegments + coordinator.getSegmentsPerSegmentGroup();
+
+        for (DataNodeStatusPair eachPair : coordinator.getDataNodeStatusPairs())
+        {
+            assertTrue("Should be within range", lowerBound <= eachPair.getStatus().getSegmentsStored());
+            assertTrue("Should be within range", eachPair.getStatus().getSegmentsStored() <= upperBound);
+        }
+    }
+
+    @Test(timeout=10000)
+    public void testRemoveDataNode()
+    {
+
+    }
+
+    public void reportStatuses()
+    {
+        List<DataNodeStatusPair> datanodeStatusPairs = coordinator.getDataNodeStatusPairs();
+
+        for (DataNodeStatusPair eachPair : datanodeStatusPairs)
+        {
+            System.out.println(eachPair);
+        }
     }
 }
 

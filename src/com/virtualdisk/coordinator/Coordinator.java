@@ -160,6 +160,11 @@ public class Coordinator
         return segmentsPerSegmentGroup;
     }
 
+    public List<DataNodeStatusPair> getDataNodeStatusPairs()
+    {
+        return new ArrayList<DataNodeStatusPair>(datanodeStatuses);
+    }
+
     /**
      * Getter for quorumSize.
      * @return  the quorum size

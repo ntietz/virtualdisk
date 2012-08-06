@@ -58,7 +58,7 @@ extends Handler
             server.attachDataNode(affectedNode);
         }
 
-        while(!coordinator.startReconfiguration())
+        while(coordinator.startReconfiguration())
         {
             // spin!!!
         }
@@ -77,6 +77,7 @@ extends Handler
 
         if (affectedNodeIsUp)
         {
+            System.out.println("Attached the node to the coordinator.");
             coordinator.attachDataNode(affectedNode);
         }
         else
@@ -104,9 +105,13 @@ extends Handler
             numberOfSegmentGroupsAssigned += status.getSegmentsStored();
         }
 
+        int segmentsPerSegmentGroup = coordinator.getSegmentsPerSegmentGroup();
         float expectedLoad = numberOfSegmentGroupsAssigned / numberOfNodes;
-        float lowerBound = (0.95f * expectedLoad) - 1;
-        float upperBound = (1.05f * expectedLoad) + 1;
+        float lowerBound = (0.99f * expectedLoad) - segmentsPerSegmentGroup;
+        float upperBound = (1.01f * expectedLoad) + segmentsPerSegmentGroup;
+
+        System.out.println("lower: " + lowerBound);
+        System.out.println("upper: " + upperBound);
 
         List<DataNodeIdentifier> nodesBelow = new ArrayList<DataNodeIdentifier>();
         List<DataNodeIdentifier> nodesAbove = new ArrayList<DataNodeIdentifier>();
@@ -152,14 +157,17 @@ extends Handler
                 DataNodeIdentifier replacementNode = nodesBelow.get(0);
                 DataNodeIdentifier oldNode = pickHeaviestLoad(replacementNode);
                 SegmentGroup affectedGroup = volumeTable.getAllSegmentGroupsContaining(oldNode).get(0);
+                // TODO FIXME make this asynchronous so writes can occur concurrently
                 reconfigureSegmentGroup(affectedGroup, oldNode, replacementNode, true);
                 updateStatus(oldNode, replacementNode);
+                System.out.println("Replacing " + oldNode + " with " + replacementNode);
             }
             else if (nodesAbove.size() > 0)
             {
                 DataNodeIdentifier oldNode = nodesAbove.get(0);
                 SegmentGroup affectedGroup = volumeTable.getAllSegmentGroupsContaining(oldNode).get(0);
                 DataNodeIdentifier replacementNode = pickReplacement(affectedGroup, oldNode);
+                // TODO FIXME make this asynchronous so writes can occur concurrently
                 reconfigureSegmentGroup(affectedGroup, oldNode, replacementNode, true);
             }
             else
@@ -196,6 +204,9 @@ extends Handler
         oldPair.getStatus().addStoredSegments(-1*segmentsPerSegmentGroup);
         newPair.getStatus().addStoredSegments(segmentsPerSegmentGroup);
 
+        datanodeStatuses.remove(oldPair);
+        datanodeStatuses.remove(newPair);
+
         datanodeStatuses.add(oldPair);
         datanodeStatuses.add(newPair);
     }
@@ -227,22 +238,26 @@ extends Handler
     private DataNodeIdentifier pickHeaviestLoad(DataNodeIdentifier otherNode)
     {
         DataNodeIdentifier replacementNode = null;
-        List<DataNodeStatusPair> removedPairs = new ArrayList();
+
+        PriorityBlockingQueue<DataNodeStatusPair> invertedStatusQueue = new PriorityBlockingQueue<DataNodeStatusPair>(datanodeStatuses.size(), new Comparator<DataNodeStatusPair>() {
+            public int compare(DataNodeStatusPair a, DataNodeStatusPair b) {
+                return -1 * a.compareTo(b);
+            }
+        });
+
+        for (DataNodeStatusPair each : datanodeStatuses)
+        {
+            invertedStatusQueue.put(each);
+        }
 
         while (replacementNode == null)
         {
-            DataNodeStatusPair next = datanodeStatuses.poll();
-            removedPairs.add(next);
+            DataNodeStatusPair next = invertedStatusQueue.poll();
             DataNodeIdentifier nextId = next.getIdentifier();
             if (!nextId.equals(otherNode))
             {
                 replacementNode = nextId;
             }
-        }
-
-        for (DataNodeStatusPair each : removedPairs)
-        {
-            datanodeStatuses.add(each);
         }
 
         return replacementNode;
@@ -266,7 +281,7 @@ extends Handler
             swap the new node into the segment group
         */
 
-       int volumeId = affectedGroup.getVolumeId();
+        int volumeId = affectedGroup.getVolumeId();
         long startingOffset = affectedGroup.getStartingBlock();
         long stoppingOffset = affectedGroup.getStoppingBlock();
 

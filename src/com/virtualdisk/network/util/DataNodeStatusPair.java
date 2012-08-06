@@ -45,5 +45,10 @@ public class DataNodeStatusPair implements Comparable<DataNodeStatusPair>
     {
         return status;
     }
+
+    public String toString()
+    {
+        return datanode.toString() + ", " + status.toString();
+    }
 }
 

@@ -26,6 +26,11 @@ public class DataNodeStatus
         segmentsStored += numberNewSegments;
     }
 
+    public String toString()
+    {
+        return "status: { holding:" + segmentsStored + " }";
+    }
+
 }
 
 

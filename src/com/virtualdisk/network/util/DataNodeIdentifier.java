@@ -47,5 +47,10 @@ public class DataNodeIdentifier
     {
         return nodeId + nodeAddress.hashCode();
     }
+
+    public String toString()
+    {
+        return "id: { id:" + nodeId + " host:" + nodeAddress + " port:" + nodePort + " }";
+    }
 }
 
