@@ -339,7 +339,29 @@ public class CoordinatorIntegrationTest
     @Test(timeout=10000)
     public void testRemoveDataNode()
     {
+        DataNodeIdentifier killedNode = nodes.get(0);
+        DataNodeIdentifier secondKilledNode = nodes.get(1);
+        System.out.println("Removing " + killedNode);
 
+        int requestId = coordinator.removeDataNode(killedNode);
+
+        while (!coordinator.requestFinished(requestId))
+        {
+            // spin!!!
+        }
+
+        System.out.println("\nStatuses after removing a node:");
+        reportStatuses();
+
+        int secondRequestId = coordinator.removeDataNode(secondKilledNode);
+
+        while (!coordinator.requestFinished(secondRequestId))
+        {
+            // spin!!!
+        }
+
+        System.out.println("\nStatuses after removing a node:");
+        reportStatuses();
     }
 
     public void reportStatuses()
