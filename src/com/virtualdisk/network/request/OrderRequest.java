@@ -52,26 +52,6 @@ extends BlockRequest
         timestamp = new Date(buffer.readLong());
     }
 
-    @Override
-    public ChannelBuffer addHeader(ChannelBuffer buffer)
-    {
-        byte type = messageType().byteValue();
-        int length = messageSize();
-
-        ChannelBuffer header = buffer(5);
-        header.writeByte(type);
-        header.writeInt(length);
-
-        ChannelBuffer message = copiedBuffer(header, buffer);
-        return message;
-    }
-
-    @Override
-    public ChannelBuffer encodeWithHeader()
-    {
-        return addHeader(encode());
-    }
-
     public final boolean equals(Object obj)
     {
         if (obj == null)

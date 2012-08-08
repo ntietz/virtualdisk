@@ -1,6 +1,7 @@
 package com.virtualdisk.network.util;
 
 import org.jboss.netty.buffer.*;
+import static org.jboss.netty.buffer.ChannelBuffers.*;
 
 public abstract class Sendable
 {
@@ -9,10 +10,27 @@ public abstract class Sendable
     public abstract MessageType messageType();
     public abstract void decode(ChannelBuffer buffer);
     public abstract ChannelBuffer encode();
-    public abstract ChannelBuffer addHeader(ChannelBuffer buffer);
-    public abstract ChannelBuffer encodeWithHeader();
     public abstract int messageSize(); // EXCLUDES header size
-    public int headerSize()
+
+    public final ChannelBuffer addHeader(ChannelBuffer buffer)
+    {
+        byte type = messageType().byteValue();
+        int length = messageSize();
+
+        ChannelBuffer header = buffer(5);
+        header.writeByte(type);
+        header.writeInt(length);
+
+        ChannelBuffer message = copiedBuffer(header, buffer);
+        return message;
+    }
+
+    public final ChannelBuffer encodeWithHeader()
+    {
+        return addHeader(encode());
+    }
+
+    public final int headerSize()
     {
         return 5; // 1 byte for message type, 4 for message length
     }
