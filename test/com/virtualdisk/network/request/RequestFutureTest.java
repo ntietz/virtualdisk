@@ -1,5 +1,6 @@
 package com.virtualdisk.network.request;
 
+import com.virtualdisk.network.util.*;
 import com.virtualdisk.network.util.Sendable.*;
 
 import org.junit.*;
@@ -14,7 +15,7 @@ public class RequestFutureTest
         long sentTime = 1234;
         MessageType messageType = MessageType.orderRequest;
 
-        RequestFuture future = new RequestFuture(requestId, sentTime, messageType);
+        RequestFuture future = new RequestFuture(requestId, sentTime, messageType, new DataNodeIdentifier(0, "localhost", 8000));
 
         assertEquals(requestId, future.getRequestId());
         assertFalse(future.isDone());

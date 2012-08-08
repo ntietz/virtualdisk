@@ -107,9 +107,9 @@ extends NetworkServer
         OrderRequest request = new OrderRequest(id, volumeId, logicalOffset, timestamp);
 
         List<RequestFuture> futures = Collections.synchronizedList(new ArrayList<RequestFuture>());
-        for (int index = 0; index < targets.getMembers().size(); ++index)
+        for (DataNodeIdentifier eachMember : targets.getMembers())
         {
-            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType(), eachMember);
             futures.add(future);
         }
 
@@ -147,9 +147,9 @@ extends NetworkServer
         WriteRequest request = new WriteRequest(id, volumeId, logicalOffset, timestamp, block);
 
         List<RequestFuture> futures = new ArrayList<RequestFuture>();
-        for (int index = 0; index < targets.getMembers().size(); ++index)
+        for (DataNodeIdentifier eachMember : targets.getMembers())
         {
-            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType(), eachMember);
             futures.add(future);
         }
 
@@ -183,9 +183,9 @@ extends NetworkServer
         ReadRequest request = new ReadRequest(id, volumeId, logicalOffset);
 
         List<RequestFuture> futures = new ArrayList<RequestFuture>();
-        for (int index = 0; index < targets.getMembers().size(); ++index)
+        for (DataNodeIdentifier eachMember : targets.getMembers())
         {
-            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType(), eachMember);
             futures.add(future);
         }
 
@@ -215,9 +215,9 @@ extends NetworkServer
         CreateVolumeRequest request = new CreateVolumeRequest(id, volumeId);
 
         List<RequestFuture> futures = new ArrayList<RequestFuture>();
-        for (int index = 0; index < targets.size(); ++index)
+        for (DataNodeIdentifier eachMember : targets)
         {
-            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType(), eachMember);
             futures.add(future);
         }
 
@@ -247,9 +247,9 @@ extends NetworkServer
         DeleteVolumeRequest request = new DeleteVolumeRequest(id, volumeId);
 
         List<RequestFuture> futures = new ArrayList<RequestFuture>();
-        for (int index = 0; index < targets.size(); ++index)
+        for (DataNodeIdentifier eachMember : targets)
         {
-            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType(), eachMember);
             futures.add(future);
         }
 
@@ -280,9 +280,9 @@ extends NetworkServer
         VolumeExistsRequest request = new VolumeExistsRequest(id, volumeId);
 
         List<RequestFuture> futures = new ArrayList<RequestFuture>();
-        for (int index = 0; index < targets.size(); ++index)
+        for (DataNodeIdentifier eachMember : targets)
         {
-            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType(), eachMember);
             futures.add(future);
         }
 
@@ -306,9 +306,9 @@ extends NetworkServer
         UnsetSegmentRequest request = new UnsetSegmentRequest(id, volumeId, startingOffset, stoppingOffset);
 
         List<RequestFuture> futures = new ArrayList<RequestFuture>();
-        for (int index = 0; index < targets.size(); ++index)
+        for (DataNodeIdentifier eachMember : targets)
         {
-            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType());
+            RequestFuture future = new RequestFuture(id, System.currentTimeMillis(), request.messageType(), eachMember);
             futures.add(future);
         }
 

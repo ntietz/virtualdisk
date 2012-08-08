@@ -2,6 +2,7 @@ package com.virtualdisk.network.request;
 
 import com.virtualdisk.coordinator.*;
 import com.virtualdisk.network.request.base.*;
+import com.virtualdisk.network.util.*;
 import com.virtualdisk.network.util.Sendable.*;
 
 public class RequestFuture
@@ -10,8 +11,9 @@ public class RequestFuture
     private long sentTime; // when we ask the future for the result, we also check if it timed out
     private MessageType requestType;
     private RequestResult result; // CAN BE NULL
+    private DataNodeIdentifier resultRecipient;
 
-    public RequestFuture(int requestId, long sentTime, MessageType requestType)
+    public RequestFuture(int requestId, long sentTime, MessageType requestType, DataNodeIdentifier resultRecipient)
     {
         this.requestId = requestId;
         this.sentTime = sentTime;
