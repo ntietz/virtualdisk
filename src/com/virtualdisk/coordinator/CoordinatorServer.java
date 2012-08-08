@@ -95,6 +95,7 @@ extends NetworkServer
      * @param   timestamp       the timestamp of the request
      * @return  the id of the request
      */
+    @Override
     public int issueOrderRequest( SegmentGroup targets
                                 , int volumeId
                                 , long logicalOffset
@@ -133,6 +134,7 @@ extends NetworkServer
      * @param   timestamp       the timestamp of the request
      * @return  the id of the request
      */
+    @Override
     public int issueWriteRequest( SegmentGroup targets
                                 , int volumeId
                                 , long logicalOffset
@@ -170,6 +172,7 @@ extends NetworkServer
      * @param   logicalOffset   the logical location to order
      * @return  the id of the request
      */
+    @Override
     public int issueReadRequest( SegmentGroup targets
                                , int volumeId
                                , long logicalOffset
@@ -203,6 +206,7 @@ extends NetworkServer
      * @param   volumeId        the volume to create
      * @return  the id of the request
      */
+    @Override
     public int issueVolumeCreationRequest(int volumeId)
     {
         List<DataNodeIdentifier> targets = allNodes;
@@ -234,6 +238,7 @@ extends NetworkServer
      * @param   volumeId        the volume to delete
      * @return  the id of the request
      */
+    @Override
     public int issueVolumeDeletionRequest(int volumeId)
     {
         List<DataNodeIdentifier> targets = allNodes;
@@ -266,6 +271,7 @@ extends NetworkServer
      * @param   volumeId        the volume to check for
      * @return  the id of the request
      */
+    @Override
     public int issueVolumeExistsRequest(int volumeId)
     {
         List<DataNodeIdentifier> targets = allNodes;
@@ -292,6 +298,7 @@ extends NetworkServer
         return id;
     }
 
+    @Override
     public int issueUnsetSegmentRequest(List<DataNodeIdentifier> targets, int volumeId, long startingOffset, long stoppingOffset)
     {
         int id = generateNewRequestId();
@@ -323,6 +330,7 @@ extends NetworkServer
      * @param   requestId   the id for the request we want the results of
      * @return  the list of all results of the request
      */
+    @Override
     public List<OrderRequestResult> getOrderRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -350,6 +358,7 @@ extends NetworkServer
      * @param   requestId   the id for the request we want the results of
      * @return  the list of all results of the request
      */
+    @Override
     public List<WriteRequestResult> getWriteRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -377,6 +386,7 @@ extends NetworkServer
      * @param   requestId   the id for the request we want the results of
      * @return  the list of all results of the request
      */
+    @Override
     public List<ReadRequestResult> getReadRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -404,6 +414,7 @@ extends NetworkServer
      * @param   requestId   the id for the request we want the results of
      * @return  the list of all results of the request
      */
+    @Override
     public List<CreateVolumeRequestResult> getVolumeCreationRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -431,6 +442,7 @@ extends NetworkServer
      * @param   requestId   the id for the request we want the results of
      * @return  the list of all results of the request
      */
+    @Override
     public List<DeleteVolumeRequestResult> getVolumeDeletionRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -458,6 +470,7 @@ extends NetworkServer
      * @param   requestId   the id for the request we want the results of
      * @return  the list of all results of the request
      */
+    @Override
     public List<VolumeExistsRequestResult> getVolumeExistsRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -479,6 +492,7 @@ extends NetworkServer
         }
     }
 
+    @Override
     public List<UnsetSegmentRequestResult> getUnsetSegmentRequestResults(int requestId)
     {
         List<RequestFuture> futures = resultMap.get(requestId);
@@ -504,6 +518,7 @@ extends NetworkServer
      * @param   requestId   the request's id
      * @param   futures     the futures
      */
+    @Override
     public void setResultFutures(int requestId, List<RequestFuture> futures)
     {
         resultMap.put(requestId, futures);
@@ -514,6 +529,7 @@ extends NetworkServer
      * @param   requestId   the request's id
      * @return  the futures
      */
+    @Override
     public List<RequestFuture> getResultFutures(int requestId)
     {
         return resultMap.get(requestId);
@@ -523,6 +539,7 @@ extends NetworkServer
      * Fetches a copy of the datanode-identifier list.
      * @return  a copy of the list of connected datanodes
      */
+    @Override
     public List<DataNodeIdentifier> getDataNodes()
     {
         return new ArrayList<DataNodeIdentifier>(allNodes);
@@ -532,6 +549,7 @@ extends NetworkServer
      * Attaches a new datanode to this coordinator.
      * @return  whether or not the attachment succeeded
      */
+    @Override
     public boolean attachDataNode(DataNodeIdentifier node)
     {
         int datanodeId = node.getNodeId();
@@ -552,6 +570,7 @@ extends NetworkServer
      * Detaches a datanode from this coordinator.
      * @return  whether or not the deattachment succeeded
      */
+    @Override
     public boolean detachDataNode(DataNodeIdentifier node)
     {
         int datanodeId = node.getNodeId();

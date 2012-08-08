@@ -47,6 +47,7 @@
     <target name="compile" depends="init" description="Compiles the main source files.">
         <javac srcdir="${src}" destdir="${build}" debug="on">
             <classpath refid="classpath.base" />
+            <compilerarg value="-Xlint:all" />
         </javac>
     </target>
 

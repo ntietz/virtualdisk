@@ -214,7 +214,7 @@ extends Handler
     private DataNodeIdentifier pickReplacement(SegmentGroup affectedGroup, DataNodeIdentifier oldNode)
     {
         DataNodeIdentifier replacementNode = null;
-        List<DataNodeStatusPair> removedPairs = new ArrayList();
+        List<DataNodeStatusPair> removedPairs = new ArrayList<DataNodeStatusPair>();
 
         while (replacementNode == null)
         {

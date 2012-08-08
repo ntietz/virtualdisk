@@ -65,7 +65,7 @@ public class SingletonCoordinator
                                 , ClientBootstrap bootstrap
                                 )
     {
-        requestCallbacks = new HashMap();
+        requestCallbacks = new HashMap<Integer, IntegerPair>();
 
         server = CoordinatorServer.getInstance(nodes, channelMap, bootstrap); // TODO FIXME this needs to also contain the last-used-nodeid
         coordinator = new Coordinator(blockSize, segmentSize, segmentsPerSegmentGroup, nodesPerSegmentGroup, quorumSize, nodes, server);

@@ -19,7 +19,7 @@ public class VolumeTable
                       , int nodesPerSegmentGroup
                       )
     {
-        table = new ConcurrentHashMap();
+        table = new ConcurrentHashMap<Integer, Map<Long, SegmentGroup>>();
         this.bytesPerBlock = bytesPerBlock;
         this.blocksPerSegment = blocksPerSegment;
         this.segmentsPerSegmentGroup = segmentsPerSegmentGroup;
@@ -28,7 +28,7 @@ public class VolumeTable
 
     public void addVolume(int volumeId)
     {
-        Map<Long, SegmentGroup> volumeMap = new ConcurrentHashMap();
+        Map<Long, SegmentGroup> volumeMap = new ConcurrentHashMap<Long, SegmentGroup>();
         table.put(volumeId, volumeMap);
     }
 

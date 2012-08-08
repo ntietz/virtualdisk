@@ -54,7 +54,7 @@ public class RequestFuture
         }
         else
         {
-            return ((RequestResult) result).isDone();
+            return result.isDone();
         }
     }
 

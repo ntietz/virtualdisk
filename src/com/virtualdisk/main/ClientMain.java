@@ -16,7 +16,7 @@ public class ClientMain
 
         Client client = new Client(host, port);
         Random random = new Random(2012);
-        List<Integer> requestIds = new ArrayList();
+        List<Integer> requestIds = new ArrayList<Integer>();
 
         System.out.println("Connecting to the coordinator on " + host + ":" + port + "...");
         client.connect();

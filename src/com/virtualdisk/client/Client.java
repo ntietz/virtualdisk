@@ -30,17 +30,17 @@ public class Client
     /**
      * Maps a request id onto true if it has finished, false or null otherwise.
      */
-    private Map<Integer, Boolean> finishedMap = new HashMap();
+    private Map<Integer, Boolean> finishedMap = new HashMap<Integer, Boolean>();
 
     /**
      * Maps a request id onto true if the result has finished and succeeded, false if it has finished and failed.
      */
-    private Map<Integer, Boolean> successMap = new HashMap();
+    private Map<Integer, Boolean> successMap = new HashMap<Integer, Boolean>();
 
     /**
      * The result map for reading.
      */
-    private Map<Integer, byte[]> readResults = new HashMap();
+    private Map<Integer, byte[]> readResults = new HashMap<Integer, byte[]>();
 
     /**
      * The last used request id; this is used to generate uique ids for each request.
