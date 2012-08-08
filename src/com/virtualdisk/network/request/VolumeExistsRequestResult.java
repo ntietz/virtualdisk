@@ -22,16 +22,19 @@ extends VolumeRequestResult
         return exists;
     }
 
+    @Override
     public MessageType messageType()
     {
         return MessageType.volumeExistsRequestResult;
     }
 
+    @Override
     public int messageSize()
     {
         return 1 + super.messageSize();
     }
 
+    @Override
     public ChannelBuffer encode()
     {
         ChannelBuffer buffer = super.encode();
@@ -40,12 +43,14 @@ extends VolumeRequestResult
         return buffer;
     }
 
+    @Override
     public void decode(ChannelBuffer buffer)
     {
         super.decode(buffer);
         exists = (buffer.readByte() == 1);
     }
 
+    @Override
     public ChannelBuffer addHeader(ChannelBuffer buffer)
     {
         byte type = messageType().byteValue();
@@ -59,11 +64,13 @@ extends VolumeRequestResult
         return message;
     }
 
+    @Override
     public ChannelBuffer encodeWithHeader()
     {
         return addHeader(encode());
     }
 
+    @Override
     public final boolean equals(Object obj)
     {
         if (obj == null)
@@ -84,6 +91,7 @@ extends VolumeRequestResult
         }
     }
 
+    @Override
     public final int hashCode()
     {
         int hash = super.hashCode();
@@ -93,6 +101,7 @@ extends VolumeRequestResult
         return hash;
     }
 
+    @Override
     public boolean canEqual(Object other)
     {
         return (other instanceof VolumeExistsRequestResult);

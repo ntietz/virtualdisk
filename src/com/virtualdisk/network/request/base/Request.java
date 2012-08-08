@@ -20,16 +20,18 @@ extends Sendable
     /**
      * @return  the request id for this request
      */
-    public int getRequestId()
+    public final int getRequestId()
     {
         return requestId;
     }
 
+    @Override
     public int messageSize()
     {
         return 4;
     }
 
+    @Override
     public ChannelBuffer encode()
     {
         ChannelBuffer buffer = dynamicBuffer();
@@ -38,11 +40,13 @@ extends Sendable
         return buffer;
     }
 
+    @Override
     public void decode(ChannelBuffer buffer)
     {
         requestId = buffer.readInt();
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (obj == null)
@@ -62,6 +66,7 @@ extends Sendable
         }
     }
 
+    @Override
     public int hashCode()
     {
         int hash = super.hashCode();

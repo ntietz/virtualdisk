@@ -40,6 +40,7 @@ extends Handler
     /**
      * This action issues the WriteRequest and waits to get a response.
      */
+    @Override
     public void action()
     {
         Date currentTime = coordinator.getTimestamp();

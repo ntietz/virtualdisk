@@ -31,11 +31,13 @@ extends Request
         return logicalOffset;
     }
 
+    @Override
     public int messageSize()
     {
         return 4 + 8 + super.messageSize();
     }
 
+    @Override
     public ChannelBuffer encode()
     {
         ChannelBuffer buffer = super.encode();
@@ -45,6 +47,7 @@ extends Request
         return buffer;
     }
 
+    @Override
     public void decode(ChannelBuffer buffer)
     {
         super.decode(buffer);
@@ -52,6 +55,7 @@ extends Request
         logicalOffset = buffer.readLong();
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (obj == null)
@@ -73,6 +77,7 @@ extends Request
         }
     }
 
+    @Override
     public int hashCode()
     {
         int hash = super.hashCode();
@@ -83,6 +88,7 @@ extends Request
         return hash;
     }
 
+    @Override
     public boolean canEqual(Object other)
     {
         return (other instanceof BlockRequest);

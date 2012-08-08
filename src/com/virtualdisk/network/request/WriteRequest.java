@@ -31,16 +31,19 @@ extends BlockRequest
         return block;
     }
 
+    @Override
     public MessageType messageType()
     {
         return MessageType.writeRequest;
     }
 
+    @Override
     public int messageSize()
     {
         return 8 + 4 + block.length + super.messageSize();
     }
 
+    @Override
     public ChannelBuffer encode()
     {
         ChannelBuffer buffer = super.encode();
@@ -51,6 +54,7 @@ extends BlockRequest
         return buffer;
     }
 
+    @Override
     public void decode(ChannelBuffer buffer)
     {
         super.decode(buffer);
@@ -68,6 +72,7 @@ extends BlockRequest
         }
     }
 
+    @Override
     public ChannelBuffer addHeader(ChannelBuffer buffer)
     {
         byte type = messageType().byteValue();
@@ -81,11 +86,13 @@ extends BlockRequest
         return message;
     }
 
+    @Override
     public ChannelBuffer encodeWithHeader()
     {
         return addHeader(encode());
     }
 
+    @Override
     public final boolean equals(Object obj)
     {
         if (obj == null)
@@ -107,6 +114,7 @@ extends BlockRequest
         }
     }
 
+    @Override
     public final int hashCode()
     {
         int hash = super.hashCode();
@@ -122,6 +130,7 @@ extends BlockRequest
         return hash;
     }
 
+    @Override
     public boolean canEqual(Object other)
     {
         return (other instanceof WriteRequest);

@@ -19,12 +19,12 @@ extends Sendable
         this.success = success;
     }
 
-    public void setRequestId(int requestId)
+    public final void setRequestId(int requestId)
     {
         this.requestId = requestId;
     }
 
-    public int getRequestId()
+    public final int getRequestId()
     {
         return requestId;
     }
@@ -32,12 +32,12 @@ extends Sendable
     /**
      * @return  true if the request completed or timed out, false otherwise
      */
-    public boolean isDone()
+    public final boolean isDone()
     {
         return done;
     }
 
-    public void setDone(boolean done)
+    public final void setDone(boolean done)
     {
         this.done = done;
     }
@@ -45,21 +45,23 @@ extends Sendable
     /**
      * @return  true if the request succeeded, false if it failed for any reason
      */
-    public boolean wasSuccessful()
+    public final boolean wasSuccessful()
     {
         return success;
     }
 
-    public void setSuccess(boolean success)
+    public final void setSuccess(boolean success)
     {
         this.success = success;
     }
 
+    @Override
     public int messageSize()
     {
         return 4 + 1 + 1;
     }
 
+    @Override
     public ChannelBuffer encode()
     {
         ChannelBuffer buffer = dynamicBuffer();
@@ -70,6 +72,7 @@ extends Sendable
         return buffer;
     }
 
+    @Override
     public void decode(ChannelBuffer buffer)
     {
         requestId = buffer.readInt();
@@ -77,6 +80,7 @@ extends Sendable
         success = (buffer.readByte() == 1);
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (obj == null)
@@ -98,6 +102,7 @@ extends Sendable
         }
     }
 
+    @Override
     public int hashCode()
     {
         int hash = super.hashCode();

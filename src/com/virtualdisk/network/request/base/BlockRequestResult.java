@@ -10,21 +10,25 @@ extends RequestResult
         super(requestId, done, success);
     }
 
+    @Override
     public int messageSize()
     {
         return 0 + super.messageSize();
     }
 
+    @Override
     public ChannelBuffer encode()
     {
         return super.encode();
     }
 
+    @Override
     public void decode(ChannelBuffer buffer)
     {
         super.decode(buffer);
     }
 
+    @Override
     public int hashCode()
     {
         return super.hashCode();

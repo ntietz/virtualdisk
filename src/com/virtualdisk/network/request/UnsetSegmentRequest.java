@@ -29,16 +29,19 @@ extends VolumeRequest
         return stoppingOffset;
     }
 
+    @Override
     public MessageType messageType()
     {
         return MessageType.unsetSegmentRequest;
     }
 
+    @Override
     public int messageSize()
     {
         return 16 + super.messageSize();
     }
 
+    @Override
     public ChannelBuffer encode()
     {
         ChannelBuffer buffer = super.encode();
@@ -48,6 +51,7 @@ extends VolumeRequest
         return buffer;
     }
 
+    @Override
     public void decode(ChannelBuffer buffer)
     {
         super.decode(buffer);
@@ -55,6 +59,7 @@ extends VolumeRequest
         stoppingOffset = buffer.readLong();
     }
 
+    @Override
     public ChannelBuffer addHeader(ChannelBuffer buffer)
     {
         byte type = messageType().byteValue();
@@ -68,11 +73,13 @@ extends VolumeRequest
         return message;
     }
 
+    @Override
     public ChannelBuffer encodeWithHeader()
     {
         return addHeader(encode());
     }
 
+    @Override
     public final boolean equals(Object obj)
     {
         if (obj == null)
@@ -94,6 +101,7 @@ extends VolumeRequest
         }
     }
 
+    @Override
     public final int hashCode()
     {
         int hash = super.hashCode();
@@ -104,6 +112,7 @@ extends VolumeRequest
         return hash;
     }
 
+    @Override
     public boolean canEqual(Object other)
     {
         return (other instanceof UnsetSegmentRequest);

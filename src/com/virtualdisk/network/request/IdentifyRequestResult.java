@@ -26,16 +26,19 @@ extends RequestResult
         return type;
     }
 
+    @Override
     public MessageType messageType()
     {
         return MessageType.identifyRequestResult;
     }
 
+    @Override
     public int messageSize()
     {
         return 1 + super.messageSize();
     }
 
+    @Override
     public ChannelBuffer encode()
     {
         ChannelBuffer buffer = super.encode();
@@ -43,12 +46,14 @@ extends RequestResult
         return buffer;
     }
 
+    @Override
     public void decode(ChannelBuffer buffer)
     {
         super.decode(buffer);
         type = buffer.readByte();
     }
 
+    @Override
     public ChannelBuffer addHeader(ChannelBuffer buffer)
     {
         byte type = messageType().byteValue();
@@ -62,11 +67,13 @@ extends RequestResult
         return message;
     }
 
+    @Override
     public ChannelBuffer encodeWithHeader()
     {
         return addHeader(encode());
     }
 
+    @Override
     public final boolean equals(Object obj)
     {
         if (obj == null)
@@ -87,6 +94,7 @@ extends RequestResult
         }
     }
 
+    @Override
     public final int hashCode()
     {
         int hash = super.hashCode();
@@ -94,6 +102,7 @@ extends RequestResult
         return hash;
     }
 
+    @Override
     public boolean canEqual(Object other)
     {
         return (other instanceof IdentifyRequestResult);

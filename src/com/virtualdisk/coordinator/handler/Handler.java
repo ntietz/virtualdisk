@@ -54,6 +54,7 @@ public abstract class Handler extends Thread
     /**
      * Sets off the action, then passes along the result to the client.
      */
+    @Override
     public final void run()
     {
         action();

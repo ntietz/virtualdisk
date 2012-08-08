@@ -21,11 +21,13 @@ extends Request
         return volumeId;
     }
 
+    @Override
     public int messageSize()
     {
         return 4 + super.messageSize();
     }
 
+    @Override
     public ChannelBuffer encode()
     {
         ChannelBuffer buffer = super.encode();
@@ -34,12 +36,14 @@ extends Request
         return buffer;
     }
 
+    @Override
     public void decode(ChannelBuffer buffer)
     {
         super.decode(buffer);
         volumeId = buffer.readInt();
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (obj == null)
@@ -60,6 +64,7 @@ extends Request
         }
     }
 
+    @Override
     public int hashCode()
     {
         int hash = super.hashCode();
@@ -69,6 +74,7 @@ extends Request
         return hash;
     }
 
+    @Override
     public boolean canEqual(Object other)
     {
         return (other instanceof VolumeRequest);
