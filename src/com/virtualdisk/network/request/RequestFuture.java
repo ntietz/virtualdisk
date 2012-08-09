@@ -27,6 +27,11 @@ public class RequestFuture
         return resultResponder.equals(candidateResponder);
     }
 
+    public DataNodeIdentifier getResponder()
+    {
+        return resultResponder;
+    }
+
     public int getRequestId()
     {
         return requestId;
