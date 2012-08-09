@@ -28,24 +28,24 @@ public class DataNodeIdentifier
         return nodePort;
     }
 
-    public final boolean equals(Object pThat)
+    public final boolean equals(Object obj)
     {
-        if (this == pThat)
-        {
-            return true;
-        }
-        if (!(pThat instanceof DataNodeIdentifier))
+        if (obj == null || !(obj instanceof DataNodeIdentifier))
         {
             return false;
         }
-        DataNodeIdentifier that = (DataNodeIdentifier)pThat;
-        return (  (nodeId == that.getNodeId())
-               && (nodeAddress.equals(that.getNodeAddress())));
+        else
+        {
+            DataNodeIdentifier that = (DataNodeIdentifier) obj;
+            return nodeId == that.getNodeId()
+                && nodePort == that.getPort()
+                && nodeAddress.equals(that.getNodeAddress());
+        }
     }
 
     public final int hashCode()
     {
-        return nodeId + nodeAddress.hashCode();
+        return nodeId + nodeAddress.hashCode() + nodePort;
     }
 
     public String toString()
