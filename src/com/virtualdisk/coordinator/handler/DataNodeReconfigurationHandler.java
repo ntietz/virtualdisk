@@ -71,8 +71,8 @@ extends Handler
             for (SegmentGroup eachGroup : affectedGroups)
             {
                 DataNodeIdentifier replacementNode = pickReplacement(eachGroup, affectedNode);
-                reconfigureSegmentGroup(eachGroup, affectedNode, replacementNode, false);
                 updateStatus(affectedNode, replacementNode);
+                reconfigureSegmentGroup(eachGroup, affectedNode, replacementNode, false);
             }
         }
 
@@ -114,66 +114,39 @@ extends Handler
         System.out.println("lower: " + lowerBound);
         System.out.println("upper: " + upperBound);
 
-        List<DataNodeIdentifier> nodesBelow = new ArrayList<DataNodeIdentifier>();
-        List<DataNodeIdentifier> nodesAbove = new ArrayList<DataNodeIdentifier>();
-
-        for (DataNodeStatusPair eachPair : datanodeStatuses)
-        {
-            DataNodeStatus status = eachPair.getStatus();
-            if (status.getSegmentsStored() < lowerBound)
-            {
-                nodesBelow.add(eachPair.getIdentifier());
-            }
-            else if (status.getSegmentsStored() > upperBound)
-            {
-                nodesAbove.add(eachPair.getIdentifier());
-            }
-        }
-
-        boolean balanced = true;
-        if (nodesBelow.size() > 0 || nodesAbove.size() > 0)
-        {
-            balanced = false;
-        }
+        boolean balanced = false;
 
         while (!balanced)
         {
-            nodesBelow.clear();
-            nodesAbove.clear();
             for (DataNodeStatusPair eachPair : datanodeStatuses)
             {
                 DataNodeStatus status = eachPair.getStatus();
                 if (status.getSegmentsStored() < lowerBound)
                 {
-                    nodesBelow.add(eachPair.getIdentifier());
+                   DataNodeIdentifier replacementNode = eachPair.getIdentifier();
+                   DataNodeIdentifier oldNode = pickHeaviestLoad(replacementNode);
+                   SegmentGroup affectedGroup = volumeTable.getAllSegmentGroupsContaining(oldNode).get(0);
+                   updateStatus(oldNode, replacementNode);
+                   // TODO FIXME make this asynchronous so writes can occur concurrently
+                   System.out.println("Replacing " + oldNode + " with " + replacementNode);
+                   reconfigureSegmentGroup(affectedGroup, oldNode, replacementNode, true);
+                   break;
                 }
                 else if (status.getSegmentsStored() > upperBound)
                 {
-                    nodesAbove.add(eachPair.getIdentifier());
+                    DataNodeIdentifier oldNode = eachPair.getIdentifier();
+                    SegmentGroup affectedGroup = volumeTable.getAllSegmentGroupsContaining(oldNode).get(0);
+                    DataNodeIdentifier replacementNode = pickReplacement(affectedGroup, oldNode);
+                    updateStatus(oldNode, replacementNode);
+                    // TODO FIXME make this asynchronous so writes can occur concurrently
+                    System.out.println("Replacing " + oldNode + " with " + replacementNode);
+                    reconfigureSegmentGroup(affectedGroup, oldNode, replacementNode, true);
+                    break;
                 }
-            }
-
-            if (nodesBelow.size() > 0)
-            {
-                DataNodeIdentifier replacementNode = nodesBelow.get(0);
-                DataNodeIdentifier oldNode = pickHeaviestLoad(replacementNode);
-                SegmentGroup affectedGroup = volumeTable.getAllSegmentGroupsContaining(oldNode).get(0);
-                // TODO FIXME make this asynchronous so writes can occur concurrently
-                reconfigureSegmentGroup(affectedGroup, oldNode, replacementNode, true);
-                updateStatus(oldNode, replacementNode);
-                System.out.println("Replacing " + oldNode + " with " + replacementNode);
-            }
-            else if (nodesAbove.size() > 0)
-            {
-                DataNodeIdentifier oldNode = nodesAbove.get(0);
-                SegmentGroup affectedGroup = volumeTable.getAllSegmentGroupsContaining(oldNode).get(0);
-                DataNodeIdentifier replacementNode = pickReplacement(affectedGroup, oldNode);
-                // TODO FIXME make this asynchronous so writes can occur concurrently
-                reconfigureSegmentGroup(affectedGroup, oldNode, replacementNode, true);
-            }
-            else
-            {
-                balanced = true;
+                else
+                {
+                    balanced = true;
+                }
             }
         }
 
@@ -270,6 +243,7 @@ extends Handler
                                           , boolean oldNodeIsUp
                                           )
     {
+        System.out.println("Reconfiguring");
          /* what do we do? this is what we do...
             note: we do NOT worry about the status of the node here; we assume that is set by the coordinator
 

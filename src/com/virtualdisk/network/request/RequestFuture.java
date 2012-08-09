@@ -11,14 +11,20 @@ public class RequestFuture
     private long sentTime; // when we ask the future for the result, we also check if it timed out
     private MessageType requestType;
     private RequestResult result; // CAN BE NULL
-    private DataNodeIdentifier resultRecipient;
+    private DataNodeIdentifier resultResponder;
 
-    public RequestFuture(int requestId, long sentTime, MessageType requestType, DataNodeIdentifier resultRecipient)
+    public RequestFuture(int requestId, long sentTime, MessageType requestType, DataNodeIdentifier resultResponder)
     {
         this.requestId = requestId;
         this.sentTime = sentTime;
         this.requestType = requestType;
         this.result = null;
+        this.resultResponder = resultResponder;
+    }
+
+    public boolean isResponder(DataNodeIdentifier candidateResponder)
+    {
+        return resultResponder.equals(candidateResponder);
     }
 
     public int getRequestId()

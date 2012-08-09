@@ -87,6 +87,35 @@ extends NetworkServer
         return instance;
     }
 
+    @Override
+    public DataNodeIdentifier getNodeFromChannel(Channel channel)
+    {
+        Integer nodeId = null;
+
+        for (Integer id : channelMap.keySet())
+        {
+            if (channel.equals(channelMap.get(id)))
+            {
+                nodeId = id;
+            }
+        }
+
+        if (nodeId == null)
+        {
+            return null;
+        }
+
+        for (DataNodeIdentifier identifier : allNodes)
+        {
+            if (nodeId.equals(identifier.getNodeId()))
+            {
+                return identifier;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * This method creates and issues an order request, and sets up the handlers for the return of the result.
      * @param   targets         the nodes to perform the order request on

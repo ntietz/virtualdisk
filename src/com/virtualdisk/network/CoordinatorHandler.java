@@ -19,16 +19,6 @@ public class CoordinatorHandler
 extends SimpleChannelHandler
 {
     /**
-     * The coordinator for the requests.
-     */
-    Coordinator coordinator = SingletonCoordinator.getCoordinator();
-    
-    /**
-     * The server used to send messages.
-     */
-    NetworkServer server = SingletonCoordinator.getServer();
-
-    /**
      * Handles requests: upon receipt of a request result, it gets sent
      * back to the requester; upon receipt of a request, it gets sent
      * to the appropriate datanodes.
@@ -41,6 +31,9 @@ extends SimpleChannelHandler
                                , MessageEvent event
                                )
     {
+        Coordinator coordinator = SingletonCoordinator.getCoordinator();
+        NetworkServer server = SingletonCoordinator.getServer();
+
         Sendable result = (Sendable) event.getMessage();
         MessageType type = result.messageType();
 
@@ -53,7 +46,10 @@ extends SimpleChannelHandler
             case createVolumeRequestResult:
             case deleteVolumeRequestResult:
             case unsetSegmentRequestResult:
-                SingletonCoordinator.setResult(((RequestResult)result).getRequestId(), (RequestResult)result);
+                //event.getChannel();
+                DataNodeIdentifier sender = server.getNodeFromChannel(event.getChannel());
+                SingletonCoordinator.setResult(((RequestResult)result).getRequestId(), sender, (RequestResult)result);
+                //SingletonCoordinator.setResult(((RequestResult)result).getRequestId(), null, (RequestResult)result);
                 break;
 
             case writeRequest: {

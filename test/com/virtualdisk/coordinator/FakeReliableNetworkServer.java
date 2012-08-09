@@ -1,11 +1,12 @@
 package com.virtualdisk.coordinator;
 
-
 import com.virtualdisk.coordinator.*;
 import com.virtualdisk.datanode.*;
 import com.virtualdisk.network.*;
 import com.virtualdisk.network.request.*;
 import com.virtualdisk.network.util.*;
+
+import org.jboss.netty.channel.*;
 
 import java.io.*;
 import java.lang.*;
@@ -47,6 +48,12 @@ extends NetworkServer
         deleteVolumeRequestResults = new HashMap<Integer, List<DeleteVolumeRequestResult>>();
         volumeExistsReqestResults = new HashMap<Integer, List<VolumeExistsRequestResult>>();
         unsetSegmentRequestResults = new HashMap<Integer, List<UnsetSegmentRequestResult>>();
+    }
+
+    // NOT IMPLEMENTED
+    public DataNodeIdentifier getNodeFromChannel(Channel channel)
+    {
+        return null;
     }
 
     /*

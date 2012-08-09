@@ -194,12 +194,13 @@ public class SingletonCoordinator
      * @param   requestId   the request id we are setting the result of
      * @param   result      the result we are setting
      */
-    public synchronized static void setResult(int requestId, RequestResult result)
+    public synchronized static void setResult(int requestId, DataNodeIdentifier responder, RequestResult result)
     {
         List<RequestFuture> futures = server.getResultFutures(requestId);
 
         for (RequestFuture each : futures)
         {
+            //if (each.isResponder(responder))
             if (!each.hasResultSet())
             {
                 each.setResult(result);

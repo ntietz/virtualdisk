@@ -38,6 +38,8 @@ public abstract class NetworkServer
         return timeoutLength;
     }
 
+    public abstract DataNodeIdentifier getNodeFromChannel(Channel channel);
+
     /**
      * This method should issue an order request to the datanodes and return the identifier of the request.
      * This method must be implemented.
