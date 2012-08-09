@@ -362,6 +362,22 @@ public class CoordinatorIntegrationTest
 
         System.out.println("\nStatuses after removing a node:");
         reportStatuses();
+
+        float totalSegments = 0.0f;
+        for (DataNodeStatusPair eachPair : coordinator.getDataNodeStatusPairs())
+        {
+            totalSegments += eachPair.getStatus().getSegmentsStored();
+        }
+
+        float averageSegments = totalSegments / coordinator.getDataNodeStatusPairs().size();
+        float lowerBound = 0.99f * averageSegments - coordinator.getSegmentsPerSegmentGroup();
+        float upperBound = 1.01f * averageSegments + coordinator.getSegmentsPerSegmentGroup();
+
+        for (DataNodeStatusPair eachPair : coordinator.getDataNodeStatusPairs())
+        {
+            assertTrue("Should be within range", lowerBound <= eachPair.getStatus().getSegmentsStored());
+            assertTrue("Should be within range", eachPair.getStatus().getSegmentsStored() <= upperBound);
+        }
     }
 
     public void reportStatuses()
